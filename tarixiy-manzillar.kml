@@ -1,0 +1,938 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>Atributlar_21_10_2023.csv</name>
+	<open>1</open>
+	<Schema name="Atributlar_21_10_2023" id="S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+		<SimpleField type="int" name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_"><displayName>&lt;b&gt;Milliy ro&apos;yxatdagi raqam (agar bo&apos;lsa)&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Yodgorlik_nomi"><displayName>&lt;b&gt;Yodgorlik nomi&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Ikkinchi_nomi__agar_bo_lsa_"><displayName>&lt;b&gt;Ikkinchi nomi (agar bo&apos;lsa)&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Manzili"><displayName>&lt;b&gt;Manzili&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Koordinata_X"><displayName>&lt;b&gt;Koordinata X&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Koordinata_Y"><displayName>&lt;b&gt;Koordinata Y&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="int" name="Balandligi"><displayName>&lt;b&gt;Balandligi&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Dengiz_sathidan_balandligi_"><displayName>&lt;b&gt;Dengiz sathidan balandligi &lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Maydoni__ga_hisobiga_"><displayName>&lt;b&gt;Maydoni (ga hisobiga)&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Saqlanish_holati___0__Buzilgan_"><displayName>&lt;b&gt;Saqlanish holati - 0 (Buzilgan)&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Hozirgi_holati_va_faoliyati"><displayName>&lt;b&gt;Hozirgi holati va faoliyati&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Yodgorlik_tavsifi"><displayName>&lt;b&gt;Yodgorlik tavsifi&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Turi_"><displayName>&lt;b&gt;Turi &lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Davrlari"><displayName>&lt;b&gt;Davrlari&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Asri"><displayName>&lt;b&gt;Asri&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Ko_rinishi"><displayName>&lt;b&gt;Ko’rinishi&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_"><displayName>&lt;b&gt;Birlamchi tadqiqot o’tkazilgan (razvedka)&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Manba__adabiyotlar"><displayName>&lt;b&gt;Manba, adabiyotlar&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Hududiy_tavsifi"><displayName>&lt;b&gt;Hududiy tavsifi&lt;/b&gt;</displayName>
+</SimpleField>
+		<SimpleField type="string" name="Ma_lumotni_kiritgan_shaxs"><displayName>&lt;b&gt;Ma&apos;lumotni kiritgan shaxs&lt;/b&gt;</displayName>
+</SimpleField>
+	</Schema>
+	<Style id="hlightPointStyle">
+		<IconStyle>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href>
+			</Icon>
+		</IconStyle>
+		<BalloonStyle>
+			<text><![CDATA[<table border="0">
+  <tr><td><b>Milliy ro'yxatdagi raqam (agar bo'lsa)</b></td><td>$[Atributlar_21_10_2023/Milliy_ro_yxatdagi_raqam__agar_bo_lsa_]</td></tr>
+  <tr><td><b>Yodgorlik nomi</b></td><td>$[Atributlar_21_10_2023/Yodgorlik_nomi]</td></tr>
+  <tr><td><b>Ikkinchi nomi (agar bo'lsa)</b></td><td>$[Atributlar_21_10_2023/Ikkinchi_nomi__agar_bo_lsa_]</td></tr>
+  <tr><td><b>Manzili</b></td><td>$[Atributlar_21_10_2023/Manzili]</td></tr>
+  <tr><td><b>Koordinata X</b></td><td>$[Atributlar_21_10_2023/Koordinata_X]</td></tr>
+  <tr><td><b>Koordinata Y</b></td><td>$[Atributlar_21_10_2023/Koordinata_Y]</td></tr>
+  <tr><td><b>Balandligi</b></td><td>$[Atributlar_21_10_2023/Balandligi]</td></tr>
+  <tr><td><b>Dengiz sathidan balandligi </b></td><td>$[Atributlar_21_10_2023/Dengiz_sathidan_balandligi_]</td></tr>
+  <tr><td><b>Maydoni (ga hisobiga)</b></td><td>$[Atributlar_21_10_2023/Maydoni__ga_hisobiga_]</td></tr>
+  <tr><td><b>Saqlanish holati - 0 (Buzilgan)</b></td><td>$[Atributlar_21_10_2023/Saqlanish_holati___0__Buzilgan_]</td></tr>
+  <tr><td><b>Hozirgi holati va faoliyati</b></td><td>$[Atributlar_21_10_2023/Hozirgi_holati_va_faoliyati]</td></tr>
+  <tr><td><b>Yodgorlik tavsifi</b></td><td>$[Atributlar_21_10_2023/Yodgorlik_tavsifi]</td></tr>
+  <tr><td><b>Turi </b></td><td>$[Atributlar_21_10_2023/Turi_]</td></tr>
+  <tr><td><b>Davrlari</b></td><td>$[Atributlar_21_10_2023/Davrlari]</td></tr>
+  <tr><td><b>Asri</b></td><td>$[Atributlar_21_10_2023/Asri]</td></tr>
+  <tr><td><b>Ko’rinishi</b></td><td>$[Atributlar_21_10_2023/Ko_rinishi]</td></tr>
+  <tr><td><b>Birlamchi tadqiqot o’tkazilgan (razvedka)</b></td><td>$[Atributlar_21_10_2023/Birlamchi_tadqiqot_o_tkazilgan__razvedka_]</td></tr>
+  <tr><td><b>Manba, adabiyotlar</b></td><td>$[Atributlar_21_10_2023/Manba__adabiyotlar]</td></tr>
+  <tr><td><b>Hududiy tavsifi</b></td><td>$[Atributlar_21_10_2023/Hududiy_tavsifi]</td></tr>
+  <tr><td><b>Ma'lumotni kiritgan shaxs</b></td><td>$[Atributlar_21_10_2023/Ma_lumotni_kiritgan_shaxs]</td></tr>
+</table>
+]]></text>
+		</BalloonStyle>
+	</Style>
+	<Style id="normPointStyle">
+		<IconStyle>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href>
+			</Icon>
+		</IconStyle>
+		<BalloonStyle>
+			<text><![CDATA[<table border="0">
+  <tr><td><b>Milliy ro'yxatdagi raqam (agar bo'lsa)</b></td><td>$[Atributlar_21_10_2023/Milliy_ro_yxatdagi_raqam__agar_bo_lsa_]</td></tr>
+  <tr><td><b>Yodgorlik nomi</b></td><td>$[Atributlar_21_10_2023/Yodgorlik_nomi]</td></tr>
+  <tr><td><b>Ikkinchi nomi (agar bo'lsa)</b></td><td>$[Atributlar_21_10_2023/Ikkinchi_nomi__agar_bo_lsa_]</td></tr>
+  <tr><td><b>Manzili</b></td><td>$[Atributlar_21_10_2023/Manzili]</td></tr>
+  <tr><td><b>Koordinata X</b></td><td>$[Atributlar_21_10_2023/Koordinata_X]</td></tr>
+  <tr><td><b>Koordinata Y</b></td><td>$[Atributlar_21_10_2023/Koordinata_Y]</td></tr>
+  <tr><td><b>Balandligi</b></td><td>$[Atributlar_21_10_2023/Balandligi]</td></tr>
+  <tr><td><b>Dengiz sathidan balandligi </b></td><td>$[Atributlar_21_10_2023/Dengiz_sathidan_balandligi_]</td></tr>
+  <tr><td><b>Maydoni (ga hisobiga)</b></td><td>$[Atributlar_21_10_2023/Maydoni__ga_hisobiga_]</td></tr>
+  <tr><td><b>Saqlanish holati - 0 (Buzilgan)</b></td><td>$[Atributlar_21_10_2023/Saqlanish_holati___0__Buzilgan_]</td></tr>
+  <tr><td><b>Hozirgi holati va faoliyati</b></td><td>$[Atributlar_21_10_2023/Hozirgi_holati_va_faoliyati]</td></tr>
+  <tr><td><b>Yodgorlik tavsifi</b></td><td>$[Atributlar_21_10_2023/Yodgorlik_tavsifi]</td></tr>
+  <tr><td><b>Turi </b></td><td>$[Atributlar_21_10_2023/Turi_]</td></tr>
+  <tr><td><b>Davrlari</b></td><td>$[Atributlar_21_10_2023/Davrlari]</td></tr>
+  <tr><td><b>Asri</b></td><td>$[Atributlar_21_10_2023/Asri]</td></tr>
+  <tr><td><b>Ko’rinishi</b></td><td>$[Atributlar_21_10_2023/Ko_rinishi]</td></tr>
+  <tr><td><b>Birlamchi tadqiqot o’tkazilgan (razvedka)</b></td><td>$[Atributlar_21_10_2023/Birlamchi_tadqiqot_o_tkazilgan__razvedka_]</td></tr>
+  <tr><td><b>Manba, adabiyotlar</b></td><td>$[Atributlar_21_10_2023/Manba__adabiyotlar]</td></tr>
+  <tr><td><b>Hududiy tavsifi</b></td><td>$[Atributlar_21_10_2023/Hududiy_tavsifi]</td></tr>
+  <tr><td><b>Ma'lumotni kiritgan shaxs</b></td><td>$[Atributlar_21_10_2023/Ma_lumotni_kiritgan_shaxs]</td></tr>
+</table>
+]]></text>
+		</BalloonStyle>
+	</Style>
+	<StyleMap id="pointStyleMap">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#normPointStyle</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#hlightPointStyle</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Folder id="layer 0">
+		<name>Atributlar_21_10_2023</name>
+		<open>1</open>
+		<Placemark>
+			<name>Katta qiztepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">1</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Katta qiztepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">Quttiqiztepa</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sirdaryo</SimpleData>
+					<SimpleData name="Koordinata_X">40°53&apos;50.99</SimpleData>
+					<SimpleData name="Koordinata_Y">68°6&apos;37.36</SimpleData>
+					<SimpleData name="Balandligi">5</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">259 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">11,7 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75 fozigacha saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Eski qabriston, Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Quttiqiztepa. Sirdaryo viloyati Sirdaryo tumani, Furqat MFY, Bog’ora maxallasi hududida joylashgan. Yodgorlik umumiy maydoni 17-18 ga bo’lib u an’anaviy formaga ega. Uning rel’efiga ko’ra ark, shaxriston va rabodlarga ega bo’lgan shaxar ekanligini taxmin qilish mumkin. Mustaxkamlangan ark qismiga ega, tsitadel o’lchami 60x48 m, balandligi 5 m bo’lib, janub va sharq tomonlardan aniq bo’lmagan o’lchamli hudud bilan tutashib ketgan. Er ustki ko’tarma materiallari asosan o’rta asrlarga qisman antik davrga oid.O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Shaharcha</SimpleData>
+					<SimpleData name="Davrlari">Antik, Ilk o&apos;rta asr, Rivojlangan o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil.avv. I-mil. XII asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">Shurf ko’rinishida</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.11037777777779,40.89749722222221,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Puchuktepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">2</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Puchuktepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sirdaryo</SimpleData>
+					<SimpleData name="Koordinata_X">40°49&apos;50.99</SimpleData>
+					<SimpleData name="Koordinata_Y">68°38&apos;44.62</SimpleData>
+					<SimpleData name="Balandligi">3</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">264 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,80 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Puchuqtepa. Sirdaryo shaxrining shimoliy chekkasida, Xakikat SFU hududida joylashgan. V. F. Karavaev tomonidan aniqlangan. Yodgorlik kuchli darajada buzilgan. Saqlanib qolgan qismi o’lchami 75x53 m bo’lgan oval shaklda balandligi 3 m. tepalik buzilayotgan vaqtda guvox bo’lgan shaxs sirlanmagan sopol idishlar va taqinchoqlar topib olganligini aytgan. Davri aniqlanmagan. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">Rivojlangan o&apos;rta asrlar, Mug&apos;ullar davri, Temuriylar davri</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.64572777777779,40.83083055555555,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Qo’rg’ontepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">3</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Qo’rg’ontepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sirdaryo</SimpleData>
+					<SimpleData name="Koordinata_X">40°49&apos;30.77</SimpleData>
+					<SimpleData name="Koordinata_Y">68°40&apos;57.86</SimpleData>
+					<SimpleData name="Balandligi">3</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">267 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,70 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Qo’rg’ontepa. Sirdaryo shaxrining chegarasida J.Mamanov SFU xududida joylashgan. To’g’ri to’rtburchak shaklidagi formaga ega. O’lchamlari 97x74 m, balandligi 3 m. shimoliy-sharqiy qismida arki joylashgan. Arkining o’lchamlari 45X40 m, balandligi 10 m. qabriston bilan band qilingan. Yuqori qismida sirlanmagan sopol idishlar ilk o’rta asrlarga oid bo’lgan materiallar uchraydi. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Shahar va Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">Rivojlangan o&apos;rta asrlar, Mug&apos;ullar davri, Temuriylar davri</SimpleData>
+					<SimpleData name="Asri">mil. V-IX asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.68273888888886,40.82521388888891,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Uchtepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">4</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Uchtepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sirdaryo</SimpleData>
+					<SimpleData name="Koordinata_X">40°48&apos;58.26</SimpleData>
+					<SimpleData name="Koordinata_Y">68°41&apos;28.41</SimpleData>
+					<SimpleData name="Balandligi">4</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">266 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,50 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Uchtepa. Uchta tepalikdan iborat bo’lib, ikkitasi J.Mamanov SFU Sirdaryo sil kasalliklari shifoxonasi hududida saqlanib qolgan. Ikkala tepalik xam kuchli emirilishga uchragan. Ulardan biri oval shaklga ega bo’lib, 39X20 m, balandligi 7 m. ikkinchi tepalik diametri 20 m balandligi 3 m. yodgorlik V. F. Karavaev xaritasida ko’rsatib o’tilgan. Davri aniqlanmagan. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.691225,40.81618333333332,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Nurota shaharchasi qoldig’i</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">10</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Nurota shaharchasi qoldig’i</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sayhunobod</SimpleData>
+					<SimpleData name="Koordinata_X">40°46&apos;58.05</SimpleData>
+					<SimpleData name="Koordinata_Y">68°47&apos;12.96</SimpleData>
+					<SimpleData name="Balandligi">6</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">263 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">7,5 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sayxunobod tumani Sh.Raximov SFU xududida joylashgan. Xozirgi kunda yodgorlikning katta qismi o’zlashtirib yuborilgan. Boshqa bir qismi qishloq erlariga qo’shib yuborilgan. Teginilmgan baland qismi 7,5 ga er maydoni qabriston uchun berib yuborilgan. V. F. Karavaev xartiasida belgilab qo’yilgan. M. E. Masson va V. A. Nilsen ishlarida eslab o’tiladi. Yu.F. Buryakov rahbarligidagi 1970 yillardagi Choch – Iloq ekspeditsiyasi tadqiqotlarida 1984 yilda Sirdaryo otryadi sopol buyumlar, pishgan g’ishtlar namunalari va “1003-1004 yillarda ash-Shoshda al-Odil Xon nomidan zarb etilgan” qoraxoniy felsi,topilgan. 1987 va 1989 yillarda A.A. Gritsina tomonidan qazuv ishlari olib borilgan. Shaxarning umumiy maydoni 40—45 ga dan oshmaydi. Unda axoli juda qisqa vaqt oraig’ida – IX asr oxirlaridan XI asr birinchi yarmiga qadar istiqomat qilganligi taxmin qilingan. Ikkinchi istiqomat davri mo’g’ul istilosidan keyingi davrda boshlanganligi va o’rta asrlar Xushket shaxri ekanligi taxmin qilingan. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Shahar va Shaharcha</SimpleData>
+					<SimpleData name="Davrlari">Rivojlangan o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil. IX-XI asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">Shurf ko’rinishida</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.78693333333334,40.78279166666669,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Chittitepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">11</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Chittitepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sayhunobod</SimpleData>
+					<SimpleData name="Koordinata_X">40°39&apos;43.38</SimpleData>
+					<SimpleData name="Koordinata_Y">68°51&apos;51.27</SimpleData>
+					<SimpleData name="Balandligi">4</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">271 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">2 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75 fozigacha saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Eski qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sayxunobod tumani Paxtakor MFY, 3 bo’limi hududida joylashgan. To’g’ri to’rtburchak shaklidagi formaga ega. O’lchamlari 66x63 m. Shimoliy-g’arbiy va Janubiy-sharqiy burchaklarida tepaliklar mavjud. Markazida diametri 36 m, balandligi 6 m bo’lgan tepalik mavjud. Davri aniqlanmagan. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.86424166666666,40.66204999999998,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Qal’atepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">12</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Qal’atepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sayhunobod</SimpleData>
+					<SimpleData name="Koordinata_X">40°37&apos;43.29</SimpleData>
+					<SimpleData name="Koordinata_Y">68°55&apos;35.42</SimpleData>
+					<SimpleData name="Balandligi">5</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">271 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">11 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Eski qabriston, Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sayxunobod tumani Soxil MFY, 3 bo’limi hududida joylashgan. 1984 yilda Sirdaryo otryadi tomonidan nomsiztepa deb belgilangan. To’g’ri to’rtburchak shaklidagi formaga ega. O’lchami 55x42 m, balandligi 5 m. Sirlangan va sirlanmagan sopol buyumlari X—XII asrlarga oid. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Shahar</SimpleData>
+					<SimpleData name="Davrlari">Rivojlangan o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil. X-XII asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.92650555555556,40.62869166666668,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Kindiktepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">13</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Kindiktepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sayhunobod</SimpleData>
+					<SimpleData name="Koordinata_X">40°39&apos;30.24</SimpleData>
+					<SimpleData name="Koordinata_Y">68°52&apos;01.20</SimpleData>
+					<SimpleData name="Balandligi">4</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">270 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">2 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75 fozigacha saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sayxunobod tumani Paxtakor MFY, 2 bo’limi hududida joylashgan. Balandligi 3-4 m bo’lgan ikkita tepalikdan iborat. Ulardan istiqomat belgilari topilmaganlig sababli qo’rg’on bo’lishi mumkin degan taxmin bor. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Mozorqo&apos;g&apos;on</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.867,40.65840000000001,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Saritepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">14</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Saritepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sayhunobod</SimpleData>
+					<SimpleData name="Koordinata_X">40°44&apos;47.0618</SimpleData>
+					<SimpleData name="Koordinata_Y">68°47&apos;03.5421</SimpleData>
+					<SimpleData name="Balandligi">9</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">270 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,40 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">Buzilgan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Eski qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sayxunobod tumani Sh.Raximov MFY hududida Nurota shaxar yodgorligidan 3 km janubiy-sharq tomonda joylashgan. V. F. Karavaev xaritasiga tushirilgan. 1984 yil Sirdaryo otryadi tomonidan o’rganilgan. Asosining o’lchamlari 77x70 m, balandligi 9 m. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Mozorqo&apos;g&apos;on</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.78431725000002,40.74640605555557,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Sigirtepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">15</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Sigirtepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">Nomsiztepa</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Sayhunobod</SimpleData>
+					<SimpleData name="Koordinata_X">40°42&apos;14.52</SimpleData>
+					<SimpleData name="Koordinata_Y">68°55&apos;19.60</SimpleData>
+					<SimpleData name="Balandligi">4</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">268 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">4 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">Buzilgan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Eski qabriston, Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sayxunobod tumani «Soxil» MFY hududida joylashgan yodgorlik. 1990 yilda A.A. Gritsina tomonidan aniqlangan. Saqlanib qolgan maydon diametri 54x46 m. Mil. X-XII asrlarga oid.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">Rivojlangan o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil. X-XII asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.92211111111112,40.70403333333333,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Hashartepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">16</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Hashartepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Guliston</SimpleData>
+					<SimpleData name="Koordinata_X">40°26&apos;01.46</SimpleData>
+					<SimpleData name="Koordinata_Y">69°04&apos;44.00</SimpleData>
+					<SimpleData name="Balandligi">3</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">282 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,70 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">Buzilgan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Qabristonga aylantirilgan</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Guliston tumani Boyovut SFU xududida joylashgan. Yodgorlikning dastlabki tashqi ko’rinishi yo’qolgan. 1990 yilda olib borilgan Sirdaryo otryadi ekspeditsiyasida o’rganilgan. Saqlanib qolgan qismi 54x46 m, balandligi qariyb 4 m. er ustki ko’tarma materiallari X—XII asrlarga taalluqli. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">0</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>69.07888888888888,40.43373888888889,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Eski Xovos shaharchasi</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">29</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Eski Xovos shaharchasi</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Xovos</SimpleData>
+					<SimpleData name="Koordinata_X">40°11&apos;59.39</SimpleData>
+					<SimpleData name="Koordinata_Y">68°48&apos;39.82</SimpleData>
+					<SimpleData name="Balandligi">19</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">379 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">12 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Qabristonga aylantirilgan</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Eski Xovos. Shu nomli temir yo’l bekati yaqinida, soyning o’ng qirg’og’ida joylashgan. M.E. Masson tomonidan yodga olinadi (Masson, 1934, 16-b.). 1984 va 1988 yillarda uni Sirdaryo arxeologik otryadi tadqiq etgan, 1988-1989, 2003-2004 yillarda u erda qazishmalar o’tkazilgan (Gritsina, 1990, 12-13, 15-16-bb.; Gritsina, Ivanitskiy, Rahimov, 2004, 61-64-bb.). Xarobalar hududi o’ta buzilgan. Yodgorlik ustidan ko’plab X-XX asrlarga oid sopol va tangalar topilgan. Arki a’lo yodgorlikning shimoli-g’arbiy qismida joylashgan. Unga bir-biridan chim devor bilan ajratilgan ikki hudud (shahriston) tutashadi. Xarobalarning umumiy maydoni 10-12 ga, undan 2 ga yaqin xududda arki a’lo joylashgan. Yodgorlikdan olingan materiallar asosida unda milodgacha I asrlardan milodiy XX asrlargacha uzluksiz hayot bo’lgan.</SimpleData>
+					<SimpleData name="Turi_">Shahar va Shaharcha</SimpleData>
+					<SimpleData name="Davrlari">Antik, Ilk o&apos;rta asr, Rivojlangan o&apos;rta asrlar, Mug&apos;ullar davri, Temuriylar davri, So&apos;nggi o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil.avv. IV-mil. XX asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">Planigrafik qazishma ko’rinishida, Shurf ko’rinishida</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Ma’lumot taxtasi mavjud</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.81106111111109,40.19983055555554,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Toltepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">30</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Toltepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Xovos</SimpleData>
+					<SimpleData name="Koordinata_X">40°11&apos;58.80</SimpleData>
+					<SimpleData name="Koordinata_Y">68°50&apos;06.43</SimpleData>
+					<SimpleData name="Balandligi">4</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">373 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">6,7 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75-100 foiz saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Toltepa. Eski Xovos yodgorligidan 2 km janubda joylashgan. Karvonsaroy maxallasining chegarasida. Oval shaklidagi formaga ega. O’lchamlari 62x40 m, balandligi 5 m. Xozirda qabriston band qilib turibdi. Er ustki ko’tarma materiallari VI—XII asrlarga oid. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni</SimpleData>
+					<SimpleData name="Davrlari">Ilk o&apos;rta asr, Rivojlangan o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil. VI-XII asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor, Atrofi o’ralgan</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.83511944444444,40.19966666666667,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Nomsiztepa</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">31</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Nomsiztepa</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Xovos</SimpleData>
+					<SimpleData name="Koordinata_X">40°12&apos;3.55</SimpleData>
+					<SimpleData name="Koordinata_Y">68°48&apos;38.16</SimpleData>
+					<SimpleData name="Balandligi">3</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">0</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">Buzilgan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Qabristonga aylantirilgan</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">0</SimpleData>
+					<SimpleData name="Turi_">Mozorqo&apos;g&apos;on</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">davri aniqlanmagan</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.81059999999999,40.20098611111113,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Ulkan-Soylik</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">38</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Ulkan-Soylik</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Guliston</SimpleData>
+					<SimpleData name="Koordinata_X">40°31&apos;58.68</SimpleData>
+					<SimpleData name="Koordinata_Y">68°45&apos;24.07</SimpleData>
+					<SimpleData name="Balandligi">12</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">274 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,20 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">Buzilgan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Qabristonga aylantirilgan</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Ulkan-Soylik. Guliston shaxri chetida Ulug’obod maxallasi hududida joylashgan. V. F. Karavaev va M. E. Masson tomonidan eslab o’tiladi. Diametri 90 m, balandligi 12 m. Ushbu qo’rg’on Sirdaryo viloyatidagi eng katta qo’rg’on hisoblanadi. V 1990 yilda qazuv ishlari olib borilgan va X—XII asrlarga oid materiallar olingan. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Mozorqo&apos;g&apos;on</SimpleData>
+					<SimpleData name="Davrlari">Rivojlangan o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil. X-XII asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.75668611111108,40.53296666666666,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Mirzarabot tepaligi</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">21</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Mirzarabot tepaligi</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Oqoltin</SimpleData>
+					<SimpleData name="Koordinata_X">40°30&apos;37.66</SimpleData>
+					<SimpleData name="Koordinata_Y">68°27&apos;6.41</SimpleData>
+					<SimpleData name="Balandligi">2</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">272 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,40 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">25% gacha saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Qabristonga aylantirilgan</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Mirzarabot. Oqoltin tumani Mirzaqishloq MFY hududida joylashgan. Sayyoxlar tadqiqotchilar ishlarida bir necha bor ma’lumotlar berilgan. V. I. Masalskiy ta’kidlashicha irvoyatlarga ko’ra Temur va yoki Abdullaxon tomonidan bunyod etilgan. Ikki qismdan iborat Mirzasardoba va Mirzatepa. Mirzarabot karvonsaroy qoldiqlari bo’lishi mumkin. Diametri 23 m, balandligi 3 m. xozirgi vaqtda sardobadan faqatgina g’ishtlar uyumi qolgan. O’rganilish tarixi: O’zR Fanlar Akademiyasi Arxeologiya institutining 1984-85 yidlardagi Sirdaryo arxeologiya guruhi tadqiqotlari.</SimpleData>
+					<SimpleData name="Turi_">Sardoba va Rabot</SimpleData>
+					<SimpleData name="Davrlari">Temuriylar davri, So&apos;nggi o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">mil. XV-XVII asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">Kadastr xujjatlari bor</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>68.45178055555554,40.5104611111111,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Qo’rg’ontepa 1</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">64</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Qo’rg’ontepa 1</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">0</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Xovos</SimpleData>
+					<SimpleData name="Koordinata_X">40°12&apos;19.31</SimpleData>
+					<SimpleData name="Koordinata_Y">68°48&apos;56.18</SimpleData>
+					<SimpleData name="Balandligi">2</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">0</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">0,20 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">Buzilgan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Qabristonga aylantirilgan</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Xovos tumanida Lolatepadan 5 km shimoliy-g’arbiy tomonda Xovos-Sarmich yo’lidan 1 km sharqda joylashgan. Diametri 20 m, balandligi 2m.</SimpleData>
+					<SimpleData name="Turi_">Mozorqo&apos;g&apos;on</SimpleData>
+					<SimpleData name="Davrlari">0</SimpleData>
+					<SimpleData name="Asri">0</SimpleData>
+					<SimpleData name="Ko_rinishi">0</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">Birlamchi tadqiqot o’tkazilgan (razvedka)</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">Археологические памятники Сырдарьинской области. Ташкент: Фан, 1992. 69 с.</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">О.У. Мамиров</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs"></SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<gx:balloonVisibility>1</gx:balloonVisibility>
+			<Point>
+				<coordinates>68.81560555555556,40.20536388888886,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Yerjar</name>
+			<styleUrl>#pointStyleMap</styleUrl>
+			<Style id="inline">
+				<IconStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffe7ebef</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>
+			<ExtendedData>
+				<SchemaData schemaUrl="#S_Atributlar_21_10_2023_ISSSSSISSSSSSSSSSSSS">
+					<SimpleData name="Milliy_ro_yxatdagi_raqam__agar_bo_lsa_">77</SimpleData>
+					<SimpleData name="Yodgorlik_nomi">Yerjar</SimpleData>
+					<SimpleData name="Ikkinchi_nomi__agar_bo_lsa_">Jarboshi</SimpleData>
+					<SimpleData name="Manzili">Sirdaryo viloyati Boyovut</SimpleData>
+					<SimpleData name="Koordinata_X">40°23&apos;13.12</SimpleData>
+					<SimpleData name="Koordinata_Y">69° 4&apos;40.12</SimpleData>
+					<SimpleData name="Balandligi">3</SimpleData>
+					<SimpleData name="Dengiz_sathidan_balandligi_">289 м</SimpleData>
+					<SimpleData name="Maydoni__ga_hisobiga_">80 ga</SimpleData>
+					<SimpleData name="Saqlanish_holati___0__Buzilgan_">75 fozigacha saqlangan</SimpleData>
+					<SimpleData name="Hozirgi_holati_va_faoliyati">Eski qabriston, Faoliyatdagi qabriston</SimpleData>
+					<SimpleData name="Yodgorlik_tavsifi">Sirdaryo viloyati Boyovut tumani 1-Boyovut 3-bo’lim Jarboshi MFY xududida joylashgan. Yodgorlik er ustki materiallari rivojlangan va so’nggi o’rta asrlarga oid bo’lib, temuriylar va so’nggi o’rta asr materiallari kuzatiladi. Katta qismi qabristonga aylantirilgan.</SimpleData>
+					<SimpleData name="Turi_">Qishloq makoni va Daryo kechuvidagi manzilgoh</SimpleData>
+					<SimpleData name="Davrlari">Temuriylar davri, So&apos;nggi o&apos;rta asrlar</SimpleData>
+					<SimpleData name="Asri">XIV-XIX asrlar</SimpleData>
+					<SimpleData name="Ko_rinishi">Shurf ko’rinishida</SimpleData>
+					<SimpleData name="Birlamchi_tadqiqot_o_tkazilgan__razvedka_">0</SimpleData>
+					<SimpleData name="Manba__adabiyotlar">0</SimpleData>
+					<SimpleData name="Hududiy_tavsifi">0</SimpleData>
+					<SimpleData name="Ma_lumotni_kiritgan_shaxs">О.У. Мамиров</SimpleData>
+				</SchemaData>
+			</ExtendedData>
+			<Point>
+				<coordinates>69.07781111111109,40.38697777777777,0</coordinates>
+			</Point>
+		</Placemark>
+	</Folder>
+</Document>
+</kml>

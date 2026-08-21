@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sirdaryo360 — Admin panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--primary:#0f766e;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(430px,100%);background:var(--card);padding:30px;border-radius:24px;box-shadow:0 18px 50px #0001}
+.logo{font-weight:800;font-size:24px;margin-bottom:8px}.sub{color:var(--muted);margin-bottom:24px}
+.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.field textarea{min-height:100px;resize:vertical}
+.primary{background:var(--primary);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700}.ghost{background:#eef2f7;padding:10px 14px;border-radius:10px}.danger{background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:10px}
+.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.side{background:#102a2a;color:#fff;padding:22px;position:sticky;top:0;height:100vh}.brand{font-size:20px;font-weight:800;margin-bottom:25px}.nav button{width:100%;text-align:left;background:transparent;color:#d7e5e5;padding:12px;border-radius:10px;margin:3px 0}.nav button.active,.nav button:hover{background:#ffffff14;color:#fff}.content{padding:26px;max-width:1400px;width:100%}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h1{margin:0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}.stat b{font-size:28px;display:block}.stat span{color:var(--muted);font-size:13px}.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--line);border-radius:10px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#e6fffa;color:#115e59;font-size:12px;font-weight:700}.actions{display:flex;gap:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full{grid-column:1/-1}.section-title{font-size:18px;margin:4px 0 14px}.note{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:13px;margin-bottom:15px}.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:12px 16px;border-radius:12px;display:none;z-index:20}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:relative;height:auto}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;width:auto}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.content{padding:15px}.grid,.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="loginView" class="login">
+  <div class="login-card">
+    <div class="logo">🌍 Sirdaryo360 Admin</div>
+    <div class="sub">Turistik kontentni boshqarish paneli</div>
+    <div id="configNote" class="note hidden"></div>
+    <div class="field"><label>Email</label><input id="email" type="email" placeholder="admin@example.com"></div>
+    <div class="field"><label>Parol</label><input id="password" type="password" placeholder="••••••••"></div>
+    <button class="primary" style="width:100%" onclick="login()">Kirish</button>
+    <p id="loginMsg" style="color:#b91c1c"></p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="side">
+    <div class="brand">🌍 Sirdaryo360</div>
+    <div class="nav">
+      <button data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+      <button data-page="places" onclick="showPage('places')">📍 Obyektlar</button>
+      <button data-page="sync" onclick="showPage('sync')">🔄 Sinxronlash</button>
+      <button data-page="submissions" onclick="showPage('submissions')">📥 Takliflar</button>
+      <button data-page="media" onclick="showPage('media')">🖼️ Media</button>
+      <button data-page="settings" onclick="showPage('settings')">⚙️ Sozlamalar</button>
+    </div>
+    <button class="ghost" style="margin-top:20px;width:100%" onclick="logout()">Chiqish</button>
+  </aside>
+  <main class="content">
+    <div id="page-dashboard">
+      <div class="top"><h1>Dashboard</h1><span id="userLabel"></span></div>
+      <div class="grid">
+        <div class="stat"><b id="countAll">0</b><span>Jami obyekt</span></div>
+        <div class="stat"><b id="countHotel">0</b><span>Mehmonxona</span></div>
+        <div class="stat"><b id="countFood">0</b><span>Ovqatlanish</span></div>
+        <div class="stat"><b id="countHistorical">0</b><span>Tarixiy maskan</span></div>
+      </div>
+      <div class="panel"><h2 class="section-title">Admin panel imkoniyatlari</h2>
+        <p>Mehmonxona, restoran/kafe va tarixiy maskanlarni qo‘shish, tahrirlash, o‘chirish; rasm va audio yuklash; manzil, telefon, ish vaqti, koordinata va 5 tildagi tavsiflarni boshqarish.</p>
+      </div>
+    </div>
+
+    <div id="page-places" class="hidden">
+      <div class="top"><h1>Obyektlar</h1><button class="primary" onclick="openForm()">+ Yangi obyekt</button></div>
+      <div class="panel">
+        <div class="toolbar"><input id="search" placeholder="Qidirish..." oninput="renderPlaces()"><select id="filter" onchange="renderPlaces()"><option value="">Barchasi</option><option value="hotel">Mehmonxona</option><option value="food">Ovqatlanish</option><option value="historical">Tarixiy maskan</option></select></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Nomi</th><th>Turi</th><th>Hudud</th><th>Holati</th><th>Amal</th></tr></thead><tbody id="placesBody"></tbody></table></div>
+      </div>
+    </div>
+
+    
+    <div id="page-sync" class="hidden">
+      <div class="top"><h1>Sayt ma'lumotlarini sinxronlash</h1></div>
+      <div class="panel">
+        <div class="note">Bu bo‘lim siz yuborgan mehmonxonalar, ovqatlanish joylari va tarixiy manzillar HTML fayllaridagi ma’lumotlarni Supabase bazasiga import qiladi. Mavjud yozuvlar o‘zgartirilmaydi; faqat yo‘q bo‘lganlari qo‘shiladi.</div>
+        <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+          <div class="stat"><b id="seedHotels">14</b><span>Mehmonxona</span></div>
+          <div class="stat"><b id="seedFood">27</b><span>Ovqatlanish</span></div>
+          <div class="stat"><b id="seedHistory">18</b><span>Tarixiy manzil</span></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+          <button class="primary" onclick="syncSiteData()">⬇️ Saytdagi ma’lumotlarni import qilish</button>
+          <button class="ghost" onclick="loadPlaces();loadStats();">🔄 Bazani yangilash</button>
+        </div>
+        <div id="syncResult" style="margin-top:15px"></div>
+      </div>
+    </div>
+
+    <div id="page-submissions" class="hidden">
+      <div class="top"><h1>Foydalanuvchi takliflari</h1></div>
+      <div class="panel">
+        <div class="toolbar"><select id="subFilter" onchange="loadSubmissions()"><option value="pending">Kutilmoqda</option><option value="approved">Tasdiqlangan</option><option value="rejected">Rad etilgan</option><option value="">Barchasi</option></select></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Nomi</th><th>Turi</th><th>Hudud</th><th>Holati</th><th>Amal</th></tr></thead><tbody id="subBody"></tbody></table></div>
+      </div>
+    </div>
+
+<div id="page-media" class="hidden">
+      <div class="top"><h1>Media</h1></div>
+      <div class="panel">
+        <div class="note">Rasm/audio yuklash Supabase Storage orqali ishlaydi. Avval <code>supabase-config.js</code> va SQL sozlamalarini bajaring.</div>
+        <div class="field"><label>Fayl</label><input id="mediaFile" type="file" accept="image/*,audio/*,video/*"></div>
+        <button class="primary" onclick="uploadMedia()">Yuklash</button>
+        <div id="mediaMsg" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div id="page-settings" class="hidden">
+      <div class="top"><h1>Sozlamalar</h1></div>
+      <div class="panel">
+        <p><b>Ulanish holati:</b> <span id="connectionStatus">Tekshirilmoqda...</span></p>
+        <p><b>Admin:</b> <span id="adminEmail"></span></p>
+        <p class="sub">Xavfsizlik uchun Supabase service_role/secret kalitini hech qachon bu HTML faylga yozmang. Frontendda faqat publishable/anon kalit ishlatiladi va RLS bilan himoyalanadi.</p>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* Sirdaryo360 — Supabase configuration
+   Publishable key only; never use a service_role/secret key in browser code. */
+window.SUPABASE_URL = "https://mojlgsypactqhfpwkngt.supabase.co";
+window.SUPABASE_KEY = "sb_publishable_r8S8T4yEP1LhhTTw6qizAw_UnOHwKcy";
+
+let sb=null, session=null, places=[], currentRole=null;
+
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2500)}
+function configured(){return window.SUPABASE_URL && window.SUPABASE_KEY && !window.SUPABASE_URL.includes('YOUR_') && !window.SUPABASE_KEY.includes('YOUR_')}
+function showPage(p){
+  document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('page-'+p).classList.remove('hidden');
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));
+  if(p==='places') loadPlaces(); if(p==='sync') loadStats(); if(p==='dashboard') loadStats(); if(p==='submissions') loadSubmissions();
+}
+async function init(){
+  if(!configured()){
+    document.getElementById('configNote').classList.remove('hidden');
+    document.getElementById('configNote').innerHTML='Supabase hali ulanmagan. <b>supabase-config.js</b> fayliga loyiha URL va publishable/anon kalitini kiriting.';
+    return;
+  }
+  sb=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY);
+  const {data}=await sb.auth.getSession(); session=data.session;
+  if(session) enter();
+  sb.auth.onAuthStateChange((_e,s)=>{session=s;if(s) enter();});
+}
+async function login(){
+  if(!configured()){document.getElementById('loginMsg').textContent='Avval Supabase konfiguratsiyasini kiriting.';return}
+  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  document.getElementById('loginMsg').textContent=error?error.message:'';
+}
+async function enter(){
+  const {data:{user}}=await sb.auth.getUser();
+  const roleRes=await sb.from('admin_users').select('role').eq('user_id',user.id).maybeSingle();
+  currentRole=roleRes.data?.role||null;
+  if(!currentRole){ document.getElementById('loginMsg').textContent='Bu akkaunt admin/moderator sifatida ro‘yxatdan o‘tmagan.'; await sb.auth.signOut(); return; }
+  document.getElementById('loginView').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userLabel').textContent=(user?.email||'')+' · '+currentRole;
+  document.getElementById('adminEmail').textContent=(user?.email||'')+' · '+currentRole;
+  showPage('dashboard');
+}
+async function logout(){if(sb) await sb.auth.signOut();location.reload()}
+async function loadPlaces(){
+  if(!sb)return;
+  const {data,error}=await sb.from('places').select('*').order('created_at',{ascending:false});
+  if(error){toast(error.message);return} places=data||[];renderPlaces();
+}
+function renderPlaces(){
+  const q=(document.getElementById('search').value||'').toLowerCase(), f=document.getElementById('filter').value;
+  const arr=places.filter(p=>(!f||p.category===f)&&(!q||JSON.stringify(p).toLowerCase().includes(q)));
+  document.getElementById('placesBody').innerHTML=arr.map(p=>`<tr><td><b>${esc(p.name_uz||'Nomsiz')}</b></td><td><span class="badge">${label(p.category)}</span></td><td>${esc(p.district||'')}</td><td>${p.is_active?'Faol':'Yopiq'}</td><td><div class="actions"><button class="ghost" onclick="editPlace('${p.id}')">Tahrirlash</button><button class="danger" onclick="deletePlace('${p.id}')">O‘chirish</button></div></td></tr>`).join('')||'<tr><td colspan="5">Ma’lumot topilmadi.</td></tr>';
+}
+function label(x){return x==='hotel'?'Mehmonxona':x==='food'?'Ovqatlanish':'Tarixiy maskan'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+const SITE_SEEDS=[{"category":"hotel","name_uz":"Guliston mehmonxonasi","name_en":"Guliston Hotel","name_ru":"Гостиница «Гулистан»","name_tr":"Gulistan Oteli","name_zh":"古利斯坦酒店","district":"Guliston shahri","phone":"+998 67 236 10 30","maps_url":"https://www.google.com/maps/search/?api=1&query=Guliston+mehmonxonasi+Sirdaryo","image_url":"https://cf.bstatic.com/xdata/images/hotel/max1024x768/844533771.jpg?k=5818049f10f03e09c4918f2489da491f745aae737fe85c344d330fd3fa37aed2&o=","lat":null,"lon":null,"hours":"24/7","description_uz":"Guliston markaziga yaqin joylashgan mehmonxona.","is_active":true},{"category":"hotel","name_uz":"Registon Hotel","name_en":"Registon Hotel","name_ru":"Отель «Регистан»","name_tr":"Registon Hotel","name_zh":"雷吉斯坦酒店","district":"Guliston shahri","phone":"+998 55 651 07 07","maps_url":"https://www.google.com/maps/search/?api=1&query=Registon+Hotel+Gulistan+Sirdaryo","image_url":"https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"24/7","description_uz":"Gulistondagi zamonaviy mehmonxona; ochiq manbalarda 4 yulduzli deb ko‘rsatilgan.","is_active":true},{"category":"hotel","name_uz":"Chehra Palace","name_en":"Chehra Palace","name_ru":"Chehra Palace","name_tr":"Chehra Palace","name_zh":"Chehra Palace","district":"Guliston shahri","phone":"+998 67 225 09 09","maps_url":"https://www.google.com/maps/search/?api=1&query=Chehra+Palace+Gulistan+Sirdaryo","image_url":"https://cdn.worldota.net/t/640x400/content/63/49/634979923bd9f3f3b501500279720f572d76a73c.JPEG","lat":null,"lon":null,"hours":"24/7","description_uz":"Toshkent ko‘chasida joylashgan yirik mehmonxona majmuasi.","is_active":true},{"category":"hotel","name_uz":"Sayhun","name_en":"Sayhun Hotel","name_ru":"Отель «Сайхун»","name_tr":"Sayhun Oteli","name_zh":"赛洪酒店","district":"Guliston shahri","phone":"+998 91 501 11 11","maps_url":"https://www.google.com/maps/search/?api=1&query=Sayhun+Hotel+Gulistan+Sirdaryo","image_url":"https://www.silkroad.uz/uploads/0000/1/2020/06/01/fvyfyvfyv.jpg","lat":null,"lon":null,"hours":"24/7","description_uz":"Gulistondagi Sayxun ko‘chasida joylashgan mehmonxona.","is_active":true},{"category":"hotel","name_uz":"Shohrux","name_en":"Shohrux Hotel","name_ru":"Отель «Шохрух»","name_tr":"Shohrux Oteli","name_zh":"肖赫鲁赫酒店","district":"Guliston shahri","phone":"+998 95 511 77 42","maps_url":"https://www.google.com/maps/search/?api=1&query=Shohrux+Hotel+Gulistan+Sirdaryo","image_url":"https://cf.bstatic.com/xdata/images/hotel/max1024x768/708119339.jpg?k=2d0cf1c8d4cc602f72a48e1ced95c6c6630bd5f39d296f1b9fe95fb016bba73d&o=","lat":null,"lon":null,"hours":"24/7","description_uz":"Wi‑Fi, avtoturargoh, basseyn, kafe va konditsioner kabi qulayliklari ko‘rsatilgan.","is_active":true},{"category":"hotel","name_uz":"Islombek mehmonxonasi","name_en":"Islombek Hotel","name_ru":"Отель «Исламбек»","name_tr":"Islombek Oteli","name_zh":"伊斯兰别克酒店","district":"Guliston shahri","phone":"+998 91 501 11 11","maps_url":"https://www.google.com/maps/search/?api=1&query=Islombek+Hotel+Gulistan+Sirdaryo","image_url":"https://cdn.worldota.net/t/640x400/content/c0/c0/c0c049de14e4bd49bd10b86ab0ec5662e1d7b70d.JPEG","lat":null,"lon":null,"hours":"24/7","description_uz":"Yangihayot hududidagi mehmonxona; ochiq manbalarda Wi‑Fi, parking, restoran va kafe ko‘rsatilgan.","is_active":true},{"category":"hotel","name_uz":"Shoxona Hotel","name_en":"Shoxona Hotel","name_ru":"Отель «Шохона»","name_tr":"Shoxona Hotel","name_zh":"Shoxona酒店","district":"Guliston tumani","phone":"+998 88 331 17 71","maps_url":"https://www.google.com/maps/search/?api=1&query=Shoxona+Hotel+Mevazor+Sirdaryo","image_url":"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"24/7","description_uz":"Guliston tumanining Mevazor mahallasida joylashgan mehmonxona.","is_active":true},{"category":"hotel","name_uz":"Dior","name_en":"Dior Hotel","name_ru":"Отель «Dior»","name_tr":"Dior Oteli","name_zh":"Dior酒店","district":"Yangiyer shahri","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Dior+Hotel+Yangiyer+Sirdaryo","image_url":"https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"Ma’lumot ko‘rsatilmagan","description_uz":"Yangiyer shahridagi mehmonxona. Ochiq katalogda 4,3 reyting bilan ko‘rsatilgan.","is_active":true},{"category":"hotel","name_uz":"Yuldashev’s","name_en":"Yuldashev’s Hotel","name_ru":"Отель «Yuldashev’s»","name_tr":"Yuldashev’s Oteli","name_zh":"Yuldashev’s酒店","district":"Yangiyer shahri","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Yuldashevs+Yangiyer+Sirdaryo","image_url":"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"Ma’lumot ko‘rsatilmagan","description_uz":"Yangiyer shahrida, Sohil ko‘chasida ko‘rsatilgan mehmonxona. Reyting va boshqa ayrim ma’lumotlar ochiq katalogda ko‘rsatilmagan.","is_active":true},{"category":"hotel","name_uz":"Hotel — Tinchlik ko‘chasi","name_en":"Hotel — Tinchlik Street","name_ru":"Отель — улица Тинчлик","name_tr":"Hotel — Tinchlik Caddesi","name_zh":"酒店—Tinchlik街","district":"Yangiyer shahri","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Hotel+Tinchlik+91+Yangiyer+Sirdaryo","image_url":"https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"Ma’lumot ko‘rsatilmagan","description_uz":"Yangiyer shahrida Tinchlik ko‘chasi, 91-manzilda mehmonxona sifatida ko‘rsatilgan obyekt.","is_active":true},{"category":"hotel","name_uz":"Gold Marhamat","name_en":"Gold Marhamat Hotel","name_ru":"Отель «Gold Marhamat»","name_tr":"Gold Marhamat Oteli","name_zh":"Gold Marhamat酒店","district":"Yangiyer shahri","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Gold+Marhamat+Yangiyer+Sirdaryo","image_url":"https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"Ma’lumot ko‘rsatilmagan","description_uz":"Yangiyer shahridagi Shukrona mahallasida mehmonxona sifatida ko‘rsatilgan obyekt.","is_active":true},{"category":"hotel","name_uz":"Sirdaryo mehmonxonasi","name_en":"Sirdaryo Hotel","name_ru":"Гостиница «Сырдарья»","name_tr":"Sirdaryo Oteli","name_zh":"锡尔河酒店","district":"Sirdaryo tumani","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Mehmonxona+Uzbekistan+94+Sirdaryo","image_url":"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"24/7","description_uz":"Sirdaryo tumanida O‘zbekiston ko‘chasi, 94-manzilda ko‘rsatilgan mehmonxona. Ochiq katalogda 2,5 reyting bilan qayd etilgan.","is_active":true},{"category":"hotel","name_uz":"Woow","name_en":"Woow Hotel","name_ru":"Отель «Woow»","name_tr":"Woow Oteli","name_zh":"Woow酒店","district":"Sirdaryo tumani","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Woow+Hotel+Farovon+Sirdaryo","image_url":"https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"Ma’lumot ko‘rsatilmagan","description_uz":"Sirdaryo tumanining Farovon aholi punktida mehmonxona sifatida ko‘rsatilgan obyekt.","is_active":true},{"category":"hotel","name_uz":"Fayz Kafe Hotel","name_en":"Fayz Kafe Hotel","name_ru":"Fayz Kafe Hotel","name_tr":"Fayz Kafe Hotel","name_zh":"Fayz Kafe酒店","district":"Oqoltin tumani","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Fayz+Kafe+Hotel+Sardoba+Oqoltin+Sirdaryo","image_url":"https://images.unsplash.com/photo-1517840901100-8179e982acb7?auto=format&fit=crop&w=1000&q=85","lat":null,"lon":null,"hours":"Ma’lumot ko‘rsatilmagan","description_uz":"Oqoltin tumanining Sardoba shaharchasida mehmonxona sifatida ko‘rsatilgan obyekt. Ochiq katalogda 3,7 reyting bilan qayd etilgan.","is_active":true},{"category":"food","name_uz":"Dilxush milliy taomlar","district":"Guliston","phone":"+998672263003","maps_url":"https://www.google.com/maps/search/?api=1&query=Dilxush+milliy+taomlar+Gulistan","image_url":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85","hours":"08:30–23:00","description_uz":"Turi: Qahvaxona. Reyting: 5.0 (808 ta baho). Manzil: Islom Karimov shoh ko‘chasi. Narx: 30000–300000 so‘m. Qulayliklar: Yetkazib berish, Olib ketish, Kofe.","is_active":true},{"category":"food","name_uz":"Uchrashuv","district":"Guliston","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Uchrashuv+Gulistan","image_url":"https://images.mindtrip.ai/restaurants/e365/b93c/f723/b685/7279/7f1e/9e43/8c96","hours":"","description_uz":"Turi: Restoran. Reyting: 4.9 (224 ta baho). Manzil: Xalqlar Do‘stligi ko‘chasi, 50A. Narx: 10000–499000 so‘m. Qulayliklar: Menyu, Oilaviy, Yetkazib berish.","is_active":true},{"category":"food","name_uz":"Mondi","district":"Guliston","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Mondi+Gulistan","image_url":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85","hours":"00:00 gacha","description_uz":"Turi: Qahvaxona. Reyting: 4.9 (313 ta baho). Manzil: 2-mavze, 98. Narx: —. Qulayliklar: Kofe, Shirinliklar, Wi‑Fi.","is_active":true},{"category":"food","name_uz":"Darhon","district":"Guliston","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Darhon+Gulistan","image_url":"https://d3fphkxyf5o5bm.cloudfront.net/image-resize/format%3Dwebp%2Cw%3D720/Q524tReNnAnmuqp47fi5hb9MIkwb9hs3ogZythzKAB","hours":"09:00–23:00","description_uz":"Turi: Restoran. Reyting: 5.0 (237 ta baho). Manzil: Sahovat ko‘chasi, 79. Narx: —. Qulayliklar: Oilaviy, Milliy taomlar, Tadbirlar.","is_active":true},{"category":"food","name_uz":"Mazza Gulistan","district":"Guliston","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Mazza+Gulistan","image_url":"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Tez ovqatlanish. Reyting: 4.7 (310 ta baho). Manzil: O‘zbekiston shoh ko‘chasi, 19A. Narx: —. Qulayliklar: Pizza, Fast food, Yetkazib berish.","is_active":true},{"category":"food","name_uz":"DUNYO RESTAURANT","district":"Guliston","phone":"+998910212828","maps_url":"https://www.google.com/maps/search/?api=1&query=DUNYO+RESTAURANT+Gulistan","image_url":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85","hours":"10:00–01:00","description_uz":"Turi: Restoran. Reyting: 3.9 (50 ta baho). Manzil: 4-mavze. Narx: 50000–200000 so‘m. Qulayliklar: Kechki ovqat, Oilaviy, Telefon orqali buyurtma.","is_active":true},{"category":"food","name_uz":"Bellissimo Pizza Guliston","district":"Guliston","phone":"+998712036666","maps_url":"https://www.google.com/maps/search/?api=1&query=Bellissimo+Pizza+Gulistan","image_url":"https://img3.restaurantguru.com/cd1e-Restaurant-Bellissimo-Pizza-Yangi-Hayot-dishes.jpg","hours":"10:00–02:00","description_uz":"Turi: Tez ovqatlanish. Reyting: 4.7 (31 ta baho). Manzil: O‘zbekiston shoh ko‘chasi, 44. Narx: 50000–100000 so‘m. Qulayliklar: Pizza, Yetkazib berish, Olib ketish.","is_active":true},{"category":"food","name_uz":"Darxon toyxonasi","district":"Guliston","phone":"+998994700777","maps_url":"https://www.google.com/maps/search/?api=1&query=Darxon+toyxonasi+Gulistan","image_url":"https://d3fphkxyf5o5bm.cloudfront.net/image-resize/format%3Dwebp%2Cw%3D720/Q524tReNnAnmuqp47fi5hb9MIkwb9hs3ogZythzKAB","hours":"09:00–23:00","description_uz":"Turi: Restoran. Reyting: 4.5 (50 ta baho). Manzil: Sahovat ko‘chasi. Narx: —. Qulayliklar: To‘y marosimlari, Oilaviy, Milliy taomlar.","is_active":true},{"category":"food","name_uz":"Sulton","district":"Guliston","phone":"+998972193232","maps_url":"https://www.google.com/maps/search/?api=1&query=Sulton+restaurant+Gulistan","image_url":"https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Restoran. Reyting: 4.0 (22 ta baho). Manzil: Sahovat ko‘chasi. Narx: 100000–150000 so‘m. Qulayliklar: Restoran, Oilaviy, Issiq taomlar.","is_active":true},{"category":"food","name_uz":"Suvon Bar","district":"Guliston","phone":"+998672253488","maps_url":"https://www.google.com/maps/search/?api=1&query=Suvon+Bar+Gulistan","image_url":"https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85","hours":"24/7","description_uz":"Turi: Bar. Reyting: 4.2 (19 ta baho). Manzil: Guliston shahri. Narx: —. Qulayliklar: Bar, 24/7, Ichimliklar.","is_active":true},{"category":"food","name_uz":"Shirin Kafe Bar","district":"Shirin","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Shirin+Kafe+Bar+Sirdaryo","image_url":"https://images.unsplash.com/photo-1579684947550-22e945225d9a?auto=format&fit=crop&w=1000&q=85","hours":"09:00–23:00","description_uz":"Turi: Bar. Reyting: 4.8 (16 ta baho). Manzil: Shirin shahri. Narx: 50000–100000 so‘m. Qulayliklar: Kafe, Bar, Oilaviy.","is_active":true},{"category":"food","name_uz":"TOSHKENT KAFE","district":"Guliston","phone":"+998982609626","maps_url":"https://www.google.com/maps/search/?api=1&query=TOSHKENT+KAFE+Gulistan","image_url":"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=85","hours":"08:00–22:30","description_uz":"Turi: Restoran. Reyting: 4.1 (21 ta baho). Manzil: Guliston shahri. Narx: —. Qulayliklar: Kafe, Nonushta, Oilaviy.","is_active":true},{"category":"food","name_uz":"Ocean Cafe","district":"Guliston","phone":"+998906862626","maps_url":"https://www.google.com/maps/search/?api=1&query=Ocean+Cafe+Gulistan","image_url":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85","hours":"10:00–04:00","description_uz":"Turi: Bar. Reyting: 5.0 (2 ta baho). Manzil: Guliston shahri. Narx: —. Qulayliklar: Bar, Kechki dam olish, Kafe.","is_active":true},{"category":"food","name_uz":"Oltin Vodiy Restaurant","district":"Guliston","phone":"+998994749595","maps_url":"https://www.google.com/maps/search/?api=1&query=Oltin+Vodiy+restaurant+Gulistan","image_url":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85","hours":"09:00–03:00","description_uz":"Turi: Restoran. Reyting: 4.3 (17 ta baho). Manzil: Guliston shahri. Narx: —. Qulayliklar: Restoran, Kechki ovqat, Oilaviy.","is_active":true},{"category":"food","name_uz":"Osiyo Restaurant","district":"Guliston","phone":"+998941606888","maps_url":"https://www.google.com/maps/search/?api=1&query=Osiyo+Restaurant+Gulistan","image_url":"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85","hours":"10:00–23:00","description_uz":"Turi: Restoran. Reyting: 4.0 (26 ta baho). Manzil: Guliston shahri. Narx: 100000–150000 so‘m. Qulayliklar: Restoran, Oilaviy, Issiq taomlar.","is_active":true},{"category":"food","name_uz":"Mazza2","district":"Guliston","phone":"+998938273311","maps_url":"https://www.google.com/maps/search/?api=1&query=Mazza2+Gulistan","image_url":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85","hours":"09:00–01:00","description_uz":"Turi: Qahvaxona. Reyting: 4.7 (13 ta baho). Manzil: Sayxun ko‘chasi. Narx: 50000–100000 so‘m. Qulayliklar: Kafe, Kechki ovqat, Shirinliklar.","is_active":true},{"category":"food","name_uz":"PIPLS","district":"Guliston","phone":"+998970402902","maps_url":"https://www.google.com/maps/search/?api=1&query=PIPLS+Gulistan","image_url":"https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=85","hours":"10:00–23:00","description_uz":"Turi: Qahvaxona. Reyting: 5.0 (2 ta baho). Manzil: O‘zbekiston shoh ko‘chasi, 44. Narx: —. Qulayliklar: Kafe, Oilaviy, Kofe.","is_active":true},{"category":"food","name_uz":"Kafe Zaytun","district":"Guliston","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Kafe+Zaytun+Gulistan","image_url":"https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85","hours":"09:00–23:00","description_uz":"Turi: Qahvaxona. Reyting: 4.1 (8 ta baho). Manzil: Guliston shahri. Narx: —. Qulayliklar: Kafe, Nonushta, Shirinliklar.","is_active":true},{"category":"food","name_uz":"Samarqand non","district":"Guliston","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Samarqand+non+Gulistan","image_url":"https://images.unsplash.com/photo-1579684947550-22e945225d9a?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Milliy taomlar. Reyting: 5.0 (1 ta baho). Manzil: Guliston shahri. Narx: —. Qulayliklar: Non mahsulotlari, Milliy, Tezkor.","is_active":true},{"category":"food","name_uz":"Karimqul Ota","district":"Yangiyer","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Karimqul+Ota+Yangiyer","image_url":"https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Milliy taomlar. Reyting: 5.0 (218 ta baho). Manzil: Mamadaliyev ko‘chasi. Narx: —. Qulayliklar: Milliy taomlar, Oilaviy, Issiq taomlar.","is_active":true},{"category":"food","name_uz":"KASHTAN restaurant","district":"Yangiyer","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=KASHTAN+restaurant+Yangiyer","image_url":"https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Restoran. Reyting: 4.5 (63 ta baho). Manzil: Yangiyer shahri. Narx: 50000–100000 so‘m. Qulayliklar: Restoran, Oilaviy, Tadbirlar.","is_active":true},{"category":"food","name_uz":"Shox burgers","district":"Yangiyer","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Shox+burgers+Yangiyer","image_url":"https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Tez ovqatlanish. Reyting: 4.9 (17 ta baho). Manzil: R-32. Narx: —. Qulayliklar: Burger, Fast food, Olib ketish.","is_active":true},{"category":"food","name_uz":"Kafe YENGI BAKU","district":"Shirin","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Kafe+YENGI+BAKU+Shirin+Sirdaryo","image_url":"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Restoran. Reyting: 5.0 (4 ta baho). Manzil: Shirin shahri. Narx: —. Qulayliklar: Restoran, Oilaviy, Kafe.","is_active":true},{"category":"food","name_uz":"OSCAR","district":"Shirin","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=OSCAR+Shirin+Sirdaryo","image_url":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Restoran. Reyting: 3.7 (13 ta baho). Manzil: Shirin shahri. Narx: —. Qulayliklar: Restoran, Oilaviy, Kechki ovqat.","is_active":true},{"category":"food","name_uz":"Rokhat","district":"Sirdaryo","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Rokhat+Syrdarya","image_url":"https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Milliy taomlar. Reyting: 4.8 (42 ta baho). Manzil: Sirdaryo shahri. Narx: 50000–100000 so‘m. Qulayliklar: Milliy taomlar, Oilaviy, Issiq taomlar.","is_active":true},{"category":"food","name_uz":"Barokat milliy taomlari","district":"Sirdaryo","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Barokat+milliy+taomlari+Syrdarya","image_url":"https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Milliy taomlar. Reyting: 4.8 (17 ta baho). Manzil: Sirdaryo shahri. Narx: 50000–100000 so‘m. Qulayliklar: Milliy taomlar, Oilaviy, Tezkor.","is_active":true},{"category":"food","name_uz":"Forish kafe","district":"Sirdaryo","phone":"","maps_url":"https://www.google.com/maps/search/?api=1&query=Forish+kafe+Syrdarya","image_url":"https://images.unsplash.com/photo-1579684947550-22e945225d9a?auto=format&fit=crop&w=1000&q=85","hours":"","description_uz":"Turi: Qahvaxona. Reyting: 4.8 (5 ta baho). Manzil: Sirdaryo shahri. Narx: —. Qulayliklar: Kafe, Oilaviy, Kofe.","is_active":true},{"category":"historical","name_uz":"Katta qiztepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.89749722222221,68.11037777777779","lat":40.89749722222221,"lon":68.11037777777779,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Puchuktepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.83083055555555,68.6457277777778","lat":40.83083055555555,"lon":68.6457277777778,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Qo’rg’ontepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.82521388888891,68.68273888888886","lat":40.82521388888891,"lon":68.68273888888886,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Uchtepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.81618333333332,68.691225","lat":40.81618333333332,"lon":68.691225,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Nurota shaharchasi qoldig’i","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.78279166666669,68.78693333333334","lat":40.78279166666669,"lon":68.78693333333334,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Chittitepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.66204999999998,68.86424166666666","lat":40.66204999999998,"lon":68.86424166666666,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Qal’atepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.62869166666668,68.92650555555556","lat":40.62869166666668,"lon":68.92650555555556,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Kindiktepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.65840000000001,68.867","lat":40.65840000000001,"lon":68.867,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Saritepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.74640605555557,68.78431725000002","lat":40.74640605555557,"lon":68.78431725000002,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Sigirtepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.70403333333333,68.92211111111112","lat":40.70403333333333,"lon":68.92211111111112,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Hashartepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.43373888888889,69.07888888888888","lat":40.43373888888889,"lon":69.07888888888888,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Eski Xovos shaharchasi","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.19983055555554,68.81106111111109","lat":40.19983055555554,"lon":68.81106111111109,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Toltepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.19966666666667,68.83511944444444","lat":40.19966666666667,"lon":68.83511944444444,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Nomsiztepa","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.20098611111113,68.8106","lat":40.20098611111113,"lon":68.8106,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Ulkan-Soylik","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.53296666666666,68.75668611111108","lat":40.53296666666666,"lon":68.75668611111108,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Mirzarabot tepaligi","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.5104611111111,68.45178055555554","lat":40.5104611111111,"lon":68.45178055555554,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Qo’rg’ontepa 1","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.20536388888886,68.81560555555556","lat":40.20536388888886,"lon":68.81560555555556,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true},{"category":"historical","name_uz":"Yerjar","district":"Sirdaryo viloyati","maps_url":"https://www.google.com/maps/dir/?api=1&destination=40.38697777777777,69.07781111111109","lat":40.38697777777777,"lon":69.07781111111109,"description_uz":"KML manzilining nomi va geografik koordinatalari saqlangan.","is_active":true}];
+
+async function syncSiteData(){
+  if(!sb){toast('Supabase ulanmagan');return}
+  const box=document.getElementById('syncResult');
+  box.textContent='Import qilinmoqda...';
+  let added=0, skipped=0, failed=0;
+  for(const item of SITE_SEEDS){
+    try{
+      const existing=await sb.from('places').select('id').eq('category',item.category).eq('name_uz',item.name_uz).limit(1);
+      if(existing.error){failed++;continue}
+      if(existing.data?.length){skipped++;continue}
+      const r=await sb.from('places').insert(item);
+      if(r.error){failed++;}else{added++;}
+    }catch(e){failed++;}
+  }
+  box.innerHTML=`<b>Sinxronlash tugadi.</b> Qo‘shildi: ${added} · Mavjud: ${skipped} · Xato: ${failed}`;
+  toast(`Import tugadi: ${added} ta qo‘shildi`);
+  await loadPlaces(); await loadStats();
+}
+
+async function loadStats(){
+  if(!sb)return;
+  const {data,error}=await sb.from('places').select('category');
+  if(error)return; const a=data||[];
+  countAll.textContent=a.length;countHotel.textContent=a.filter(x=>x.category==='hotel').length;countFood.textContent=a.filter(x=>x.category==='food').length;countHistorical.textContent=a.filter(x=>x.category==='historical').length;
+}
+function openForm(p=null){
+  const overlay=document.createElement('div');overlay.id='formOverlay';overlay.style='position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:16px;z-index:10';
+  overlay.innerHTML=`<div class="panel" style="width:min(850px,100%);max-height:92vh;overflow:auto">
+  <div class="top"><h2>${p?'Obyektni tahrirlash':'Yangi obyekt'}</h2><button class="ghost" onclick="document.getElementById('formOverlay').remove()">✕</button></div>
+  <div class="form-grid">
+  <div class="field"><label>Turi</label><select id="fcat"><option value="hotel">Mehmonxona</option><option value="food">Ovqatlanish</option><option value="historical">Tarixiy maskan</option></select></div>
+  <div class="field"><label>O‘zbekcha nom</label><input id="fname" value="${esc(p?.name_uz||'')}"></div>
+  <div class="field"><label>Hudud/tuman</label><input id="fdistrict" value="${esc(p?.district||'')}"></div>
+  <div class="field"><label>Telefon</label><input id="fphone" value="${esc(p?.phone||'')}"></div>
+  <div class="field"><label>Google Maps URL</label><input id="fmap" value="${esc(p?.maps_url||'')}"></div>
+  <div class="field"><label>Rasm URL</label><input id="fimage" value="${esc(p?.image_url||'')}"></div>
+  <div class="field"><label>Latitude</label><input id="flat" type="number" step="any" value="${p?.lat??''}"></div>
+  <div class="field"><label>Longitude</label><input id="flon" type="number" step="any" value="${p?.lon??''}"></div>
+  <div class="field"><label>Ish vaqti</label><input id="fhours" value="${esc(p?.hours||'')}"></div>
+  <div class="field"><label>Faol</label><select id="factive"><option value="true" ${p?.is_active!==false?'selected':''}>Ha</option><option value="false" ${p?.is_active===false?'selected':''}>Yo‘q</option></select></div>
+  <div class="field full"><label>O‘zbekcha tavsif</label><textarea id="fdesc">${esc(p?.description_uz||'')}</textarea></div>
+  <div class="field full"><label>Inglizcha nom</label><input id="fname_en" value="${esc(p?.name_en||'')}"></div>
+  <div class="field full"><label>Ruscha nom</label><input id="fname_ru" value="${esc(p?.name_ru||'')}"></div>
+  <div class="field full"><label>Turkcha nom</label><input id="fname_tr" value="${esc(p?.name_tr||'')}"></div>
+  <div class="field full"><label>Xitoycha nom</label><input id="fname_zh" value="${esc(p?.name_zh||'')}"></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px"><button class="ghost" onclick="document.getElementById('formOverlay').remove()">Bekor qilish</button><button class="primary" onclick="savePlace('${p?.id||''}')">Saqlash</button></div>
+  </div>`;
+  document.body.appendChild(overlay);document.getElementById('fcat').value=p?.category||'hotel';
+}
+function editPlace(id){const p=places.find(x=>x.id===id);if(p)openForm(p)}
+async function savePlace(id){
+  const obj={category:fcat.value,name_uz:fname.value.trim(),name_en:fname_en.value.trim(),name_ru:fname_ru.value.trim(),name_tr:fname_tr.value.trim(),name_zh:fname_zh.value.trim(),district:fdistrict.value.trim(),phone:fphone.value.trim(),maps_url:fmap.value.trim(),image_url:fimage.value.trim(),lat:flat.value?Number(flat.value):null,lon:flon.value?Number(flon.value):null,hours:fhours.value.trim(),description_uz:fdesc.value.trim(),is_active:factive.value==='true'};
+  if(!obj.name_uz){toast('Nomni kiriting');return}
+  const r=id?await sb.from('places').update(obj).eq('id',id):await sb.from('places').insert(obj);
+  if(r.error){toast(r.error.message);return} document.getElementById('formOverlay').remove();toast('Saqlandi');loadPlaces();loadStats();
+}
+async function deletePlace(id){if(!confirm('O‘chirishni tasdiqlaysizmi?'))return;const {error}=await sb.from('places').delete().eq('id',id);if(error)toast(error.message);else{toast('O‘chirildi');loadPlaces();loadStats()}}
+
+async function loadSubmissions(){
+  if(!sb || !currentRole) return;
+  const status=document.getElementById('subFilter').value;
+  let q=sb.from('place_submissions').select('*').order('created_at',{ascending:false});
+  if(status) q=q.eq('status',status);
+  const {data,error}=await q;
+  if(error){toast(error.message);return}
+  document.getElementById('subBody').innerHTML=(data||[]).map(s=>`
+    <tr><td><b>${esc(s.name_uz)}</b></td><td><span class="badge">${label(s.category)}</span></td>
+    <td>${esc(s.district||'')}</td><td>${esc(s.status)}</td>
+    <td class="actions">${s.status==='pending'
+      ? `<button class="primary" onclick="approveSubmission('${s.id}')">Tasdiqlash</button><button class="danger" onclick="rejectSubmission('${s.id}')">Rad etish</button>`
+      : `<span class="badge">Ko‘rib chiqilgan</span>`}</td></tr>`).join('') || '<tr><td colspan="5">Taklif topilmadi.</td></tr>';
+}
+async function approveSubmission(id){
+  const {data,error}=await sb.from('place_submissions').select('*').eq('id',id).single();
+  if(error){toast(error.message);return}
+  const place={category:data.category,name_uz:data.name_uz,description_uz:data.description_uz,district:data.district,phone:data.phone,maps_url:data.maps_url,image_url:data.image_url,lat:data.lat,lon:data.lon,hours:data.hours,is_active:true};
+  const ins=await sb.from('places').insert(place);
+  if(ins.error){toast(ins.error.message);return}
+  const upd=await sb.from('place_submissions').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',id);
+  if(upd.error){toast(upd.error.message);return}
+  toast('Taklif tasdiqlandi va sayt bazasiga qo‘shildi');loadSubmissions();loadPlaces();loadStats();
+}
+async function rejectSubmission(id){
+  const note=prompt('Rad etish sababi (ixtiyoriy):')||'';
+  const {error}=await sb.from('place_submissions').update({status:'rejected',admin_note:note,reviewed_at:new Date().toISOString()}).eq('id',id);
+  if(error)toast(error.message);else{toast('Taklif rad etildi');loadSubmissions();}
+}
+
+async function uploadMedia(){
+  if(!sb){toast('Supabase ulanmagan');return}
+  const f=document.getElementById('mediaFile').files[0];if(!f){toast('Fayl tanlang');return}
+  const safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_'), path=`${Date.now()}_${safe}`;
+  const {error}=await sb.storage.from('sirdaryo-media').upload(path,f,{cacheControl:'3600',upsert:false});
+  document.getElementById('mediaMsg').textContent=error?error.message:'Yuklandi: '+path;
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sirdaryo360 — Admin panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--primary:#0f766e;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(430px,100%);background:var(--card);padding:30px;border-radius:24px;box-shadow:0 18px 50px #0001}
+.logo{font-weight:800;font-size:24px;margin-bottom:8px}.sub{color:var(--muted);margin-bottom:24px}
+.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.field textarea{min-height:100px;resize:vertical}
+.primary{background:var(--primary);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700}.ghost{background:#eef2f7;padding:10px 14px;border-radius:10px}.danger{background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:10px}
+.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.side{background:#102a2a;color:#fff;padding:22px;position:sticky;top:0;height:100vh}.brand{font-size:20px;font-weight:800;margin-bottom:25px}.nav button{width:100%;text-align:left;background:transparent;color:#d7e5e5;padding:12px;border-radius:10px;margin:3px 0}.nav button.active,.nav button:hover{background:#ffffff14;color:#fff}.content{padding:26px;max-width:1400px;width:100%}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h1{margin:0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}.stat b{font-size:28px;display:block}.stat span{color:var(--muted);font-size:13px}.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--line);border-radius:10px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#e6fffa;color:#115e59;font-size:12px;font-weight:700}.actions{display:flex;gap:7px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full{grid-column:1/-1}.section-title{font-size:18px;margin:4px 0 14px}.note{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:13px;margin-bottom:15px}.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:12px 16px;border-radius:12px;display:none;z-index:20}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:relative;height:auto}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;width:auto}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.content{padding:15px}.grid,.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="loginView" class="login">
+  <div class="login-card">
+    <div class="logo">🌍 Sirdaryo360 Admin</div>
+    <div class="sub">Turistik kontentni boshqarish paneli</div>
+    <div id="configNote" class="note hidden"></div>
+    <div class="field"><label>Email</label><input id="email" type="email" placeholder="admin@example.com"></div>
+    <div class="field"><label>Parol</label><input id="password" type="password" placeholder="••••••••"></div>
+    <button class="primary" style="width:100%" onclick="login()">Kirish</button>
+    <p id="loginMsg" style="color:#b91c1c"></p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="side">
+    <div class="brand">🌍 Sirdaryo360</div>
+    <div class="nav">
+      <button data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+      <button data-page="places" onclick="showPage('places')">📍 Obyektlar</button>
+      <button data-page="submissions" onclick="showPage('submissions')">📥 Takliflar</button>
+      <button data-page="media" onclick="showPage('media')">🖼️ Media</button>
+      <button data-page="settings" onclick="showPage('settings')">⚙️ Sozlamalar</button>
+    </div>
+    <button class="ghost" style="margin-top:20px;width:100%" onclick="logout()">Chiqish</button>
+  </aside>
+  <main class="content">
+    <div id="page-dashboard">
+      <div class="top"><h1>Dashboard</h1><span id="userLabel"></span></div>
+      <div class="grid">
+        <div class="stat"><b id="countAll">0</b><span>Jami obyekt</span></div>
+        <div class="stat"><b id="countHotel">0</b><span>Mehmonxona</span></div>
+        <div class="stat"><b id="countFood">0</b><span>Ovqatlanish</span></div>
+        <div class="stat"><b id="countHistorical">0</b><span>Tarixiy maskan</span></div>
+      </div>
+      <div class="panel"><h2 class="section-title">Admin panel imkoniyatlari</h2>
+        <p>Mehmonxona, restoran/kafe va tarixiy maskanlarni qo‘shish, tahrirlash, o‘chirish; rasm va audio yuklash; manzil, telefon, ish vaqti, koordinata va 5 tildagi tavsiflarni boshqarish.</p>
+      </div>
+    </div>
+
+    <div id="page-places" class="hidden">
+      <div class="top"><h1>Obyektlar</h1><button class="primary" onclick="openForm()">+ Yangi obyekt</button></div>
+      <div class="panel">
+        <div class="toolbar"><input id="search" placeholder="Qidirish..." oninput="renderPlaces()"><select id="filter" onchange="renderPlaces()"><option value="">Barchasi</option><option value="hotel">Mehmonxona</option><option value="food">Ovqatlanish</option><option value="historical">Tarixiy maskan</option></select></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Nomi</th><th>Turi</th><th>Hudud</th><th>Holati</th><th>Amal</th></tr></thead><tbody id="placesBody"></tbody></table></div>
+      </div>
+    </div>
+
+    
+    <div id="page-submissions" class="hidden">
+      <div class="top"><h1>Foydalanuvchi takliflari</h1></div>
+      <div class="panel">
+        <div class="toolbar"><select id="subFilter" onchange="loadSubmissions()"><option value="pending">Kutilmoqda</option><option value="approved">Tasdiqlangan</option><option value="rejected">Rad etilgan</option><option value="">Barchasi</option></select></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Nomi</th><th>Turi</th><th>Hudud</th><th>Holati</th><th>Amal</th></tr></thead><tbody id="subBody"></tbody></table></div>
+      </div>
+    </div>
+
+<div id="page-media" class="hidden">
+      <div class="top"><h1>Media</h1></div>
+      <div class="panel">
+        <div class="note">Rasm/audio yuklash Supabase Storage orqali ishlaydi. Avval <code>supabase-config.js</code> va SQL sozlamalarini bajaring.</div>
+        <div class="field"><label>Fayl</label><input id="mediaFile" type="file" accept="image/*,audio/*,video/*"></div>
+        <button class="primary" onclick="uploadMedia()">Yuklash</button>
+        <div id="mediaMsg" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div id="page-settings" class="hidden">
+      <div class="top"><h1>Sozlamalar</h1></div>
+      <div class="panel">
+        <p><b>Ulanish holati:</b> <span id="connectionStatus">Tekshirilmoqda...</span></p>
+        <p><b>Admin:</b> <span id="adminEmail"></span></p>
+        <p class="sub">Xavfsizlik uchun Supabase service_role/secret kalitini hech qachon bu HTML faylga yozmang. Frontendda faqat publishable/anon kalit ishlatiladi va RLS bilan himoyalanadi.</p>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="supabase-config.js"></script>
+<script>
+let sb=null, session=null, places=[], currentRole=null;
+
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2500)}
+function configured(){return window.SUPABASE_URL && window.SUPABASE_KEY && !window.SUPABASE_URL.includes('YOUR_') && !window.SUPABASE_KEY.includes('YOUR_')}
+function showPage(p){
+  document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('page-'+p).classList.remove('hidden');
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));
+  if(p==='places') loadPlaces(); if(p==='dashboard') loadStats(); if(p==='submissions') loadSubmissions();
+}
+async function init(){
+  if(!configured()){
+    document.getElementById('configNote').classList.remove('hidden');
+    document.getElementById('configNote').innerHTML='Supabase hali ulanmagan. <b>supabase-config.js</b> fayliga loyiha URL va publishable/anon kalitini kiriting.';
+    return;
+  }
+  sb=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY);
+  const {data}=await sb.auth.getSession(); session=data.session;
+  if(session) enter();
+  sb.auth.onAuthStateChange((_e,s)=>{session=s;if(s) enter();});
+}
+async function login(){
+  if(!configured()){document.getElementById('loginMsg').textContent='Avval Supabase konfiguratsiyasini kiriting.';return}
+  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  document.getElementById('loginMsg').textContent=error?error.message:'';
+}
+async function enter(){
+  const {data:{user}}=await sb.auth.getUser();
+  const roleRes=await sb.from('admin_users').select('role').eq('user_id',user.id).maybeSingle();
+  currentRole=roleRes.data?.role||null;
+  if(!currentRole){ document.getElementById('loginMsg').textContent='Bu akkaunt admin/moderator sifatida ro‘yxatdan o‘tmagan.'; await sb.auth.signOut(); return; }
+  document.getElementById('loginView').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userLabel').textContent=(user?.email||'')+' · '+currentRole;
+  document.getElementById('adminEmail').textContent=(user?.email||'')+' · '+currentRole;
+  showPage('dashboard');
+}
+async function logout(){if(sb) await sb.auth.signOut();location.reload()}
+async function loadPlaces(){
+  if(!sb)return;
+  const {data,error}=await sb.from('places').select('*').order('created_at',{ascending:false});
+  if(error){toast(error.message);return} places=data||[];renderPlaces();
+}
+function renderPlaces(){
+  const q=(document.getElementById('search').value||'').toLowerCase(), f=document.getElementById('filter').value;
+  const arr=places.filter(p=>(!f||p.category===f)&&(!q||JSON.stringify(p).toLowerCase().includes(q)));
+  document.getElementById('placesBody').innerHTML=arr.map(p=>`<tr><td><b>${esc(p.name_uz||'Nomsiz')}</b></td><td><span class="badge">${label(p.category)}</span></td><td>${esc(p.district||'')}</td><td>${p.is_active?'Faol':'Yopiq'}</td><td><div class="actions"><button class="ghost" onclick="editPlace('${p.id}')">Tahrirlash</button><button class="danger" onclick="deletePlace('${p.id}')">O‘chirish</button></div></td></tr>`).join('')||'<tr><td colspan="5">Ma’lumot topilmadi.</td></tr>';
+}
+function label(x){return x==='hotel'?'Mehmonxona':x==='food'?'Ovqatlanish':'Tarixiy maskan'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+async function loadStats(){
+  if(!sb)return;
+  const {data,error}=await sb.from('places').select('category');
+  if(error)return; const a=data||[];
+  countAll.textContent=a.length;countHotel.textContent=a.filter(x=>x.category==='hotel').length;countFood.textContent=a.filter(x=>x.category==='food').length;countHistorical.textContent=a.filter(x=>x.category==='historical').length;
+}
+function openForm(p=null){
+  const overlay=document.createElement('div');overlay.id='formOverlay';overlay.style='position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:16px;z-index:10';
+  overlay.innerHTML=`<div class="panel" style="width:min(850px,100%);max-height:92vh;overflow:auto">
+  <div class="top"><h2>${p?'Obyektni tahrirlash':'Yangi obyekt'}</h2><button class="ghost" onclick="document.getElementById('formOverlay').remove()">✕</button></div>
+  <div class="form-grid">
+  <div class="field"><label>Turi</label><select id="fcat"><option value="hotel">Mehmonxona</option><option value="food">Ovqatlanish</option><option value="historical">Tarixiy maskan</option></select></div>
+  <div class="field"><label>O‘zbekcha nom</label><input id="fname" value="${esc(p?.name_uz||'')}"></div>
+  <div class="field"><label>Hudud/tuman</label><input id="fdistrict" value="${esc(p?.district||'')}"></div>
+  <div class="field"><label>Telefon</label><input id="fphone" value="${esc(p?.phone||'')}"></div>
+  <div class="field"><label>Google Maps URL</label><input id="fmap" value="${esc(p?.maps_url||'')}"></div>
+  <div class="field"><label>Rasm URL</label><input id="fimage" value="${esc(p?.image_url||'')}"></div>
+  <div class="field"><label>Latitude</label><input id="flat" type="number" step="any" value="${p?.lat??''}"></div>
+  <div class="field"><label>Longitude</label><input id="flon" type="number" step="any" value="${p?.lon??''}"></div>
+  <div class="field"><label>Ish vaqti</label><input id="fhours" value="${esc(p?.hours||'')}"></div>
+  <div class="field"><label>Faol</label><select id="factive"><option value="true" ${p?.is_active!==false?'selected':''}>Ha</option><option value="false" ${p?.is_active===false?'selected':''}>Yo‘q</option></select></div>
+  <div class="field full"><label>O‘zbekcha tavsif</label><textarea id="fdesc">${esc(p?.description_uz||'')}</textarea></div>
+  <div class="field full"><label>Inglizcha nom</label><input id="fname_en" value="${esc(p?.name_en||'')}"></div>
+  <div class="field full"><label>Ruscha nom</label><input id="fname_ru" value="${esc(p?.name_ru||'')}"></div>
+  <div class="field full"><label>Turkcha nom</label><input id="fname_tr" value="${esc(p?.name_tr||'')}"></div>
+  <div class="field full"><label>Xitoycha nom</label><input id="fname_zh" value="${esc(p?.name_zh||'')}"></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px"><button class="ghost" onclick="document.getElementById('formOverlay').remove()">Bekor qilish</button><button class="primary" onclick="savePlace('${p?.id||''}')">Saqlash</button></div>
+  </div>`;
+  document.body.appendChild(overlay);document.getElementById('fcat').value=p?.category||'hotel';
+}
+function editPlace(id){const p=places.find(x=>x.id===id);if(p)openForm(p)}
+async function savePlace(id){
+  const obj={category:fcat.value,name_uz:fname.value.trim(),name_en:fname_en.value.trim(),name_ru:fname_ru.value.trim(),name_tr:fname_tr.value.trim(),name_zh:fname_zh.value.trim(),district:fdistrict.value.trim(),phone:fphone.value.trim(),maps_url:fmap.value.trim(),image_url:fimage.value.trim(),lat:flat.value?Number(flat.value):null,lon:flon.value?Number(flon.value):null,hours:fhours.value.trim(),description_uz:fdesc.value.trim(),is_active:factive.value==='true'};
+  if(!obj.name_uz){toast('Nomni kiriting');return}
+  const r=id?await sb.from('places').update(obj).eq('id',id):await sb.from('places').insert(obj);
+  if(r.error){toast(r.error.message);return} document.getElementById('formOverlay').remove();toast('Saqlandi');loadPlaces();loadStats();
+}
+async function deletePlace(id){if(!confirm('O‘chirishni tasdiqlaysizmi?'))return;const {error}=await sb.from('places').delete().eq('id',id);if(error)toast(error.message);else{toast('O‘chirildi');loadPlaces();loadStats()}}
+
+async function loadSubmissions(){
+  if(!sb || !currentRole) return;
+  const status=document.getElementById('subFilter').value;
+  let q=sb.from('place_submissions').select('*').order('created_at',{ascending:false});
+  if(status) q=q.eq('status',status);
+  const {data,error}=await q;
+  if(error){toast(error.message);return}
+  document.getElementById('subBody').innerHTML=(data||[]).map(s=>`
+    <tr><td><b>${esc(s.name_uz)}</b></td><td><span class="badge">${label(s.category)}</span></td>
+    <td>${esc(s.district||'')}</td><td>${esc(s.status)}</td>
+    <td class="actions">${s.status==='pending'
+      ? `<button class="primary" onclick="approveSubmission('${s.id}')">Tasdiqlash</button><button class="danger" onclick="rejectSubmission('${s.id}')">Rad etish</button>`
+      : `<span class="badge">Ko‘rib chiqilgan</span>`}</td></tr>`).join('') || '<tr><td colspan="5">Taklif topilmadi.</td></tr>';
+}
+async function approveSubmission(id){
+  const {data,error}=await sb.from('place_submissions').select('*').eq('id',id).single();
+  if(error){toast(error.message);return}
+  const place={category:data.category,name_uz:data.name_uz,description_uz:data.description_uz,district:data.district,phone:data.phone,maps_url:data.maps_url,image_url:data.image_url,lat:data.lat,lon:data.lon,hours:data.hours,is_active:true};
+  const ins=await sb.from('places').insert(place);
+  if(ins.error){toast(ins.error.message);return}
+  const upd=await sb.from('place_submissions').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',id);
+  if(upd.error){toast(upd.error.message);return}
+  toast('Taklif tasdiqlandi va sayt bazasiga qo‘shildi');loadSubmissions();loadPlaces();loadStats();
+}
+async function rejectSubmission(id){
+  const note=prompt('Rad etish sababi (ixtiyoriy):')||'';
+  const {error}=await sb.from('place_submissions').update({status:'rejected',admin_note:note,reviewed_at:new Date().toISOString()}).eq('id',id);
+  if(error)toast(error.message);else{toast('Taklif rad etildi');loadSubmissions();}
+}
+
+async function uploadMedia(){
+  if(!sb){toast('Supabase ulanmagan');return}
+  const f=document.getElementById('mediaFile').files[0];if(!f){toast('Fayl tanlang');return}
+  const safe=f.name.replace(/[^a-zA-Z0-9._-]/g,'_'), path=`${Date.now()}_${safe}`;
+  const {error}=await sb.storage.from('sirdaryo-media').upload(path,f,{cacheControl:'3600',upsert:false});
+  document.getElementById('mediaMsg').textContent=error?error.message:'Yuklandi: '+path;
+}
+init();
+</script>
+</body>
+</html>

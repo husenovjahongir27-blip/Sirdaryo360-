@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sirdaryo360 — Obyekt taklif qilish</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}.wrap{max-width:760px;margin:30px auto;padding:18px}.card{background:white;border-radius:20px;padding:24px;box-shadow:0 10px 30px #0001}.field{margin:12px 0}.field label{display:block;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ddd;border-radius:10px}.field textarea{min-height:130px}.btn{background:#0f766e;color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:700}</style>
+</head><body><div class="wrap"><div class="card"><h1>➕ Sirdaryo360'ga obyekt taklif qilish</h1><p>Yuborilgan ma’lumot darhol saytga chiqmaydi. Avval moderator/admin tekshiradi.</p>
+<div class="field"><label>Turi</label><select id="cat"><option value="hotel">Mehmonxona</option><option value="food">Ovqatlanish</option><option value="historical">Tarixiy maskan</option></select></div>
+<div class="field"><label>Nomi</label><input id="name" required></div><div class="field"><label>Hudud/tuman</label><input id="district"></div>
+<div class="field"><label>Telefon</label><input id="phone"></div><div class="field"><label>Google Maps havolasi</label><input id="maps"></div>
+<div class="field"><label>Rasm URL (ixtiyoriy)</label><input id="image"></div><div class="field"><label>Tavsif</label><textarea id="desc"></textarea></div>
+<button class="btn" onclick="send()">Yuborish</button><p id="msg"></p></div></div>
+<script src="supabase-config.js"></script><script>
+const sb=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY);
+async function send(){const name=document.getElementById('name').value.trim();if(!name){msg.textContent='Nomni kiriting';return}
+const {data:{user}}=await sb.auth.getUser();
+const {error}=await sb.from('place_submissions').insert({category:cat.value,name_uz:name,district:district.value.trim(),phone:phone.value.trim(),maps_url:maps.value.trim(),image_url:image.value.trim(),description_uz:desc.value.trim(),submitted_by:user?.id||null});
+msg.textContent=error?error.message:'Rahmat! Taklifingiz tekshiruvga yuborildi.';}
+</script></body></html>

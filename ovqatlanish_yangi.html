@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sirdaryo360 — Ovqatlanish</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;--primary:#0f766e;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(430px,100%);background:var(--card);padding:30px;border-radius:24px;box-shadow:0 18px 50px #0001}
+.logo{font-weight:800;font-size:24px;margin-bottom:8px}.sub{color:var(--muted);margin-bottom:24px}
+.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.field textarea{min-height:100px;resize:vertical}
+.primary{background:var(--primary);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700}.ghost{background:#eef2f7;padding:10px 14px;border-radius:10px}.danger{background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:10px}
+.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.side{background:#102a2a;color:#fff;padding:22px;position:sticky;top:0;height:100vh}.brand{font-size:20px;font-weight:800;margin-bottom:25px}.nav button{width:100%;text-align:left;background:transparent;color:#d7e5e5;padding:12px;border-radius:10px;margin:3px 0}.nav button.active,.nav button:hover{background:#ffffff14;color:#fff}.content{padding:26px;max-width:1400px;width:100%}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h1{margin:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--line);border-radius:10px}
+.toolbar input{min-width:200px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#e6fffa;color:#115e59;font-size:12px;font-weight:700}.actions{display:flex;gap:7px}
+.status{display:inline-block;padding:5px 9px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700}.closed{background:#fee2e2;color:#991b1b}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full{grid-column:1/-1}.section-title{font-size:18px;margin:4px 0 14px}
+.note{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:13px;margin-bottom:15px}.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:12px 16px;border-radius:12px;display:none;z-index:30}
+.importbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f0fdfa;border:1px solid #ccfbf1;border-radius:12px;margin-bottom:15px;color:#115e59;font-size:13px}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:relative;height:auto}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;width:auto}.content{padding:20px}}
+@media(max-width:600px){.content{padding:15px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start;flex-direction:column}.importbar{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="hidden"></div>
+
+<div id="app" class="app">
+  <aside class="side">
+    <div class="brand">🌍 Sirdaryo360</div>
+    <div class="nav">
+      <button class="active">🍽️ Ovqatlanish</button>
+    </div>
+    <button class="ghost" style="margin-top:20px;width:100%" onclick="logout()">Chiqish</button>
+  </aside>
+
+  <main class="content">
+    <div class="top">
+      <h1>Ovqatlanish</h1>
+      <button class="primary" onclick="openForm()">+ Yangi ovqatlanish joyi</button>
+    </div>
+
+    <div class="panel">
+      <div class="importbar">
+        <span>Saytdagi mavjud ovqatlanish joylarini Supabase bazasiga bir marta import qilish mumkin.</span>
+        <button class="ghost" onclick="importStaticFood()">⬆ Import qilish</button>
+      </div>
+
+      <div class="toolbar">
+        <input id="search" placeholder="Qidirish..." oninput="renderPlaces()">
+        <select id="filter" disabled><option>Barchasi</option></select>
+        <button class="ghost" onclick="loadPlaces()">🔄 Yangilash</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Nomi</th><th>Turi</th><th>Hudud</th><th>Telefon</th><th>Holati</th><th>Amal</th></tr>
+          </thead>
+          <tbody id="placesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="supabase-config.js"></script>
+<script>
+let sb=null,session=null,places=[];
+
+const STATIC_FOOD = [
+['Dilxush milliy taomlar','Guliston','Qahvaxona','+998672263003','08:30–23:00','30000–300000 so‘m','https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Dilxush+milliy+taomlar+Gulistan'],
+['Uchrashuv','Guliston','Restoran','','','10000–499000 so‘m','https://images.mindtrip.ai/restaurants/e365/b93c/f723/b685/7279/7f1e/9e43/8c96','https://www.google.com/maps/search/?api=1&query=Uchrashuv+Gulistan'],
+['Mondi','Guliston','Qahvaxona','','00:00 gacha','—','https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Mondi+Gulistan'],
+['Darhon','Guliston','Restoran','','09:00–23:00','—','https://d3fphkxyf5o5bm.cloudfront.net/image-resize/format%3Dwebp%2Cw%3D720/Q524tReNnAnmuqp47fi5hb9MIkwb9hs3ogZythzKAB','https://www.google.com/maps/search/?api=1&query=Darhon+Gulistan'],
+['Mazza Gulistan','Guliston','Tez ovqatlanish','','','—','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Mazza+Gulistan'],
+['DUNYO RESTAURANT','Guliston','Restoran','+998910212828','10:00–01:00','50000–200000 so‘m','https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=DUNYO+RESTAURANT+Gulistan'],
+['Bellissimo Pizza Guliston','Guliston','Tez ovqatlanish','+998712036666','10:00–02:00','50000–100000 so‘m','https://img3.restaurantguru.com/cd1e-Restaurant-Bellissimo-Pizza-Yangi-Hayot-dishes.jpg','https://www.google.com/maps/search/?api=1&query=Bellissimo+Pizza+Gulistan'],
+['Darxon toyxonasi','Guliston','Restoran','+998994700777','09:00–23:00','—','https://d3fphkxyf5o5bm.cloudfront.net/image-resize/format%3Dwebp%2Cw%3D720/Q524tReNnAnmuqp47fi5hb9MIkwb9hs3ogZythzKAB','https://www.google.com/maps/search/?api=1&query=Darxon+toyxonasi+Gulistan'],
+['Sulton','Guliston','Restoran','+998972193232','','100000–150000 so‘m','https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Sulton+restaurant+Gulistan'],
+['Suvon Bar','Guliston','Bar','+998672253488','24/7','—','https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Suvon+Bar+Gulistan'],
+['Shirin Kafe Bar','Shirin','Bar','','09:00–23:00','50000–100000 so‘m','https://images.unsplash.com/photo-1579684947550-22e945225d9a?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Shirin+Kafe+Bar+Sirdaryo'],
+['TOSHKENT KAFE','Guliston','Restoran','+998982609626','08:00–22:30','—','https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=TOSHKENT+KAFE+Gulistan'],
+['Ocean Cafe','Guliston','Bar','+998906862626','10:00–04:00','—','https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Ocean+Cafe+Gulistan'],
+['Oltin Vodiy Restaurant','Guliston','Restoran','+998994749595','09:00–03:00','—','https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Oltin+Vodiy+restaurant+Gulistan'],
+['Osiyo Restaurant','Guliston','Restoran','+998941606888','10:00–23:00','100000–150000 so‘m','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Osiyo+Restaurant+Gulistan'],
+['Mazza2','Guliston','Qahvaxona','+998938273311','09:00–01:00','50000–100000 so‘m','https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Mazza2+Gulistan'],
+['PIPLS','Guliston','Qahvaxona','+998970402902','10:00–23:00','—','https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=PIPLS+Gulistan'],
+['Kafe Zaytun','Guliston','Qahvaxona','','09:00–23:00','—','https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Kafe+Zaytun+Gulistan'],
+['Samarqand non','Guliston','Milliy taomlar','','','—','https://images.unsplash.com/photo-1579684947550-22e945225d9a?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Samarqand+non+Gulistan'],
+['Karimqul Ota','Yangiyer','Milliy taomlar','','','—','https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Karimqul+Ota+Yangiyer'],
+['KASHTAN restaurant','Yangiyer','Restoran','','','50000–100000 so‘m','https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=KASHTAN+restaurant+Yangiyer'],
+['Shox burgers','Yangiyer','Tez ovqatlanish','','','—','https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Shox+burgers+Yangiyer'],
+['Kafe YENGI BAKU','Shirin','Restoran','','','—','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Kafe+YENGI+BAKU+Shirin+Sirdaryo'],
+['OSCAR','Shirin','Restoran','','','—','https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=OSCAR+Shirin+Sirdaryo'],
+['Rokhat','Sirdaryo','Milliy taomlar','','','50000–100000 so‘m','https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Rokhat+Syrdarya'],
+['Barokat milliy taomlari','Sirdaryo','Milliy taomlar','','','50000–100000 so‘m','https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Barokat+milliy+taomlari+Syrdarya'],
+['Forish kafe','Sirdaryo','Qahvaxona','','','—','https://images.unsplash.com/photo-1579684947550-22e945225d9a?auto=format&fit=crop&w=1000&q=85','https://www.google.com/maps/search/?api=1&query=Forish+kafe+Syrdarya']
+];
+
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',3000)}
+function configured(){return window.SUPABASE_URL&&window.SUPABASE_KEY&&!window.SUPABASE_URL.includes('YOUR_')&&!window.SUPABASE_KEY.includes('YOUR_')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function typeLabel(x){return x==='food'?'Ovqatlanish':x||''}
+
+async function init(){
+ if(!configured()){toast('Supabase konfiguratsiyasi topilmadi');return}
+ sb=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY);
+ const {data}=await sb.auth.getSession();
+ session=data.session;
+ loadPlaces();
+}
+async function logout(){if(sb)await sb.auth.signOut();location.reload()}
+
+async function loadPlaces(){
+ if(!sb)return;
+ const {data,error}=await sb.from('places').select('*').eq('category','food').order('created_at',{ascending:false});
+ if(error){toast(error.message);return}
+ places=data||[];renderPlaces();
+}
+function renderPlaces(){
+ const q=(search.value||'').toLowerCase();
+ const arr=places.filter(p=>(!q||JSON.stringify(p).toLowerCase().includes(q)));
+ placesBody.innerHTML=arr.map(p=>`<tr>
+ <td><b>${esc(p.name_uz||'Nomsiz')}</b></td>
+ <td><span class="badge">Ovqatlanish</span></td>
+ <td>${esc(p.district||'')}</td>
+ <td>${esc(p.phone||'')}</td>
+ <td><span class="status ${p.is_active?'':'closed'}">${p.is_active?'Faol':'Yopiq'}</span></td>
+ <td><div class="actions"><button class="ghost" onclick="editPlace('${p.id}')">Tahrirlash</button><button class="danger" onclick="deletePlace('${p.id}')">O‘chirish</button></div></td>
+ </tr>`).join('')||'<tr><td colspan="6">Ma’lumot topilmadi.</td></tr>';
+}
+
+function openForm(p=null){
+ const overlay=document.createElement('div');overlay.id='formOverlay';
+ overlay.style='position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:16px;z-index:20';
+ overlay.innerHTML=`<div class="panel" style="width:min(850px,100%);max-height:92vh;overflow:auto">
+ <div class="top"><h2>${p?'Ovqatlanish joyini tahrirlash':'Yangi ovqatlanish joyi'}</h2><button class="ghost" onclick="formOverlay.remove()">✕</button></div>
+ <div class="form-grid">
+ <div class="field"><label>O‘zbekcha nom</label><input id="fname" value="${esc(p?.name_uz||'')}"></div>
+ <div class="field"><label>Turi</label><input value="Ovqatlanish" disabled></div>
+ <div class="field"><label>Hudud/tuman</label><input id="fdistrict" value="${esc(p?.district||'')}"></div>
+ <div class="field"><label>Telefon</label><input id="fphone" value="${esc(p?.phone||'')}"></div>
+ <div class="field"><label>Google Maps URL</label><input id="fmap" value="${esc(p?.maps_url||'')}"></div>
+ <div class="field"><label>Rasm URL</label><input id="fimage" value="${esc(p?.image_url||'')}"></div>
+ <div class="field"><label>Latitude</label><input id="flat" type="number" step="any" value="${p?.lat??''}"></div>
+ <div class="field"><label>Longitude</label><input id="flon" type="number" step="any" value="${p?.lon??''}"></div>
+ <div class="field"><label>Ish vaqti</label><input id="fhours" value="${esc(p?.hours||'')}"></div>
+ <div class="field"><label>Faol</label><select id="factive"><option value="true" ${p?.is_active!==false?'selected':''}>Ha</option><option value="false" ${p?.is_active===false?'selected':''}>Yo‘q</option></select></div>
+ <div class="field full"><label>O‘zbekcha tavsif</label><textarea id="fdesc">${esc(p?.description_uz||'')}</textarea></div>
+ </div>
+ <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px"><button class="ghost" onclick="formOverlay.remove()">Bekor qilish</button><button class="primary" onclick="savePlace('${p?.id||''}')">Saqlash</button></div>
+ </div>`;
+ document.body.appendChild(overlay);
+}
+function editPlace(id){const p=places.find(x=>x.id===id);if(p)openForm(p)}
+
+async function savePlace(id){
+ const obj={category:'food',name_uz:fname.value.trim(),district:fdistrict.value.trim(),phone:fphone.value.trim(),maps_url:fmap.value.trim(),image_url:fimage.value.trim(),lat:flat.value?Number(flat.value):null,lon:flon.value?Number(flon.value):null,hours:fhours.value.trim(),description_uz:fdesc.value.trim(),is_active:factive.value==='true'};
+ if(!obj.name_uz){toast('Nomni kiriting');return}
+ const r=id?await sb.from('places').update(obj).eq('id',id):await sb.from('places').insert(obj);
+ if(r.error){toast(r.error.message);return}
+ formOverlay.remove();toast('Saqlandi');loadPlaces();
+}
+async function deletePlace(id){
+ if(!confirm('O‘chirishni tasdiqlaysizmi?'))return;
+ const {error}=await sb.from('places').delete().eq('id',id);
+ if(error)toast(error.message);else{toast('O‘chirildi');loadPlaces()}
+}
+
+async function importStaticFood(){
+ if(!sb)return;
+ if(!confirm('Saytdagi mavjud ovqatlanish joylarini bazaga import qilinsinmi? Takroriy nomlar tashlab ketiladi.'))return;
+ let added=0,skipped=0;
+ const {data:existing,error:e}=await sb.from('places').select('name_uz').eq('category','food');
+ if(e){toast(e.message);return}
+ const names=new Set((existing||[]).map(x=>(x.name_uz||'').trim().toLowerCase()));
+ for(const x of STATIC_FOOD){
+   if(names.has(x[0].trim().toLowerCase())){skipped++;continue}
+   const obj={category:'food',name_uz:x[0],district:x[1],phone:x[3]||null,hours:x[4]||null,image_url:x[6],maps_url:x[7],is_active:true};
+   const r=await sb.from('places').insert(obj);
+   if(!r.error){added++;names.add(x[0].trim().toLowerCase())}
+ }
+ toast(`Import tugadi: ${added} ta qo‘shildi, ${skipped} ta mavjud edi`);
+ loadPlaces();
+}
+init();
+</script>
+</body>
+</html>

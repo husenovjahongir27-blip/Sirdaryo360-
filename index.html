@@ -389,30 +389,59 @@
   </div>
 
 
-  <section class="travel-help" aria-label="Sayohat uchun qulayliklar">
-    <div class="travel-help-kicker">TURIST UCHUN QULAYLIK</div>
-    <h2 class="travel-help-title">Sayohatingizni osonlashtiring</h2>
-    <div class="travel-help-grid">
-      <a class="travel-help-card" href="mehmonxonalar.html">
-        <div class="travel-help-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-6h3v6M13 20v-6h3v6"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
-        </div>
-        <div><h3>Mehmonxonalar</h3><p>Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.</p></div>
-      </a>
-      <a class="travel-help-card" href="ovqatlanish.html">
-        <div class="travel-help-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v18H4z"/><path d="M8 7h8M8 11h8M8 15h5"/><path d="M16 18h.01"/></svg>
-        </div>
-        <div><h3>Ovqatlanish</h3><p>Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.</p></div>
-      </a>
-      <a class="travel-help-card" href="tarixiy-manzillar.html">
-        <div class="travel-help-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-5h8v5"/><path d="M9 10h.01M12 10h.01M15 10h.01"/><path d="M7 9h10"/></svg>
-        </div>
-        <div><h3>Tarixiy maskanlar</h3><p>Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.</p></div>
-      </a>
-    </div>
-  </section>
+<section class="travel-help" aria-label="Sayohat uchun qulayliklar">
+  <div class="travel-help-kicker" data-i="travel_help_kicker">TURIST UCHUN QULAYLIK</div>
+  <h2 class="travel-help-title" data-i="travel_help_title">Sayohatingizni osonlashtiring</h2>
+
+  <div class="travel-help-grid">
+
+    <a class="travel-help-card" href="mehmonxonalar.html">
+      <div class="travel-help-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 20h18"/>
+          <path d="M5 20V9l7-5 7 5v11"/>
+          <path d="M8 20v-6h3v6M13 20v-6h3v6"/>
+          <path d="M8 10h.01M12 10h.01M16 10h.01"/>
+        </svg>
+      </div>
+      <div>
+        <h3 data-i="travel_hotel_title">Mehmonxonalar</h3>
+        <p data-i="travel_hotel_desc">Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.</p>
+      </div>
+    </a>
+
+    <a class="travel-help-card" href="ovqatlanish.html">
+      <div class="travel-help-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 3h16v18H4z"/>
+          <path d="M8 7h8M8 11h8M8 15h5"/>
+          <path d="M16 18h.01"/>
+        </svg>
+      </div>
+      <div>
+        <h3 data-i="travel_food_title">Ovqatlanish</h3>
+        <p data-i="travel_food_desc">Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.</p>
+      </div>
+    </a>
+
+    <a class="travel-help-card" href="tarixiy-manzillar.html">
+      <div class="travel-help-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 20h18"/>
+          <path d="M5 20V9l7-5 7 5v11"/>
+          <path d="M8 20v-5h8v5"/>
+          <path d="M9 10h.01M12 10h.01M15 10h.01"/>
+          <path d="M7 9h10"/>
+        </svg>
+      </div>
+      <div>
+        <h3 data-i="travel_history_title">Tarixiy maskanlar</h3>
+        <p data-i="travel_history_desc">Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.</p>
+      </div>
+    </a>
+
+  </div>
+</section>
 
   <div class="section-divider" aria-hidden="true">
     <div class="section-divider-badge">
@@ -545,6 +574,69 @@ const UI = {
   f_audio_playing:{ uz:"Tinglanmoqda...", en:"Playing...", ru:"Воспроизведение...", tr:"Çalıyor...", zh:"播放中..." },
   f_fav_t:{ uz:"Sevimlilar", en:"Favorites", ru:"Избранное", tr:"Favoriler", zh:"收藏" },
   f_fav_s:{ uz:"Yoqtirgan joylaringizni saqlang", en:"Save the places you like", ru:"Сохраняйте понравившиеся места", tr:"Beğendiğiniz yerleri kaydedin", zh:"保存您喜欢的地点" },
+  travel_help_kicker:{
+  uz:"TURIST UCHUN QULAYLIK",
+  en:"TRAVEL CONVENIENCE",
+  ru:"УДОБСТВА ДЛЯ ТУРИСТОВ",
+  tr:"TURİST İÇİN KOLAYLIKLAR",
+  zh:"游客便利服务"
+},
+
+travel_help_title:{
+  uz:"Sayohatingizni osonlashtiring",
+  en:"Make your journey easier",
+  ru:"Сделайте своё путешествие проще",
+  tr:"Seyahatinizi kolaylaştırın",
+  zh:"让您的旅程更轻松"
+},
+
+travel_hotel_title:{
+  uz:"Mehmonxonalar",
+  en:"Hotels",
+  ru:"Гостиницы",
+  tr:"Oteller",
+  zh:"酒店"
+},
+
+travel_hotel_desc:{
+  uz:"Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.",
+  en:"Find places to stay in Guliston and view them on the map.",
+  ru:"Найдите места для проживания в Гулистане и посмотрите их на карте.",
+  tr:"Guliston'da konaklama yerlerini bulun ve haritada görüntüleyin.",
+  zh:"查找古利斯坦的住宿地点并在地图上查看。"
+},
+
+travel_food_title:{
+  uz:"Ovqatlanish",
+  en:"Dining",
+  ru:"Питание",
+  tr:"Yeme İçme",
+  zh:"餐饮"
+},
+
+travel_food_desc:{
+  uz:"Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.",
+  en:"Useful information about restaurants, cafes and national cuisine.",
+  ru:"Полезная информация о ресторанах, кафе и национальной кухне.",
+  tr:"Restoranlar, kafeler ve yöresel yemekler hakkında faydalı bilgiler.",
+  zh:"关于餐厅、咖啡馆和民族美食的实用信息。"
+},
+
+travel_history_title:{
+  uz:"Tarixiy maskanlar",
+  en:"Historical sites",
+  ru:"Исторические места",
+  tr:"Tarihi yerler",
+  zh:"历史遗迹"
+},
+
+travel_history_desc:{
+  uz:"Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.",
+  en:"Discover ancient cities, hills and archaeological sites in Sirdaryo.",
+  ru:"Откройте для себя древние города, холмы и археологические памятники Сырдарьи.",
+  tr:"Sirdaryo'daki antik şehirleri, tepeleri ve arkeolojik alanları keşfedin.",
+  zh:"探索锡尔河州的古城、丘陵和考古遗址。"
+},
   fact_title:{ uz:"Qiziqarli ma'lumot", en:"Interesting fact", ru:"Интересный факт", tr:"İlginç bilgi", zh:"趣味知识" },
   links_title:{ uz:"Foydali havolalar", en:"Useful links", ru:"Полезные ссылки", tr:"Faydalı bağlantılar", zh:"实用链接" },
   link1:{ uz:"Sirdaryo viloyati rasmiy sayti", en:"Official Sirdaryo Region website", ru:"Официальный сайт Сырдарьинской области", tr:"Sirdaryo Bölgesi resmi sitesi", zh:"锡尔河州官方网站" },

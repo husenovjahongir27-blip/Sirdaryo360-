@@ -85,6 +85,7 @@
   .lang-opt:hover{ background:var(--pastel-blue); }
   .lang-opt.active{ color:var(--green-dark); }
   .lang-flag{ font-size:15px; line-height:1; }
+  .lang-flag-img{ width:20px; height:14px; object-fit:cover; border-radius:2px; display:block; flex:0 0 auto; }
 
   /* ================= MODALS (Xarita / Sevimlilar) ================= */
   .modal-overlay{ position:fixed; inset:0; background:rgba(10,18,24,0.55); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
@@ -123,11 +124,12 @@
   .feedback-card h4{ font-size:15px; font-weight:800; margin-bottom:4px; color:var(--blue); }
   .feedback-card .fb-sub{ font-size:12px; color:var(--ink-dim); margin-bottom:14px; }
   .fb-row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
-  .fb-row input, .fb-row textarea{
+  .fb-row input, .fb-row textarea, .fb-row select{
     flex:1; min-width:180px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px;
     font-family:inherit; background:var(--bg); color:var(--ink); outline:none; resize:vertical;
   }
-  .fb-row input:focus, .fb-row textarea:focus{ border-color:var(--blue); }
+  .fb-row input:focus, .fb-row textarea:focus, .fb-row select:focus{ border-color:var(--blue); }
+  .fb-type{ cursor:pointer; appearance:auto; }
   .fb-row textarea{ min-height:90px; width:100%; }
   .fb-submit{ background:var(--green); color:#fff; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700; border:none; }
   .fb-submit:hover{ background:var(--green-dark); }
@@ -178,7 +180,7 @@
   .viewer-card{ position:relative; background:#0d1418; border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(20,40,60,0.10); height:500px; }
   #panorama{ width:100%; height:100%; }
 
-  .loc-pill{ position:absolute; top:16px; left:50%; transform:translateX(-50%); background:rgba(20,30,38,0.72); backdrop-filter:blur(4px);
+  .loc-pill{ display:none !important; position:absolute; top:16px; left:50%; transform:translateX(-50%); background:rgba(20,30,38,0.72); backdrop-filter:blur(4px);
     color:#fff; padding:8px 16px; border-radius:100px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; z-index:5; }
   .loc-pill .num{ opacity:0.7; font-weight:500; }
 
@@ -360,7 +362,7 @@
     <div class="header-actions">
       <div class="icon-btn fav-count" id="favCountBtn">♥ <span id="favCount">0</span></div>
       <div class="icon-btn" id="darkToggle">🌙</div>
-      <div class="lang-btn" id="langBtn"><span class="lang-flag" id="langFlag">🇺🇿</span> <span id="langLabel">UZ</span> ▾</div>
+      <div class="lang-btn" id="langBtn"><img class="lang-flag-img" id="langFlag" src="https://flagcdn.com/w20/uz.png" alt="UZ bayrog'i"> <span id="langLabel">UZ</span> ▾</div>
       <div class="lang-menu" id="langMenu"></div>
     </div>
   </header>
@@ -429,6 +431,12 @@
         </div>
         <div><h3 data-i="travel_food_title">Ovqatlanish</h3><p data-i="travel_food_desc">Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.</p></div>
       </a>
+      <a class="travel-help-card" href="tarixiy-manzillar.html">
+        <div class="travel-help-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-5h8v5"/><path d="M9 10h.01M12 10h.01M15 10h.01"/><path d="M7 9h10"/></svg>
+        </div>
+        <div><h3 data-i="travel_history_title">Tarixiy maskanlar</h3><p data-i="travel_history_desc">Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.</p></div>
+      </a>
     </div>
   </section>
 
@@ -491,6 +499,10 @@
     <form id="feedbackForm">
       <div class="fb-row">
         <input type="text" id="fbName" data-i-placeholder="fb_name" placeholder="Ismingiz" required>
+        <select id="fbType" class="fb-type" aria-label="Murojaat turi">
+          <option value="suggestion">💡 Taklif</option>
+          <option value="complaint">⚠️ Shikoyat</option>
+        </select>
         <input type="text" id="fbSubject" data-i-placeholder="fb_subject" placeholder="Mavzu (ixtiyoriy)">
       </div>
       <div class="fb-row">
@@ -548,6 +560,46 @@ const LANGS = [
 ];
 let currentLang = localStorage.getItem("sirdaryo360_lang") || "uz";
 
+const LANG_FLAG_URLS = {
+  uz:"https://flagcdn.com/w20/uz.png",
+  en:"https://flagcdn.com/w20/gb.png",
+  ru:"https://flagcdn.com/w20/ru.png",
+  tr:"https://flagcdn.com/w20/tr.png",
+  zh:"https://flagcdn.com/w20/cn.png"
+};
+
+function updateLanguageButton(){
+  const activeLang = LANGS.find(l=>l.code===currentLang) || LANGS[0];
+  const label = document.getElementById("langLabel");
+  const flag = document.getElementById("langFlag");
+  if(label) label.textContent = activeLang.label;
+  if(flag){
+    flag.src = LANG_FLAG_URLS[activeLang.code] || LANG_FLAG_URLS.uz;
+    flag.alt = activeLang.name + " bayrog'i";
+  }
+}
+
+function translateFeedback(){
+  ["feedback_title","feedback_sub","fb_send"].forEach(key=>{
+    const el=document.querySelector(`[data-i="${key}"]`);
+    if(el && UI[key]) el.textContent=tr(key);
+  });
+  document.querySelectorAll("[data-i-placeholder]").forEach(el=>{
+    const key=el.getAttribute("data-i-placeholder");
+    if(["fb_name","fb_subject","fb_message"].includes(key) && UI[key]) el.placeholder=tr(key);
+  });
+  const type=document.getElementById("fbType");
+  if(type){
+    const selected=type.value || "suggestion";
+    const s=type.querySelector('option[value="suggestion"]');
+    const c=type.querySelector('option[value="complaint"]');
+    if(s) s.textContent=tr("fb_type_suggestion");
+    if(c) c.textContent=tr("fb_type_complaint");
+    type.value=selected;
+  }
+}
+
+
 const UI = {
   tagline:{ uz:"Virtual sayohat", en:"Virtual journey", ru:"Виртуальное путешествие", tr:"Sanal gezi", zh:"虚拟之旅" },
   nav_home:{ uz:"Bosh sahifa", en:"Home", ru:"Главная", tr:"Ana sayfa", zh:"首页" },
@@ -604,6 +656,8 @@ const UI = {
   feedback_title:{ uz:"Taklif va shikoyatlar", en:"Suggestions & complaints", ru:"Предложения и жалобы", tr:"Öneriler ve şikâyetler", zh:"意见与投诉" },
   feedback_sub:{ uz:"Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.", en:"Write your feedback — it will be sent directly to the admin panel.", ru:"Напишите сообщение — оно будет отправлено прямо в админ-панель.", tr:"Fikrinizi yazın — mesaj doğrudan yönetim paneline gönderilir.", zh:"留下您的意见——消息将直接发送到管理面板。" },
   fb_name:{ uz:"Ismingiz", en:"Your name", ru:"Ваше имя", tr:"Adınız", zh:"您的姓名" },
+  fb_type_suggestion:{ uz:"💡 Taklif", en:"💡 Suggestion", ru:"💡 Предложение", tr:"💡 Öneri", zh:"💡 建议" },
+  fb_type_complaint:{ uz:"⚠️ Shikoyat", en:"⚠️ Complaint", ru:"⚠️ Жалоба", tr:"⚠️ Şikâyet", zh:"⚠️ 投诉" },
   fb_subject:{ uz:"Mavzu (ixtiyoriy)", en:"Subject (optional)", ru:"Тема (необязательно)", tr:"Konu (isteğe bağlı)", zh:"主题（可选）" },
   fb_message:{ uz:"Taklif yoki shikoyatingizni shu yerga yozing...", en:"Write your suggestion or complaint here...", ru:"Напишите здесь ваше предложение или жалобу...", tr:"Öneri veya şikâyetinizi buraya yazın...", zh:"请在此填写您的意见或投诉..." },
   fb_send:{ uz:"✉️ Yuborish", en:"✉️ Send", ru:"✉️ Отправить", tr:"✉️ Gönder", zh:"✉️ 发送" },
@@ -630,40 +684,21 @@ const UI = {
 function tr(key){ return (UI[key] && UI[key][currentLang]) || (UI[key] && UI[key].uz) || key; }
 
 function applyStaticTranslations(){
-  const activeLang = LANGS.find(l=>l.code===currentLang) || LANGS[0];
-
-  document.documentElement.lang = currentLang;
-
   document.querySelectorAll("[data-i]").forEach(el => {
     const key = el.getAttribute("data-i");
     if (UI[key]) el.textContent = tr(key);
   });
-
   document.querySelectorAll("[data-i-placeholder]").forEach(el => {
     const key = el.getAttribute("data-i-placeholder");
     if (UI[key]) el.placeholder = tr(key);
   });
-
   document.querySelectorAll("[data-i-title]").forEach(el => {
     const key = el.getAttribute("data-i-title");
     if (UI[key]) el.title = tr(key);
   });
-
-  document.getElementById("langLabel").textContent = activeLang.label;
-  document.getElementById("langFlag").textContent = activeLang.flag;
-
-  // Rebuild the menu so the selected language is visibly active.
-  const menu = document.getElementById("langMenu");
-  if (menu && menu.classList.contains("open")) renderLangMenu();
-
-  if (currentDistrict){
-    document.getElementById("footFact").textContent =
-      tr("fact_body_" + currentDistrict.id) ||
-      currentDistrict.fact?.[currentLang] ||
-      currentDistrict.fact?.uz ||
-      "";
-  }
-
+  updateLanguageButton();
+  translateFeedback();
+  document.getElementById("footFact").textContent = tr("fact_body_" + currentDistrict.id) || "";
   updateWeatherLanguageUI();
 }
 
@@ -716,9 +751,7 @@ function dbRowToLocation(p, index){
   return {
     id: String(p.id || `place-${index}`),
     seed: String(p.id || index),
-    // image_url is a normal thumbnail/photo. Use a dedicated panorama
-    // field when the database has one; otherwise keep the working demo panorama.
-    pano: p.panorama_url || p.pano_url || p.pano || DEMO_PANOS[index % DEMO_PANOS.length],
+    pano: p.image_url || DEMO_PANOS[index % DEMO_PANOS.length],
     image_url: p.image_url || "",
     category,
     name:{
@@ -784,7 +817,7 @@ async function loadPlacesFromSupabase(){
 
     const { data, error } = await publicPlacesClient
       .from("places")
-      .select("*")
+      .select("id,category,name_uz,name_en,name_ru,name_tr,name_zh,description_uz,district,phone,maps_url,image_url,lat,lon,hours,is_active,created_at")
       .eq("is_active", true)
       .order("created_at", { ascending:false });
 
@@ -1415,59 +1448,31 @@ function buildScenesConfig(){
   return scenes;
 }
 
-function createPanoramaViewer(firstSceneId){
-  const scenes = buildScenesConfig();
-  if (!scenes[firstSceneId]) return null;
-
-  const instance = pannellum.viewer("panorama", {
-    default:{
-      firstScene:firstSceneId,
-      autoLoad:true,
-      showZoomCtrl:false,
-      showFullscreenCtrl:false,
-      showControls:false,
-      autoRotate:autoRotateOn ? -1.4 : 0,
-      sceneFadeDuration:600,
-      compass:false
-    },
-    scenes
-  });
-
-  instance.on("scenechange", onSceneChange);
-  instance.on("load", () => {
-    document.getElementById("loadingTag").style.display = "none";
-  });
-  // Pannellum fires an error event for a broken/incompatible panorama.
-  instance.on("error", (err) => {
-    console.warn("Panorama yuklanmadi:", err);
-    document.getElementById("loadingTag").textContent = "Panorama yuklanmadi";
-  });
-  return instance;
-}
-
 function loadScene(index){
-  if (!currentDistrict || !Array.isArray(currentDistrict.locations) || !currentDistrict.locations.length) return;
-
-  index = Math.max(0, Math.min(index, currentDistrict.locations.length - 1));
   currentLocIndex = index;
   const loc = currentDistrict.locations[index];
   document.getElementById("loadingTag").style.display = "block";
-  document.getElementById("loadingTag").textContent = tr("loading");
-
-  // Rebuild only when the district/data set changed. This keeps navigation smooth.
-  if (viewer){
-    try { viewer.destroy(); } catch (_) {}
-    viewer = null;
-  }
-
-  viewer = createPanoramaViewer(loc.id);
 
   if (!viewer){
-    document.getElementById("loadingTag").textContent = "Panorama yuklanmadi";
+    viewer = pannellum.viewer("panorama", {
+      default:{ firstScene: loc.id, autoLoad:true, showZoomCtrl:false, showFullscreenCtrl:false, showControls:false, autoRotate: autoRotateOn ? -1.4 : 0, sceneFadeDuration:600 },
+      scenes: buildScenesConfig()
+    });
+    viewer.on("scenechange", onSceneChange);
+    viewer.on("load", () => { document.getElementById("loadingTag").style.display = "none"; });
+  } else {
+    viewer.destroy();
+    viewer = pannellum.viewer("panorama", {
+      default:{ firstScene: loc.id, autoLoad:true, showZoomCtrl:false, showFullscreenCtrl:false, showControls:false, autoRotate: autoRotateOn ? -1.4 : 0, sceneFadeDuration:600 },
+      scenes: buildScenesConfig()
+    });
+    viewer.on("scenechange", onSceneChange);
+    viewer.on("load", () => { document.getElementById("loadingTag").style.display = "none"; });
   }
 
   updateUIForLocation(loc);
 }
+
 function onSceneChange(sceneId){
   const idx = currentDistrict.locations.findIndex(l => l.id === sceneId);
   if (idx === -1) return;
@@ -1540,14 +1545,21 @@ document.getElementById("navContact").addEventListener("click", (e) => {
 ============================================================ */
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const form=e.currentTarget,name=document.getElementById("fbName").value.trim(),subject=document.getElementById("fbSubject").value.trim(),message=document.getElementById("fbMessage").value.trim(),btn=form.querySelector("button[type=submit]");
+  const form=e.currentTarget,
+        name=document.getElementById("fbName").value.trim(),
+        type=document.getElementById("fbType")?.value || "suggestion",
+        subject=document.getElementById("fbSubject").value.trim(),
+        message=document.getElementById("fbMessage").value.trim(),
+        btn=form.querySelector("button[type=submit]");
   if(!name||!message)return;
+  const typeLabel = type === "complaint" ? tr("fb_type_complaint") : tr("fb_type_suggestion");
+  const fullSubject = subject ? `${typeLabel} — ${subject}` : typeLabel;
   const oldText=btn.textContent;btn.disabled=true;btn.textContent="…";
   try{
     const client=publicPlacesClient||(window.supabase&&window.SUPABASE_URL&&window.SUPABASE_KEY?window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null);
     if(!client)throw new Error("Supabase unavailable");
     let submittedBy=null;try{const {data:{user}}=await client.auth.getUser();submittedBy=user?.id||null;}catch(_){}
-    const {error}=await client.from("site_feedback").insert({name,subject:subject||null,message,status:"pending",submitted_by:submittedBy,page_path:location.pathname,language:currentLang});
+    const {error}=await client.from("site_feedback").insert({name,subject:fullSubject,message,status:"pending",submitted_by:submittedBy,page_path:location.pathname,language:currentLang});
     if(error)throw error;form.reset();alert(tr("fb_success"));
   }catch(err){console.error("Feedback error:",err);alert(tr("fb_error"));}
   finally{btn.disabled=false;btn.textContent=oldText;}
@@ -1619,13 +1631,13 @@ async function initPublicSite(){
   rebuildAllLocations();
   registerPWA();
   setupPWAInstall();
-  applyStaticTranslations();
   renderLangMenu();
   renderDistrictChips();
   renderLocList();
   initMiniMap();
   updateWeather();
   loadScene(0);
+  applyStaticTranslations();
 
   // Sayt ochilgandan keyin admin panelda yangi obyekt qo'shilgan bo'lsa,
   // uni ko'rsatish uchun bir marta qayta tekshiramiz.

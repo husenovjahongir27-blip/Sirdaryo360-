@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1ea672">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="sirdaryo360.webmanifest">
 <title>Sirdaryo 360° — Virtual sayohat</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +15,8 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
 <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -219,6 +225,23 @@
   .rp-detail .dl{ color:var(--ink-dim); font-weight:600; display:block; }
   .rp-detail .dv{ color:var(--ink); font-weight:600; }
   .rp-actions{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .nearby-box{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .nearby-title{ font-size:12.5px; font-weight:800; margin-bottom:8px; }
+  .nearby-list{ display:flex; flex-direction:column; gap:6px; }
+  .nearby-item{ display:flex; align-items:center; gap:8px; padding:8px; border:1px solid var(--line); border-radius:10px; background:var(--bg); cursor:pointer; }
+  .nearby-item:hover{ border-color:var(--green); background:var(--pastel-green); }
+  .nearby-item .ni-main{ flex:1; min-width:0; }
+  .nearby-item .ni-name{ font-size:11.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .nearby-item .ni-meta{ font-size:10px; color:var(--ink-dim); margin-top:2px; }
+  .nearby-item .ni-distance{ font-size:10px; color:var(--green-dark); font-weight:800; white-space:nowrap; }
+  .nearby-empty{ font-size:11px; color:var(--ink-dim); padding:8px 0; }
+  .install-card{ margin-top:16px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; display:none; align-items:center; gap:12px; box-shadow:0 2px 8px rgba(20,40,60,.04); }
+  .install-card.show{ display:flex; }
+  .install-card .install-copy{ flex:1; min-width:0; }
+  .install-card h4{ font-size:13px; margin:0 0 3px; font-weight:800; }
+  .install-card p{ font-size:11px; color:var(--ink-dim); margin:0; line-height:1.4; }
+  .install-btn{ background:var(--green); color:#fff; border:none; border-radius:9px; padding:9px 12px; font-size:11.5px; font-weight:800; white-space:nowrap; }
+  .install-close{ background:var(--pastel-blue); color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:8px 10px; font-size:11px; }
   .btn-primary, .btn-secondary, .btn-audio{ padding:10px; border-radius:10px; font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px; border:none; }
   .btn-primary{ background:var(--green); color:#fff; }
   .btn-primary:hover{ background:var(--green-dark); }
@@ -331,6 +354,7 @@
       <div class="nav-item active" id="navTour">🎡 <span data-i="nav_tour">360° Tur</span></div>
       <div class="nav-item" id="navAbout">📋 <span data-i="nav_about">Loyiha haqida</span></div>
       <div class="nav-item" id="navNews">📰 <span data-i="nav_news">Yangiliklar</span></div>
+      <a class="nav-item" href="tarixiy-manzillar.html" style="text-decoration:none">🏛️ <span data-i="nav_history">Tarixiy manzillar</span></a>
       <div class="nav-item" id="navContact">✉️ <span data-i="nav_contact">Aloqa</span></div>
     </nav>
     <div class="header-actions">
@@ -350,7 +374,7 @@
         <div class="district-scroll" id="districtScroll"></div>
 
         <div class="aside-title" data-i="places_title" style="margin-top:2px;">Joylar ro'yxati</div>
-        <input class="search-input" type="text" id="searchBox">
+        <input class="search-input" type="text" id="searchBox" data-i-placeholder="search_placeholder" aria-label="Qidiruv">
         <div class="loc-list" id="locList"></div>
 
         <div class="map-card" id="miniMapCard">
@@ -379,7 +403,7 @@
         <div class="features">
           <div class="feature clickable" id="mapFeatureBtn"><div class="feature-icon" style="background:var(--pastel-green);color:var(--green)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 3.8 21V6L9 3l6 3 5.2-3v15L15 21z"/><path d="M9 3v15M15 6v15"/></svg></div><div><div class="feature-title" data-i="f_map_t">Interaktiv xarita</div><div class="feature-sub" data-i="f_map_s">Barcha joylar xaritada</div></div></div>
           <div class="feature clickable" id="audioFeatureBtn"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7 7 0 0 1 0 10"/></svg></div><div><div class="feature-title" data-i="f_audio_t">Audio gid</div><div class="feature-sub" id="audioFeatureSub" data-i="f_audio_s">Bosing va tinglang</div></div></div>
-          <div class="feature clickable" id="weatherFeatureBtn" title="Ob-havo ma'lumotlarini ko'rish"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)" id="weatherIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8 5.2 5.2M10.8 10.8 12.2 12.2"/><path d="M7 19h10a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.6-1.1A3.5 3.5 0 0 0 7 19z"/></svg></div><div><div class="feature-title">Viloyat ob-havosi</div><div class="feature-sub" id="weatherFeatureSub">Ob-havo yuklanmoqda...</div></div></div>
+          <div class="feature clickable" id="weatherFeatureBtn" data-i-title="weather_feature_title"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)" id="weatherIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8 5.2 5.2M10.8 10.8 12.2 12.2"/><path d="M7 19h10a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.6-1.1A3.5 3.5 0 0 0 7 19z"/></svg></div><div><div class="feature-title" data-i="weather_feature">Viloyat ob-havosi</div><div class="feature-sub" id="weatherFeatureSub" data-i="weather_loading_short">Ob-havo yuklanmoqda...</div></div></div>
           <div class="feature clickable" id="favFeatureBtn"><div class="feature-icon" style="background:var(--pastel-amber);color:var(--amber)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6z"/></svg></div><div><div class="feature-title" data-i="f_fav_t">Sevimlilar</div><div class="feature-sub" data-i="f_fav_s">Yoqtirgan joylaringizni saqlang</div></div></div>
         </div>
       </main>
@@ -390,34 +414,41 @@
 
 
   <section class="travel-help" aria-label="Sayohat uchun qulayliklar">
-    <div class="travel-help-kicker">TURIST UCHUN QULAYLIK</div>
-    <h2 class="travel-help-title">Sayohatingizni osonlashtiring</h2>
+    <div class="travel-help-kicker" data-i="travel_kicker">TURIST UCHUN QULAYLIK</div>
+    <h2 class="travel-help-title" data-i="travel_title">Sayohatingizni osonlashtiring</h2>
     <div class="travel-help-grid">
       <a class="travel-help-card" href="mehmonxonalar.html">
         <div class="travel-help-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-6h3v6M13 20v-6h3v6"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
         </div>
-        <div><h3>Mehmonxonalar</h3><p>Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.</p></div>
+        <div><h3 data-i="travel_hotel_title">Mehmonxonalar</h3><p data-i="travel_hotel_desc">Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.</p></div>
       </a>
       <a class="travel-help-card" href="ovqatlanish.html">
         <div class="travel-help-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v18H4z"/><path d="M8 7h8M8 11h8M8 15h5"/><path d="M16 18h.01"/></svg>
         </div>
-        <div><h3>Ovqatlanish</h3><p>Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.</p></div>
+        <div><h3 data-i="travel_food_title">Ovqatlanish</h3><p data-i="travel_food_desc">Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.</p></div>
       </a>
       <a class="travel-help-card" href="tarixiy-manzillar.html">
         <div class="travel-help-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-5h8v5"/><path d="M9 10h.01M12 10h.01M15 10h.01"/><path d="M7 9h10"/></svg>
         </div>
-        <div><h3>Tarixiy maskanlar</h3><p>Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.</p></div>
+        <div><h3 data-i="travel_history_title">Tarixiy maskanlar</h3><p data-i="travel_history_desc">Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.</p></div>
       </a>
     </div>
   </section>
 
+  <div class="install-card" id="installCard">
+    <div style="font-size:24px">📱</div>
+    <div class="install-copy"><h4 data-i="install_title">Sirdaryo360'ni telefonga o‘rnating</h4><p data-i="install_text">Saytni ilovadek tez va qulay ishlatish uchun bosh ekranga qo‘shing.</p></div>
+    <button class="install-btn" id="installBtn" data-i="install_button">O‘rnatish</button>
+    <button class="install-close" id="installClose" data-i="install_later">Keyinroq</button>
+  </div>
+
   <div class="section-divider" aria-hidden="true">
     <div class="section-divider-badge">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m12 7 2 5-2 5-2-5 2-5z"/><path d="M12 3.5v2M20.5 12h-2M12 20.5v-2M3.5 12h2"/></svg>
-      Sirdaryoni kashf eting
+      <span data-i="discover_badge">Sirdaryoni kashf eting</span>
     </div>
   </div>
 
@@ -461,17 +492,17 @@
   </div>
 
   <div class="feedback-card" id="feedbackCard">
-    <h4>Taklif va shikoyatlar</h4>
-    <div class="fb-sub">Fikringizni yozing — xabar to'g'ridan-to'g'ri emailimizga yuboriladi.</div>
+    <h4 data-i="feedback_title">Taklif va shikoyatlar</h4>
+    <div class="fb-sub" data-i="feedback_sub">Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.</div>
     <form id="feedbackForm">
       <div class="fb-row">
-        <input type="text" id="fbName" placeholder="Ismingiz" required>
-        <input type="text" id="fbSubject" placeholder="Mavzu (ixtiyoriy)">
+        <input type="text" id="fbName" data-i-placeholder="fb_name" placeholder="Ismingiz" required>
+        <input type="text" id="fbSubject" data-i-placeholder="fb_subject" placeholder="Mavzu (ixtiyoriy)">
       </div>
       <div class="fb-row">
-        <textarea id="fbMessage" placeholder="Taklif yoki shikoyatingizni shu yerga yozing..." required></textarea>
+        <textarea id="fbMessage" data-i-placeholder="fb_message" placeholder="Taklif yoki shikoyatingizni shu yerga yozing..." required></textarea>
       </div>
-      <button type="submit" class="fb-submit">✉️ Yuborish</button>
+      <button type="submit" class="fb-submit" data-i="fb_send">✉️ Yuborish</button>
     </form>
   </div>
 
@@ -495,9 +526,9 @@
 <!-- Weather modal -->
 <div class="modal-overlay" id="weatherModalOverlay">
   <div class="modal-box weather-modal-box">
-    <div class="modal-head"><span>🌤️ Sirdaryo viloyati ob-havosi</span><button class="modal-close" id="weatherModalClose">✕</button></div>
+    <div class="modal-head"><span>🌤️ <span data-i="weather_modal_title">Sirdaryo viloyati ob-havosi</span></span><button class="modal-close" id="weatherModalClose">✕</button></div>
     <div class="modal-body weather-body" id="weatherModalBody">
-      <div class="weather-loading">Ob-havo ma'lumotlari yuklanmoqda...</div>
+      <div class="weather-loading" data-i="weather_loading">Ob-havo ma'lumotlari yuklanmoqda...</div>
     </div>
   </div>
 </div>
@@ -521,7 +552,7 @@ const LANGS = [
   { code:"tr", label:"TR", name:"Türkçe",    speech:"tr-TR", flag:"🇹🇷" },
   { code:"zh", label:"ZH", name:"中文",       speech:"zh-CN", flag:"🇨🇳" }
 ];
-let currentLang = "uz";
+let currentLang = localStorage.getItem("sirdaryo360_lang") || "uz";
 
 const UI = {
   tagline:{ uz:"Virtual sayohat", en:"Virtual journey", ru:"Виртуальное путешествие", tr:"Sanal gezi", zh:"虚拟之旅" },
@@ -560,20 +591,86 @@ const UI = {
   yo_nalish:{ uz:"Yo'nalish olish", en:"Get directions", ru:"Проложить маршрut".replace("ut","ут"), tr:"Yol tarifi al", zh:"获取路线" },
   sevimli:{ uz:"Sevimlilarga qo'shish", en:"Add to favorites", ru:"Добавить в избранное", tr:"Favorilere ekle", zh:"添加到收藏" },
   sevimli_saved:{ uz:"Sevimlilarda", en:"Saved", ru:"В избранном", tr:"Favorilerde", zh:"已收藏" },
-  demo_notice:{ uz:"Namuna panoramalar ko'rsatilmoqda", en:"Sample panoramas are shown", ru:"Показаны демо-панорамы", tr:"Örnek panoramalar gösteriliyor", zh:"显示的是示例全景图" }
+  demo_notice:{ uz:"Namuna panoramalar ko‘rsatilmoqda", en:"Sample panoramas are shown", ru:"Показаны демо-панорамы", tr:"Örnek panoramalar gösteriliyor", zh:"显示的是示例全景图" },
+  nav_history:{ uz:"Tarixiy manzillar", en:"Historical sites", ru:"Исторические места", tr:"Tarihi yerler", zh:"历史遗址" },
+  search_no_results:{ uz:"Ma’lumot topilmadi.", en:"No results found.", ru:"Ничего не найдено.", tr:"Sonuç bulunamadı.", zh:"未找到结果。" },
+  search_placeholder:{ uz:"Joy, tuman yoki turini qidiring...", en:"Search place, district or type...", ru:"Поиск места, района или типа...", tr:"Yer, ilçe veya tür ara...", zh:"搜索地点、地区或类型..." },
+  weather_feature_title:{ uz:"Ob-havo ma’lumotlarini ko‘rish", en:"View weather information", ru:"Посмотреть информацию о погоде", tr:"Hava durumu bilgilerini görüntüle", zh:"查看天气信息" },
+  weather_feature:{ uz:"Viloyat ob-havosi", en:"Regional weather", ru:"Погода в регионе", tr:"Bölge hava durumu", zh:"地区天气" },
+  weather_loading_short:{ uz:"Ob-havo yuklanmoqda...", en:"Loading weather...", ru:"Загрузка погоды...", tr:"Hava durumu yükleniyor...", zh:"天气加载中..." },
+  travel_kicker:{ uz:"TURIST UCHUN QULAYLIK", en:"TRAVEL CONVENIENCE", ru:"УДОБСТВА ДЛЯ ТУРИСТА", tr:"TURİST KOLAYLIKLARI", zh:"游客便利服务" },
+  travel_title:{ uz:"Sayohatingizni osonlashtiring", en:"Make your journey easier", ru:"Сделайте путешествие проще", tr:"Seyahatinizi kolaylaştırın", zh:"让您的旅程更轻松" },
+  travel_hotel_title:{ uz:"Mehmonxonalar", en:"Hotels", ru:"Гостиницы", tr:"Oteller", zh:"酒店" },
+  travel_hotel_desc:{ uz:"Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.", en:"Find places to stay in Guliston and view them on the map.", ru:"Найдите места для проживания в Гулистане и посмотрите их на карте.", tr:"Guliston'da konaklama yerlerini bulun ve haritada görüntüleyin.", zh:"查找古利斯坦的住宿地点并在地图上查看。" },
+  travel_food_title:{ uz:"Ovqatlanish", en:"Food & Dining", ru:"Питание", tr:"Yeme-İçme", zh:"餐饮" },
+  travel_food_desc:{ uz:"Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.", en:"Useful information about restaurants, cafés and local cuisine.", ru:"Полезная информация о ресторанах, кафе и национальной кухне.", tr:"Restoranlar, kafeler ve yerel yemekler hakkında faydalı bilgiler.", zh:"餐厅、咖啡馆和当地美食的实用信息。" },
+  travel_history_title:{ uz:"Tarixiy maskanlar", en:"Historical sites", ru:"Исторические места", tr:"Tarihi yerler", zh:"历史遗址" },
+  travel_history_desc:{ uz:"Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.", en:"Discover ancient settlements, mounds and archaeological sites in Sirdaryo.", ru:"Откройте древние поселения, городища и археологические памятники Сырдарьи.", tr:"Sirdaryo’daki antik yerleşimleri, tepeleri ve arkeolojik alanları keşfedin.", zh:"探索锡尔河州的古城、古丘和考古遗址。" },
+  discover_badge:{ uz:"Sirdaryoni kashf eting", en:"Discover Sirdaryo", ru:"Откройте Сырдарью", tr:"Sirdaryo’yu keşfedin", zh:"探索锡尔河州" },
+  feedback_title:{ uz:"Taklif va shikoyatlar", en:"Suggestions & complaints", ru:"Предложения и жалобы", tr:"Öneriler ve şikâyetler", zh:"意见与投诉" },
+  feedback_sub:{ uz:"Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.", en:"Write your feedback — it will be sent directly to the admin panel.", ru:"Напишите сообщение — оно будет отправлено прямо в админ-панель.", tr:"Fikrinizi yazın — mesaj doğrudan yönetim paneline gönderilir.", zh:"留下您的意见——消息将直接发送到管理面板。" },
+  fb_name:{ uz:"Ismingiz", en:"Your name", ru:"Ваше имя", tr:"Adınız", zh:"您的姓名" },
+  fb_subject:{ uz:"Mavzu (ixtiyoriy)", en:"Subject (optional)", ru:"Тема (необязательно)", tr:"Konu (isteğe bağlı)", zh:"主题（可选）" },
+  fb_message:{ uz:"Taklif yoki shikoyatingizni shu yerga yozing...", en:"Write your suggestion or complaint here...", ru:"Напишите здесь ваше предложение или жалобу...", tr:"Öneri veya şikâyetinizi buraya yazın...", zh:"请在此填写您的意见或投诉..." },
+  fb_send:{ uz:"✉️ Yuborish", en:"✉️ Send", ru:"✉️ Отправить", tr:"✉️ Gönder", zh:"✉️ 发送" },
+  fb_success:{ uz:"Rahmat! Xabaringiz admin panelga yuborildi.", en:"Thank you! Your message was sent to the admin panel.", ru:"Спасибо! Ваше сообщение отправлено в админ-панель.", tr:"Teşekkürler! Mesajınız yönetim paneline gönderildi.", zh:"谢谢！您的消息已发送到管理面板。" },
+  fb_error:{ uz:"Xabar yuborilmadi. Keyinroq qayta urinib ko‘ring.", en:"Message could not be sent. Please try again.", ru:"Не удалось отправить сообщение. Попробуйте позже.", tr:"Mesaj gönderilemedi. Lütfen tekrar deneyin.", zh:"消息发送失败，请稍后重试。" },
+  nearby_title:{ uz:"Yaqin joylar", en:"Nearby places", ru:"Места рядом", tr:"Yakındaki yerler", zh:"附近地点" },
+  nearby_empty:{ uz:"Yaqin joylar uchun koordinatalar mavjud emas.", en:"Coordinates for nearby places are unavailable.", ru:"Координаты ближайших мест недоступны.", tr:"Yakındaki yerlerin koordinatları mevcut değil.", zh:"暂无附近地点的坐标。" },
+  distance_km:{ uz:"km", en:"km", ru:"км", tr:"km", zh:"公里" },
+  install_title:{ uz:"Sirdaryo360'ni telefonga o‘rnating", en:"Install Sirdaryo360 on your phone", ru:"Установите Sirdaryo360 на телефон", tr:"Sirdaryo360'ı telefonunuza yükleyin", zh:"将 Sirdaryo360 安装到手机" },
+  install_text:{ uz:"Saytni ilovadek tez va qulay ishlatish uchun bosh ekranga qo‘shing.", en:"Add it to your home screen for a faster app-like experience.", ru:"Добавьте сайт на главный экран для удобной работы как в приложении.", tr:"Uygulama gibi hızlı kullanmak için ana ekrana ekleyin.", zh:"添加到主屏幕，享受更快捷的应用式体验。" },
+  install_button:{ uz:"O‘rnatish", en:"Install", ru:"Установить", tr:"Yükle", zh:"安装" },
+  install_later:{ uz:"Keyinroq", en:"Later", ru:"Позже", tr:"Daha sonra", zh:"稍后" },
+  weather_modal_title:{ uz:"Sirdaryo viloyati ob-havosi", en:"Sirdaryo Region weather", ru:"Погода в Сырдарьинской области", tr:"Sirdaryo Bölgesi hava durumu", zh:"锡尔河州天气" },
+  weather_loading:{ uz:"Ob-havo ma’lumotlari yuklanmoqda...", en:"Loading weather information...", ru:"Загрузка данных о погоде...", tr:"Hava durumu bilgileri yükleniyor...", zh:"天气信息加载中..." },
+  weather_humidity:{ uz:"Namlik", en:"Humidity", ru:"Влажность", tr:"Nem", zh:"湿度" },
+  weather_feels:{ uz:"His qilinishi", en:"Feels like", ru:"Ощущается как", tr:"Hissedilen", zh:"体感温度" },
+  weather_wind:{ uz:"Shamol", en:"Wind", ru:"Ветер", tr:"Rüzgâr", zh:"风速" },
+  weather_forecast:{ uz:"5 kunlik prognoz", en:"5-day forecast", ru:"Прогноз на 5 дней", tr:"5 günlük tahmin", zh:"5天预报" },
+  weather_error:{ uz:"Ob-havo ma’lumotlarini yuklab bo‘lmadi.", en:"Weather information could not be loaded.", ru:"Не удалось загрузить данные о погоде.", tr:"Hava durumu bilgileri yüklenemedi.", zh:"无法加载天气信息。" },
+  weather_retry:{ uz:"Internet aloqasini tekshirib, qayta urinib ko‘ring.", en:"Check your internet connection and try again.", ru:"Проверьте интернет-соединение и повторите попытку.", tr:"İnternet bağlantınızı kontrol edip tekrar deneyin.", zh:"请检查网络连接后重试。" },
+  weather_unknown:{ uz:"Ob-havo ma’lumoti", en:"Weather information", ru:"Информация о погоде", tr:"Hava durumu bilgisi", zh:"天气信息" }
 };
 
 function tr(key){ return (UI[key] && UI[key][currentLang]) || (UI[key] && UI[key].uz) || key; }
 
 function applyStaticTranslations(){
+  const activeLang = LANGS.find(l=>l.code===currentLang) || LANGS[0];
+
+  document.documentElement.lang = currentLang;
+
   document.querySelectorAll("[data-i]").forEach(el => {
     const key = el.getAttribute("data-i");
     if (UI[key]) el.textContent = tr(key);
   });
-  const activeLang = LANGS.find(l=>l.code===currentLang);
+
+  document.querySelectorAll("[data-i-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i-placeholder");
+    if (UI[key]) el.placeholder = tr(key);
+  });
+
+  document.querySelectorAll("[data-i-title]").forEach(el => {
+    const key = el.getAttribute("data-i-title");
+    if (UI[key]) el.title = tr(key);
+  });
+
   document.getElementById("langLabel").textContent = activeLang.label;
   document.getElementById("langFlag").textContent = activeLang.flag;
-  document.getElementById("footFact").textContent = tr("fact_body_" + currentDistrict.id) || "";
+
+  // Rebuild the menu so the selected language is visibly active.
+  const menu = document.getElementById("langMenu");
+  if (menu && menu.classList.contains("open")) renderLangMenu();
+
+  if (currentDistrict){
+    document.getElementById("footFact").textContent =
+      tr("fact_body_" + currentDistrict.id) ||
+      currentDistrict.fact?.[currentLang] ||
+      currentDistrict.fact?.uz ||
+      "";
+  }
+
+  updateWeatherLanguageUI();
 }
 
 /* ============================================================
@@ -588,7 +685,151 @@ const DEMO_PANOS = [
 function thumbUrl(seed){ return `https://picsum.photos/seed/${seed}/160/120`; }
 function thumbUrlSmall(seed){ return `https://picsum.photos/seed/${seed}/100/70`; }
 
-const districts = [
+function locImage(loc, small=false){
+  const url = loc.image_url || loc.pano;
+  if (url) return url;
+  return small ? thumbUrlSmall(loc.seed || loc.id) : thumbUrl(loc.seed || loc.id);
+}
+
+function safeNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function makeLocalized(value, fallback){
+  const v = value || fallback || "";
+  return { uz:v, en:v, ru:v, tr:v, zh:v };
+}
+
+function categoryLocalized(category){
+  const map = {
+    hotel:{uz:"Mehmonxona",en:"Hotel",ru:"Гостиница",tr:"Otel",zh:"酒店"},
+    food:{uz:"Ovqatlanish",en:"Food & Dining",ru:"Питание",tr:"Yeme-İçme",zh:"餐饮"},
+    historical:{uz:"Tarixiy maskan",en:"Historical site",ru:"Историческое место",tr:"Tarihi yer",zh:"历史遗址"}
+  };
+  return map[category] || makeLocalized(category, "Joy");
+}
+
+function rebuildAllLocations(){
+  allLocations = [];
+  districts.forEach(d => d.locations.forEach(loc => allLocations.push({district:d, loc})));
+}
+
+function dbRowToLocation(p, index){
+  const category = categoryLocalized(p.category);
+  const nameUz = p.name_uz || "Nomsiz obyekt";
+  const description = p.description_uz || "";
+  return {
+    id: String(p.id || `place-${index}`),
+    seed: String(p.id || index),
+    // image_url is a normal thumbnail/photo. Use a dedicated panorama
+    // field when the database has one; otherwise keep the working demo panorama.
+    pano: p.panorama_url || p.pano_url || p.pano || DEMO_PANOS[index % DEMO_PANOS.length],
+    image_url: p.image_url || "",
+    category,
+    name:{
+      uz:nameUz,
+      en:p.name_en || nameUz,
+      ru:p.name_ru || nameUz,
+      tr:p.name_tr || nameUz,
+      zh:p.name_zh || nameUz
+    },
+    desc:{
+      uz:description,
+      en:description,
+      ru:description,
+      tr:description,
+      zh:description
+    },
+    phone:p.phone || "",
+    maps_url:p.maps_url || "",
+    hours:p.hours || "",
+    lat:safeNum(p.lat),
+    lon:safeNum(p.lon),
+    db_category:p.category || ""
+  };
+}
+
+function rowsToDistricts(rows){
+  const groups = new Map();
+  rows.forEach((p, index) => {
+    const districtName = (p.district || "Sirdaryo viloyati").trim();
+    if (!groups.has(districtName)) groups.set(districtName, []);
+    groups.get(districtName).push(dbRowToLocation(p, index));
+  });
+
+  return Array.from(groups.entries()).map(([districtName, locations], i) => {
+    const valid = locations.filter(x => x.lat !== null && x.lon !== null);
+    const lat = valid.length ? valid.reduce((a,x)=>a+x.lat,0)/valid.length : 40.35;
+    const lng = valid.length ? valid.reduce((a,x)=>a+x.lon,0)/valid.length : 68.65;
+    return {
+      id:`db-${i}-${districtName.toLowerCase().replace(/[^a-z0-9а-яё]+/gi,"-")}`,
+      lat, lng,
+      name:makeLocalized(districtName),
+      fact:makeLocalized(`${districtName} hududidagi sayyohlik obyektlari.`),
+      locations
+    };
+  });
+}
+
+let publicPlacesClient = null;
+let publicPlacesLoaded = false;
+
+async function loadPlacesFromSupabase(){
+  if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
+    console.warn("Supabase konfiguratsiyasi topilmadi. Demo ma'lumotlar ishlatiladi.");
+    return false;
+  }
+
+  try {
+    publicPlacesClient = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_KEY,
+      { auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false } }
+    );
+
+    const { data, error } = await publicPlacesClient
+      .from("places")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending:false });
+
+    if (error) {
+      console.error("Supabase places xatosi:", error);
+      console.warn("Agar xato RLS/policy haqida bo'lsa, public SELECT policy kerak.");
+      return false;
+    }
+
+    if (!Array.isArray(data) || data.length === 0) {
+      console.info("places jadvalida faol obyektlar yo'q.");
+      return false;
+    }
+
+    const dbDistricts = rowsToDistricts(data);
+    if (!dbDistricts.length) return false;
+
+    // Admin paneldan kelgan ma'lumotlar asosiy ma'lumot sifatida ishlatiladi.
+    districts = dbDistricts;
+    currentDistrict = districts[0];
+    currentLocIndex = 0;
+    publicPlacesLoaded = true;
+
+    // Yangi districtlar uchun tarjima kalitlarini qayta yaratamiz.
+    districts.forEach(d => {
+      UI["fact_body_" + d.id] = d.fact;
+    });
+
+    rebuildAllLocations();
+    return true;
+
+  } catch (err) {
+    console.error("Supabase places yuklash xatosi:", err);
+    return false;
+  }
+}
+
+
+let districts = [
   { id:"guliston-shahar", lat:40.4897, lng:68.7842,
     name:{ uz:"Guliston shahri", en:"Guliston city", ru:"город Гулистан", tr:"Guliston şehri", zh:"古利斯坦市" },
     fact:{ uz:"Guliston 1961-yilda Sirdaryo viloyati markazi etib belgilangan.", en:"Guliston was designated the capital of Sirdaryo Region in 1961.", ru:"Гулистан стал центром Сырдарьинской области в 1961 году.", tr:"Guliston, 1961'de Sirdaryo Bölgesi'nin merkezi ilan edildi.", zh:"古利斯坦于1961年被定为锡尔河州首府。" },
@@ -704,7 +945,7 @@ function locCat(loc){ return loc.category[currentLang] || loc.category.uz; }
 function distName(d){ return d.name[currentLang] || d.name.uz; }
 
 // Flat index of every location across every district — used by favorites & the map modal.
-const allLocations = [];
+let allLocations = [];
 districts.forEach(d => d.locations.forEach(loc => allLocations.push({ district: d, loc })));
 
 function selectDistrict(d){
@@ -751,7 +992,7 @@ function renderFavList(){
   favs.forEach(({district, loc}) => {
     const row = document.createElement("div");
     row.className = "fav-item";
-    row.innerHTML = `<img src="${thumbUrl(loc.seed)}" alt="">
+    row.innerHTML = `<img src="${locImage(loc)}" alt="">
       <div class="fi-text"><div class="fi-name">${locName(loc)}</div><div class="fi-sub">${distName(district)}</div></div>
       <button class="fi-remove" title="O'chirish">✕</button>`;
     row.querySelector(".fi-remove").addEventListener("click", (e) => {
@@ -794,16 +1035,43 @@ function renderDistrictChips(){
 /* ============================================================
    5. RENDER — LOCATION LIST
 ============================================================ */
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
+}
+function haversineKm(lat1, lon1, lat2, lon2){
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function findNearbyPlaces(loc, limit=4){
+  if(!loc || !Number.isFinite(loc.lat) || !Number.isFinite(loc.lon)) return [];
+  return allLocations.filter(x=>x.loc.id!==loc.id && Number.isFinite(x.loc.lat) && Number.isFinite(x.loc.lon)).map(x=>({...x,distance:haversineKm(loc.lat,loc.lon,x.loc.lat,x.loc.lon)})).sort((a,b)=>a.distance-b.distance).slice(0,limit);
+}
+
 function renderLocList(filter=""){
   const wrap = document.getElementById("locList");
   wrap.innerHTML = "";
-  currentDistrict.locations.forEach((loc, i) => {
-    if (filter && !locName(loc).toLowerCase().includes(filter.toLowerCase())) return;
-    const div = document.createElement("div");
-    div.className = "loc-item" + (i === currentLocIndex ? " active" : "");
-    div.innerHTML = `<img class="loc-thumb" src="${thumbUrl(loc.seed)}" alt=""><div><div class="loc-name">${locName(loc)}</div></div><span class="loc-heart${isFavorite(loc) ? ' active' : ''}">${isFavorite(loc) ? '♥' : '♡'}</span>`;
-    div.addEventListener("click", () => loadScene(i));
-    div.querySelector(".loc-heart").addEventListener("click", (e) => { e.stopPropagation(); toggleFavorite(loc); });
+  const q = String(filter||"").trim().toLowerCase();
+  if(q){
+    const results = allLocations.filter(({district,loc}) => [locName(loc),locCat(loc),distName(district),locDesc(loc)].join(" ").toLowerCase().includes(q));
+    if(!results.length){ wrap.innerHTML=`<div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div>`; return; }
+    results.forEach(({district,loc})=>{
+      const i=district.locations.findIndex(x=>x.id===loc.id);
+      const div=document.createElement("div");
+      div.className="loc-item"+(district.id===currentDistrict.id&&i===currentLocIndex?" active":"");
+      div.innerHTML=`<img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt=""><div style="min-width:0"><div class="loc-name">${escapeHtml(locName(loc))}</div><div class="loc-sub">${escapeHtml(distName(district))} · ${escapeHtml(locCat(loc))}</div></div><span class="loc-heart${isFavorite(loc)?' active':''}">${isFavorite(loc)?'♥':'♡'}</span>`;
+      div.addEventListener("click",()=>{selectDistrict(district);loadScene(i>=0?i:0);document.getElementById("searchBox").value="";renderLocList("");});
+      div.querySelector(".loc-heart").addEventListener("click",e=>{e.stopPropagation();toggleFavorite(loc);});
+      wrap.appendChild(div);
+    });
+    return;
+  }
+  currentDistrict.locations.forEach((loc,i)=>{
+    const div=document.createElement("div");
+    div.className="loc-item"+(i===currentLocIndex?" active":"");
+    div.innerHTML=`<img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt=""><div style="min-width:0"><div class="loc-name">${escapeHtml(locName(loc))}</div></div><span class="loc-heart${isFavorite(loc)?' active':''}">${isFavorite(loc)?'♥':'♡'}</span>`;
+    div.addEventListener("click",()=>loadScene(i));
+    div.querySelector(".loc-heart").addEventListener("click",e=>{e.stopPropagation();toggleFavorite(loc);});
     wrap.appendChild(div);
   });
 }
@@ -813,7 +1081,7 @@ function renderThumbStrip(){
   strip.innerHTML = "";
   currentDistrict.locations.forEach((loc, i) => {
     const img = document.createElement("img");
-    img.src = thumbUrlSmall(loc.seed);
+    img.src = locImage(loc, true);
     if (i === currentLocIndex) img.classList.add("active");
     img.addEventListener("click", () => loadScene(i));
     strip.appendChild(img);
@@ -827,7 +1095,7 @@ function renderRightPanel(loc){
   const rp = document.getElementById("rightPanel");
   rp.innerHTML = `
     <div class="rp-card">
-      <img class="rp-img" src="${thumbUrl(loc.seed)}" alt="">
+      <img class="rp-img" src="${locImage(loc)}" alt="">
       <div class="rp-body">
         <div class="rp-title">${locName(loc)}</div>
         <span class="rp-badge">${locCat(loc)}</span>
@@ -838,14 +1106,24 @@ function renderRightPanel(loc){
           <button class="btn-audio" id="audioBtn">🔊 ${tr("f_audio_t")}</button>
           <button class="btn-secondary${isFavorite(loc) ? ' active' : ''}" id="favBtn">${isFavorite(loc) ? '♥' : '♡'} ${isFavorite(loc) ? tr("sevimli_saved") : tr("sevimli")}</button>
         </div>
+        <div class="nearby-box"><div class="nearby-title">📍 ${tr("nearby_title")}</div><div class="nearby-list" id="nearbyList"></div></div>
       </div>
     </div>
   `;
   document.getElementById("favBtn").addEventListener("click", () => toggleFavorite(loc));
   document.getElementById("audioBtn").addEventListener("click", () => toggleAudioGuide(loc));
   document.getElementById("directionBtn").addEventListener("click", () => {
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${currentDistrict.lat},${currentDistrict.lng}`, "_blank", "noopener");
+    if (loc.maps_url) { window.open(loc.maps_url, "_blank", "noopener"); return; }
+    const lat = loc.lat ?? currentDistrict.lat;
+    const lng = loc.lon ?? currentDistrict.lng;
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, "_blank", "noopener");
   });
+  const nearby=findNearbyPlaces(loc);
+  const nearbyList=document.getElementById("nearbyList");
+  if(nearbyList){
+    nearbyList.innerHTML=nearby.length?nearby.map(x=>{const idx=x.district.locations.findIndex(l=>l.id===x.loc.id);return `<div class="nearby-item" data-nearby-id="${escapeHtml(String(x.loc.id))}"><div class="ni-main"><div class="ni-name">${escapeHtml(locName(x.loc))}</div><div class="ni-meta">${escapeHtml(distName(x.district))} · ${escapeHtml(locCat(x.loc))}</div></div><div class="ni-distance">${x.distance.toFixed(1)} ${escapeHtml(tr("distance_km"))}</div></div>`;}).join(""):`<div class="nearby-empty">${escapeHtml(tr("nearby_empty"))}</div>`;
+    nearbyList.querySelectorAll("[data-nearby-id]").forEach(el=>el.addEventListener("click",()=>{const x=nearby.find(y=>String(y.loc.id)===el.dataset.nearbyId);if(!x)return;const idx=x.district.locations.findIndex(l=>l.id===x.loc.id);selectDistrict(x.district);loadScene(idx>=0?idx:0);}));
+  }
 }
 
 /* ============================================================
@@ -960,17 +1238,15 @@ document.getElementById("audioFeatureBtn").addEventListener("click", () => {
 /* ============================================================
    8. WEATHER — SIRDARYO REGION
 ============================================================ */
-function weatherText(code){
-  const map = {
-    0:"Ochiq osmon",1:"Asosan ochiq",2:"Qisman bulutli",3:"Bulutli",
-    45:"Tuman",48:"Qirovli tuman",51:"Mayda yomg'ir",53:"Mayda yomg'ir",
-    55:"Mayda yomg'ir",61:"Yomg'ir",63:"Yomg'ir",65:"Kuchli yomg'ir",
-    71:"Qor",73:"Qor",75:"Kuchli qor",80:"Yomg'irli jala",81:"Yomg'irli jala",
-    82:"Kuchli yomg'irli jala",95:"Momaqaldiroq",96:"Do'l bilan momaqaldiroq",
-    99:"Kuchli do'l bilan momaqaldiroq"
-  };
-  return map[code] || "Ob-havo ma'lumoti";
-}
+const WEATHER_TEXT={
+ uz:{0:"Ochiq osmon",1:"Asosan ochiq",2:"Qisman bulutli",3:"Bulutli",45:"Tuman",48:"Qirovli tuman",51:"Mayda yomg‘ir",53:"Mayda yomg‘ir",55:"Mayda yomg‘ir",61:"Yomg‘ir",63:"Yomg‘ir",65:"Kuchli yomg‘ir",71:"Qor",73:"Qor",75:"Kuchli qor",80:"Yomg‘irli jala",81:"Yomg‘irli jala",82:"Kuchli yomg‘irli jala",95:"Momaqaldiroq",96:"Do‘l bilan momaqaldiroq",99:"Kuchli do‘l bilan momaqaldiroq"},
+ en:{0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Dense drizzle",61:"Rain",63:"Rain",65:"Heavy rain",71:"Snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy rain showers",95:"Thunderstorm",96:"Thunderstorm with hail",99:"Thunderstorm with heavy hail"},
+ ru:{0:"Ясное небо",1:"Преимущественно ясно",2:"Переменная облачность",3:"Пасмурно",45:"Туман",48:"Изморозь и туман",51:"Мелкий дождь",53:"Дождь",55:"Сильный моросящий дождь",61:"Дождь",63:"Дождь",65:"Сильный дождь",71:"Снег",73:"Снег",75:"Сильный снег",80:"Ливневый дождь",81:"Ливневый дождь",82:"Сильный ливень",95:"Гроза",96:"Гроза с градом",99:"Сильная гроза с градом"},
+ tr:{0:"Açık hava",1:"Çoğunlukla açık",2:"Parçalı bulutlu",3:"Kapalı",45:"Sis",48:"Kırağılı sis",51:"Hafif çiseleme",53:"Çiseleme",55:"Yoğun çiseleme",61:"Yağmur",63:"Yağmur",65:"Kuvvetli yağmur",71:"Kar",73:"Kar",75:"Yoğun kar",80:"Sağanak",81:"Sağanak",82:"Kuvvetli sağanak",95:"Gök gürültülü fırtına",96:"Dolu ile gök gürültüsü",99:"Kuvvetli dolulu fırtına"},
+ zh:{0:"晴朗",1:"基本晴朗",2:"局部多云",3:"阴天",45:"雾",48:"霜雾",51:"小毛毛雨",53:"毛毛雨",55:"较强毛毛雨",61:"降雨",63:"降雨",65:"大雨",71:"降雪",73:"降雪",75:"大雪",80:"阵雨",81:"阵雨",82:"强阵雨",95:"雷暴",96:"雷暴伴冰雹",99:"强雷暴伴冰雹"}
+};
+function weatherText(code){return WEATHER_TEXT[currentLang]?.[code] || WEATHER_TEXT.en[code] || tr("weather_unknown");}
+function updateWeatherLanguageUI(){const sub=document.getElementById("weatherFeatureSub"),btn=document.getElementById("weatherFeatureBtn");if(btn)btn.title=tr("weather_feature_title");if(sub&&!sub.dataset.loaded)sub.textContent=tr("weather_loading_short");}
 function weatherIcon(code){
   const wrap = (body) => `<svg viewBox="0 0 48 48" aria-hidden="true" style="width:42px;height:42px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${body}</svg>`;
   if (code === 0) return wrap(`<circle cx="24" cy="24" r="8" fill="currentColor" stroke="none"/><path d="M24 4v5M24 39v5M4 24h5M39 24h5M9.9 9.9l3.5 3.5M34.6 34.6l3.5 3.5M38.1 9.9l-3.5 3.5M13.4 34.6l-3.5 3.5"/>`);
@@ -982,9 +1258,8 @@ function weatherIcon(code){
   return wrap(`<circle cx="16" cy="16" r="6"/><path d="M14 35h18a5 5 0 0 0 .5-10 7 7 0 0 0-13.2-1.7A5.5 5.5 0 0 0 14 35z"/>`);
 }
 function weatherDayName(dateStr){
-  const days = ["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
-  const d = new Date(dateStr + "T12:00:00");
-  return days[d.getDay()];
+  const days={uz:["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],ru:["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],tr:["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"],zh:["周日","周一","周二","周三","周四","周五","周六"]};
+  const d=new Date(dateStr+"T12:00:00");return (days[currentLang]||days.en)[d.getDay()];
 }
 async function getWeatherData(){
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentDistrict.lat}&longitude=${currentDistrict.lng}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTashkent&forecast_days=5`;
@@ -996,25 +1271,28 @@ async function updateWeather(){
   const sub = document.getElementById("weatherFeatureSub");
   const icon = document.getElementById("weatherIcon");
   if (!sub || !icon) return;
-  sub.textContent = "Ob-havo yuklanmoqda...";
+  sub.dataset.loaded="";
+  sub.textContent = tr("weather_loading_short");
   icon.innerHTML = weatherIcon(2);
   try {
     const data = await getWeatherData();
     const c = data.current;
     icon.innerHTML = weatherIcon(c.weather_code);
+    sub.dataset.loaded="1";
     sub.textContent = `${Math.round(c.temperature_2m)}°C · ${weatherText(c.weather_code)}`;
     document.getElementById("weatherFeatureBtn").title =
       `${distName(currentDistrict)}: ${Math.round(c.temperature_2m)}°C, ${weatherText(c.weather_code)}, shamol ${Math.round(c.wind_speed_10m)} km/soat`;
   } catch (err) {
     icon.innerHTML = weatherIcon(2);
-    sub.textContent = "Ob-havoni ko'rish uchun bosing";
+    sub.dataset.loaded="";
+    sub.textContent = tr("weather_feature_title");
   }
 }
 async function openWeatherModal(){
   const overlay = document.getElementById("weatherModalOverlay");
   const body = document.getElementById("weatherModalBody");
   overlay.classList.add("open");
-  body.innerHTML = `<div class="weather-loading">${distName(currentDistrict)} uchun ob-havo ma'lumotlari yuklanmoqda...</div>`;
+  body.innerHTML = `<div class="weather-loading">${escapeHtml(distName(currentDistrict))} — ${escapeHtml(tr("weather_loading"))}</div>`;
   try {
     const data = await getWeatherData();
     const c = data.current;
@@ -1035,16 +1313,16 @@ async function openWeatherModal(){
         </div>
       </div>
       <div class="weather-details">
-        <div class="weather-detail"><span style="color:var(--blue)">◌</span> Namlik<strong>${Math.round(c.relative_humidity_2m)}%</strong></div>
-        <div class="weather-detail"><span style="color:var(--blue)">°</span> His qilinishi<strong>${Math.round(c.apparent_temperature)}°C</strong></div>
-        <div class="weather-detail"><span style="color:var(--blue)">≋</span> Shamol<strong>${Math.round(c.wind_speed_10m)} km/soat</strong></div>
+        <div class="weather-detail"><span style="color:var(--blue)">◌</span> ${tr("weather_humidity")}<strong>${Math.round(c.relative_humidity_2m)}%</strong></div>
+        <div class="weather-detail"><span style="color:var(--blue)">°</span> ${tr("weather_feels")}<strong>${Math.round(c.apparent_temperature)}°C</strong></div>
+        <div class="weather-detail"><span style="color:var(--blue)">≋</span> ${tr("weather_wind")}<strong>${Math.round(c.wind_speed_10m)} km/soat</strong></div>
       </div>
-      <div style="font-size:13px;font-weight:800;margin:18px 0 10px">5 kunlik prognoz</div>
+      <div style="font-size:13px;font-weight:800;margin:18px 0 10px">${tr("weather_forecast")}</div>
       <div class="weather-days">${forecast}</div>
     `;
     updateWeather();
   } catch (err) {
-    body.innerHTML = `<div class="weather-error">Ob-havo ma'lumotlarini yuklab bo'lmadi.<br><small>Internet aloqasini tekshirib, qayta urinib ko'ring.</small></div>`;
+    body.innerHTML = `<div class="weather-error">${escapeHtml(tr("weather_error"))}<br><small>${escapeHtml(tr("weather_retry"))}</small></div>`;
   }
 }
 function closeWeatherModal(){
@@ -1070,8 +1348,11 @@ function initMiniMap(){
 function updateMiniMap(){
   document.getElementById("mapDistrictName").textContent = distName(currentDistrict);
   if (!miniMap) return;
-  miniMap.setView([currentDistrict.lat, currentDistrict.lng], 11);
-  miniMarker.setLatLng([currentDistrict.lat, currentDistrict.lng]);
+  const loc = currentDistrict.locations[currentLocIndex];
+  const lat = loc?.lat ?? currentDistrict.lat;
+  const lng = loc?.lon ?? currentDistrict.lng;
+  miniMap.setView([lat, lng], 13);
+  miniMarker.setLatLng([lat, lng]);
   setTimeout(() => miniMap.invalidateSize(), 150);
 }
 
@@ -1140,31 +1421,59 @@ function buildScenesConfig(){
   return scenes;
 }
 
+function createPanoramaViewer(firstSceneId){
+  const scenes = buildScenesConfig();
+  if (!scenes[firstSceneId]) return null;
+
+  const instance = pannellum.viewer("panorama", {
+    default:{
+      firstScene:firstSceneId,
+      autoLoad:true,
+      showZoomCtrl:false,
+      showFullscreenCtrl:false,
+      showControls:false,
+      autoRotate:autoRotateOn ? -1.4 : 0,
+      sceneFadeDuration:600,
+      compass:false
+    },
+    scenes
+  });
+
+  instance.on("scenechange", onSceneChange);
+  instance.on("load", () => {
+    document.getElementById("loadingTag").style.display = "none";
+  });
+  // Pannellum fires an error event for a broken/incompatible panorama.
+  instance.on("error", (err) => {
+    console.warn("Panorama yuklanmadi:", err);
+    document.getElementById("loadingTag").textContent = "Panorama yuklanmadi";
+  });
+  return instance;
+}
+
 function loadScene(index){
+  if (!currentDistrict || !Array.isArray(currentDistrict.locations) || !currentDistrict.locations.length) return;
+
+  index = Math.max(0, Math.min(index, currentDistrict.locations.length - 1));
   currentLocIndex = index;
   const loc = currentDistrict.locations[index];
   document.getElementById("loadingTag").style.display = "block";
+  document.getElementById("loadingTag").textContent = tr("loading");
+
+  // Rebuild only when the district/data set changed. This keeps navigation smooth.
+  if (viewer){
+    try { viewer.destroy(); } catch (_) {}
+    viewer = null;
+  }
+
+  viewer = createPanoramaViewer(loc.id);
 
   if (!viewer){
-    viewer = pannellum.viewer("panorama", {
-      default:{ firstScene: loc.id, autoLoad:true, showZoomCtrl:false, showFullscreenCtrl:false, showControls:false, autoRotate: autoRotateOn ? -1.4 : 0, sceneFadeDuration:600 },
-      scenes: buildScenesConfig()
-    });
-    viewer.on("scenechange", onSceneChange);
-    viewer.on("load", () => { document.getElementById("loadingTag").style.display = "none"; });
-  } else {
-    viewer.destroy();
-    viewer = pannellum.viewer("panorama", {
-      default:{ firstScene: loc.id, autoLoad:true, showZoomCtrl:false, showFullscreenCtrl:false, showControls:false, autoRotate: autoRotateOn ? -1.4 : 0, sceneFadeDuration:600 },
-      scenes: buildScenesConfig()
-    });
-    viewer.on("scenechange", onSceneChange);
-    viewer.on("load", () => { document.getElementById("loadingTag").style.display = "none"; });
+    document.getElementById("loadingTag").textContent = "Panorama yuklanmadi";
   }
 
   updateUIForLocation(loc);
 }
-
 function onSceneChange(sceneId){
   const idx = currentDistrict.locations.findIndex(l => l.id === sceneId);
   if (idx === -1) return;
@@ -1235,14 +1544,19 @@ document.getElementById("navContact").addEventListener("click", (e) => {
 /* ============================================================
    10d. FEEDBACK FORM (Taklif va shikoyatlar) — sends via mailto:
 ============================================================ */
-document.getElementById("feedbackForm").addEventListener("submit", (e) => {
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("fbName").value.trim();
-  const subject = document.getElementById("fbSubject").value.trim() || "Sirdaryo 360 — Taklif/shikoyat";
-  const message = document.getElementById("fbMessage").value.trim();
-  const body = `Ism: ${name}\n\n${message}`;
-  const mailto = `mailto:husenovjahongir27@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailto;
+  const form=e.currentTarget,name=document.getElementById("fbName").value.trim(),subject=document.getElementById("fbSubject").value.trim(),message=document.getElementById("fbMessage").value.trim(),btn=form.querySelector("button[type=submit]");
+  if(!name||!message)return;
+  const oldText=btn.textContent;btn.disabled=true;btn.textContent="…";
+  try{
+    const client=publicPlacesClient||(window.supabase&&window.SUPABASE_URL&&window.SUPABASE_KEY?window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null);
+    if(!client)throw new Error("Supabase unavailable");
+    let submittedBy=null;try{const {data:{user}}=await client.auth.getUser();submittedBy=user?.id||null;}catch(_){}
+    const {error}=await client.from("site_feedback").insert({name,subject:subject||null,message,status:"pending",submitted_by:submittedBy,page_path:location.pathname,language:currentLang});
+    if(error)throw error;form.reset();alert(tr("fb_success"));
+  }catch(err){console.error("Feedback error:",err);alert(tr("fb_error"));}
+  finally{btn.disabled=false;btn.textContent=oldText;}
 });
 
 /* ============================================================
@@ -1265,8 +1579,10 @@ function renderLangMenu(){
     opt.innerHTML = `<span class="lang-flag">${l.flag}</span> <span>${l.name}</span>`;
     opt.addEventListener("click", () => {
       currentLang = l.code;
+      localStorage.setItem("sirdaryo360_lang", currentLang);
       menu.classList.remove("open");
       applyStaticTranslations();
+      renderLangMenu();
       renderDistrictChips();
       renderLocList(document.getElementById("searchBox").value);
       renderThumbStrip();
@@ -1290,13 +1606,48 @@ document.addEventListener("click", (e) => {
 /* ============================================================
    13. INIT
 ============================================================ */
-renderLangMenu();
-renderDistrictChips();
-renderLocList();
-initMiniMap();
-updateWeather();
-loadScene(0);
-applyStaticTranslations();
+let deferredInstallPrompt=null;
+function setupPWAInstall(){
+  const card=document.getElementById("installCard"),btn=document.getElementById("installBtn"),close=document.getElementById("installClose");if(!card||!btn||!close)return;
+  if(localStorage.getItem("s360_install_dismissed")==="1")return;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;card.classList.add("show");});
+  window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;card.classList.remove("show");});
+  btn.addEventListener("click",async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice;}catch(_){}deferredInstallPrompt=null;card.classList.remove("show");});
+  close.addEventListener("click",()=>{localStorage.setItem("s360_install_dismissed","1");card.classList.remove("show");});
+}
+async function registerPWA(){if("serviceWorker" in navigator){try{await navigator.serviceWorker.register("sirdaryo360-sw.js");}catch(e){console.debug("PWA service worker:",e);}}}
+
+async function initPublicSite(){
+  // Avval Supabase'dan faol obyektlarni olamiz.
+  // Muvaffaqiyatsiz bo'lsa, mavjud demo ma'lumotlar saqlanadi.
+  await loadPlacesFromSupabase();
+
+  rebuildAllLocations();
+  registerPWA();
+  setupPWAInstall();
+  applyStaticTranslations();
+  renderLangMenu();
+  renderDistrictChips();
+  renderLocList();
+  initMiniMap();
+  updateWeather();
+  loadScene(0);
+
+  // Sayt ochilgandan keyin admin panelda yangi obyekt qo'shilgan bo'lsa,
+  // uni ko'rsatish uchun bir marta qayta tekshiramiz.
+  setTimeout(async () => {
+    const before = allLocations.length;
+    const loadedAgain = await loadPlacesFromSupabase();
+    if (loadedAgain && allLocations.length !== before) {
+      renderDistrictChips();
+      renderLocList(document.getElementById("searchBox")?.value || "");
+      updateMiniMap();
+      loadScene(0);
+    }
+  }, 3000);
+}
+
+initPublicSite();
 </script>
 
 </body>

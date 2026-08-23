@@ -597,9 +597,11 @@
 <!-- Weather modal -->
 <div class="modal-overlay" id="weatherModalOverlay">
   <div class="modal-box weather-modal-box">
-    <div class="modal-head"><span>🌤️ Sirdaryo viloyati ob-havosi</span><button class="modal-close" id="weatherModalClose">✕</button></div>
+    <span>🌤️ <span data-i="weather_title">Sirdaryo viloyati ob-havosi</span></span><button class="modal-close" id="weatherModalClose">✕</button></div>
     <div class="modal-body weather-body" id="weatherModalBody">
-      <div class="weather-loading">Ob-havo ma'lumotlari yuklanmoqda...</div>
+      <div class="weather-loading" data-i="weather_loading">
+  Ob-havo ma'lumotlari yuklanmoqda...
+</div>
     </div>
   </div>
 </div>
@@ -765,6 +767,125 @@ const UI = {
   },
 
   weather_title_hint:{
+    weather_clear:{
+  uz:"Ochiq osmon",
+  en:"Clear sky",
+  ru:"Ясное небо",
+  tr:"Açık gökyüzü",
+  zh:"晴朗天空"
+},
+
+weather_mainly_clear:{
+  uz:"Asosan ochiq",
+  en:"Mainly clear",
+  ru:"Преимущественно ясно",
+  tr:"Çoğunlukla açık",
+  zh:"大致晴朗"
+},
+
+weather_partly_cloudy:{
+  uz:"Qisman bulutli",
+  en:"Partly cloudy",
+  ru:"Переменная облачность",
+  tr:"Parçalı bulutlu",
+  zh:"局部多云"
+},
+
+weather_cloudy:{
+  uz:"Bulutli",
+  en:"Cloudy",
+  ru:"Облачно",
+  tr:"Bulutlu",
+  zh:"多云"
+},
+
+weather_fog:{
+  uz:"Tuman",
+  en:"Fog",
+  ru:"Туман",
+  tr:"Sis",
+  zh:"雾"
+},
+
+weather_rain:{
+  uz:"Yomg‘ir",
+  en:"Rain",
+  ru:"Дождь",
+  tr:"Yağmur",
+  zh:"下雨"
+},
+
+weather_heavy_rain:{
+  uz:"Kuchli yomg‘ir",
+  en:"Heavy rain",
+  ru:"Сильный дождь",
+  tr:"Şiddetli yağmur",
+  zh:"大雨"
+},
+
+weather_snow:{
+  uz:"Qor",
+  en:"Snow",
+  ru:"Снег",
+  tr:"Kar",
+  zh:"下雪"
+},
+
+weather_heavy_snow:{
+  uz:"Kuchli qor",
+  en:"Heavy snow",
+  ru:"Сильный снег",
+  tr:"Yoğun kar",
+  zh:"大雪"
+},
+
+weather_shower:{
+  uz:"Yom‘g‘irli jala",
+  en:"Rain showers",
+  ru:"Ливень",
+  tr:"Sağanak yağış",
+  zh:"阵雨"
+},
+
+weather_humidity:{
+  uz:"Namlik",
+  en:"Humidity",
+  ru:"Влажность",
+  tr:"Nem",
+  zh:"湿度"
+},
+
+weather_feels:{
+  uz:"His qilinishi",
+  en:"Feels like",
+  ru:"Ощущается как",
+  tr:"Hissedilen",
+  zh:"体感温度"
+},
+
+weather_wind:{
+  uz:"Shamol",
+  en:"Wind",
+  ru:"Ветер",
+  tr:"Rüzgar",
+  zh:"风速"
+},
+
+weather_forecast:{
+  uz:"5 kunlik prognoz",
+  en:"5-day forecast",
+  ru:"Прогноз на 5 дней",
+  tr:"5 günlük tahmin",
+  zh:"5天天气预报"
+},
+
+weather_load_error:{
+  uz:"Ob-havo ma’lumotlarini yuklab bo‘lmadi. Internet aloqasini tekshirib, qayta urinib ko‘ring.",
+  en:"Weather data could not be loaded. Check your internet connection and try again.",
+  ru:"Не удалось загрузить данные о погоде. Проверьте подключение к интернету и повторите попытку.",
+  tr:"Hava durumu verileri yüklenemedi. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+  zh:"无法加载天气数据。请检查网络连接后重试。"
+},
     uz:"Ob-havo ma'lumotlarini ko'rish",
     en:"View weather information",
     ru:"Посмотреть информацию о погоде",
@@ -1311,9 +1432,17 @@ function weatherIcon(code){
   return wrap(`<circle cx="16" cy="16" r="6"/><path d="M14 35h18a5 5 0 0 0 .5-10 7 7 0 0 0-13.2-1.7A5.5 5.5 0 0 0 14 35z"/>`);
 }
 function weatherDayName(dateStr){
-  const days = ["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"];
+  const days = {
+    uz:["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"],
+    en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+    ru:["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
+    tr:["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"],
+    zh:["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
+  };
+
   const d = new Date(dateStr + "T12:00:00");
-  return days[d.getDay()];
+
+  return (days[currentLang] || days.uz)[d.getDay()];
 }
 async function getWeatherData(){
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentDistrict.lat}&longitude=${currentDistrict.lng}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTashkent&forecast_days=5`;
@@ -1363,17 +1492,34 @@ async function openWeatherModal(){
           <div class="weather-current-desc">${weatherText(c.weather_code)}</div>
         </div>
       </div>
-      <div class="weather-details">
-        <div class="weather-detail"><span style="color:var(--blue)">◌</span> Namlik<strong>${Math.round(c.relative_humidity_2m)}%</strong></div>
-        <div class="weather-detail"><span style="color:var(--blue)">°</span> His qilinishi<strong>${Math.round(c.apparent_temperature)}°C</strong></div>
-        <div class="weather-detail"><span style="color:var(--blue)">≋</span> Shamol<strong>${Math.round(c.wind_speed_10m)} km/soat</strong></div>
-      </div>
-      <div style="font-size:13px;font-weight:800;margin:18px 0 10px">5 kunlik prognoz</div>
+     <div class="weather-details">
+  <div class="weather-detail">
+    <span style="color:var(--blue)">◌</span>
+    ${tr("weather_humidity")}
+    <strong>${Math.round(c.relative_humidity_2m)}%</strong>
+  </div>
+
+  <div class="weather-detail">
+    <span style="color:var(--blue)">°</span>
+    ${tr("weather_feels")}
+    <strong>${Math.round(c.apparent_temperature)}°C</strong>
+  </div>
+
+  <div class="weather-detail">
+    <span style="color:var(--blue)">≋</span>
+    ${tr("weather_wind")}
+    <strong>${Math.round(c.wind_speed_10m)} km/soat</strong>
+  </div>
+</div>
+
+<div style="font-size:13px;font-weight:800;margin:18px 0 10px">
+  ${tr("weather_forecast")}
+</div>
       <div class="weather-days">${forecast}</div>
     `;
     updateWeather();
   } catch (err) {
-    body.innerHTML = `<div class="weather-error">Ob-havo ma'lumotlarini yuklab bo'lmadi.<br><small>Internet aloqasini tekshirib, qayta urinib ko'ring.</small></div>`;
+    body.innerHTML = `<div class="weather-error">${tr("weather_load_error")}</div>`;
   }
 }
 function closeWeatherModal(){

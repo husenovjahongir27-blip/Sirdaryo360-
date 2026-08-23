@@ -85,7 +85,7 @@
   .lang-opt:hover{ background:var(--pastel-blue); }
   .lang-opt.active{ color:var(--green-dark); }
   .lang-flag{ font-size:15px; line-height:1; }
-  .lang-flag-img{ width:20px; min-width:20px; height:18px; display:inline-flex; align-items:center; justify-content:center; font-size:16px; line-height:1; flex:0 0 20px; }
+  .lang-flag-img{ width:22px; height:15px; object-fit:cover; border-radius:2px; display:block; flex:0 0 auto; background:#e8eef3; }
 
   /* ================= MODALS (Xarita / Sevimlilar) ================= */
   .modal-overlay{ position:fixed; inset:0; background:rgba(10,18,24,0.55); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
@@ -124,12 +124,11 @@
   .feedback-card h4{ font-size:15px; font-weight:800; margin-bottom:4px; color:var(--blue); }
   .feedback-card .fb-sub{ font-size:12px; color:var(--ink-dim); margin-bottom:14px; }
   .fb-row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
-  .fb-row input, .fb-row textarea, .fb-row select{
+  .fb-row input, .fb-row textarea{
     flex:1; min-width:180px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px;
     font-family:inherit; background:var(--bg); color:var(--ink); outline:none; resize:vertical;
   }
-  .fb-row input:focus, .fb-row textarea:focus, .fb-row select:focus{ border-color:var(--blue); }
-  .fb-type{ cursor:pointer; appearance:auto; }
+  .fb-row input:focus, .fb-row textarea:focus{ border-color:var(--blue); }
   .fb-row textarea{ min-height:90px; width:100%; }
   .fb-submit{ background:var(--green); color:#fff; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700; border:none; }
   .fb-submit:hover{ background:var(--green-dark); }
@@ -323,7 +322,7 @@
     nav{ display:none; }
     .features{ grid-template-columns:repeat(2,1fr); }
     .foot-grid{ grid-template-columns:1fr 1fr; }
-    #miniMap{ aspect-ratio:16/9; max-height:280px; }
+    #miniMap{ aspect-ratio:16/9; max-height:220px; }
   }
   @media (max-width: 620px){
     .shell{ padding:10px 12px 24px; }
@@ -342,7 +341,6 @@
 <div class="shell">
 
   <header>
-    <div class="brand">
     <div class="brand">
       <div class="brand-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Uzbekistan.svg" alt="O'zbekiston bayrog'i"></div>
       <div class="brand-text">
@@ -500,10 +498,6 @@
     <form id="feedbackForm">
       <div class="fb-row">
         <input type="text" id="fbName" data-i-placeholder="fb_name" placeholder="Ismingiz" required>
-        <select id="fbType" class="fb-type" data-i-aria="fb_type_label" aria-label="Murojaat turi">
-          <option value="suggestion">💡 Taklif</option>
-          <option value="complaint">⚠️ Shikoyat</option>
-        </select>
         <input type="text" id="fbSubject" data-i-placeholder="fb_subject" placeholder="Mavzu (ixtiyoriy)">
       </div>
       <div class="fb-row">
@@ -516,7 +510,7 @@
   <div class="bottom-bar">
     <span data-i="foot_copy">© 2026 Sirdaryo 360 – Barcha huquqlar himoyalangan</span>
     <span data-i="foot_slogan">"Sirdaryoni kashf eting – tarix, madaniyat va go'zallik maskani"</span>
-
+    <span data-i="foot_made">Sayt ishlab chiqilgan ❤ bilan</span>
     <span>Dasturchi: <strong>Husenov Jahongir</strong></span>
   </div>
 
@@ -561,12 +555,17 @@ const LANGS = [
 ];
 let currentLang = localStorage.getItem("sirdaryo360_lang") || "uz";
 
+function flagSvg(svg){
+  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
+// Inline bayroqlar: tashqi flag CDN ishlamasa ham kompyuter va telefonda bir xil ko‘rinadi.
 const LANG_FLAG_URLS = {
-  uz:"https://flagcdn.com/w20/uz.png",
-  en:"https://flagcdn.com/w20/gb.png",
-  ru:"https://flagcdn.com/w20/ru.png",
-  tr:"https://flagcdn.com/w20/tr.png",
-  zh:"https://flagcdn.com/w20/cn.png"
+  uz:flagSvg(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#1eb4e8"/><rect y="6.67" width="30" height="6.66" fill="#fff"/><rect y="13.33" width="30" height="6.67" fill="#1faa66"/><rect y="6.15" width="30" height=".52" fill="#ce1126"/><rect y="13.33" width="30" height=".52" fill="#ce1126"/><circle cx="4.5" cy="3.3" r="1.6" fill="#fff"/><circle cx="8" cy="2.4" r=".7" fill="#fff"/><circle cx="9.6" cy="3.7" r=".7" fill="#fff"/><circle cx="8" cy="5" r=".7" fill="#fff"/><circle cx="6.2" cy="4.4" r=".7" fill="#fff"/></svg>`),
+  en:flagSvg(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><path d="M0 0h30v3H0zM0 7h30v3H0zM0 14h30v3H0z" fill="#c8102e"/><path d="M0 0h13v11H0z" fill="#012169"/><path d="M0 0l13 11M13 0L0 11" stroke="#fff" stroke-width="2.4"/><path d="M0 0l13 11M13 0L0 11" stroke="#c8102e" stroke-width="1.2"/><path d="M6 0v11M0 5.5h13" stroke="#fff" stroke-width="3.2"/><path d="M6 0v11M0 5.5h13" stroke="#c8102e" stroke-width="1.7"/></svg>`),
+  ru:flagSvg(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#fff"/><rect y="6.67" width="30" height="6.66" fill="#0039a6"/><rect y="13.33" width="30" height="6.67" fill="#d52b1e"/></svg>`),
+  tr:flagSvg(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" fill="#e30a17"/><circle cx="13" cy="10" r="5" fill="#fff"/><circle cx="14.5" cy="10" r="4" fill="#e30a17"/><path d="m20 10 5-1.6-3 3.8v-4.4l3 3.8z" fill="#fff"/></svg>`),
+  zh:flagSvg(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><path d="M4 2.5l.8 1.7 1.9.2-1.4 1.2.4 1.9L4 6.5 2.3 7.5l.4-1.9L1.3 4.4l1.9-.2z" fill="#ffde00"/></svg>`)
 };
 
 function updateLanguageButton(){
@@ -575,10 +574,8 @@ function updateLanguageButton(){
   const flag = document.getElementById("langFlag");
   if(label) label.textContent = activeLang.label;
   if(flag){
-    // Emoji bayroqdan foydalanamiz: u kompyuter va telefonda tashqi CDN'siz ko'rinadi.
-    flag.textContent = activeLang.flag;
-    flag.title = activeLang.name;
-    flag.setAttribute("aria-label", activeLang.name + " bayrog'i");
+    flag.src = LANG_FLAG_URLS[activeLang.code] || LANG_FLAG_URLS.uz;
+    flag.alt = activeLang.name + " bayrog'i";
   }
 }
 
@@ -591,15 +588,6 @@ function translateFeedback(){
     const key=el.getAttribute("data-i-placeholder");
     if(["fb_name","fb_subject","fb_message"].includes(key) && UI[key]) el.placeholder=tr(key);
   });
-  const type=document.getElementById("fbType");
-  if(type){
-    const selected=type.value || "suggestion";
-    const s=type.querySelector('option[value="suggestion"]');
-    const c=type.querySelector('option[value="complaint"]');
-    if(s) s.textContent=tr("fb_type_suggestion");
-    if(c) c.textContent=tr("fb_type_complaint");
-    type.value=selected;
-  }
 }
 
 
@@ -659,9 +647,6 @@ const UI = {
   feedback_title:{ uz:"Taklif va shikoyatlar", en:"Suggestions & complaints", ru:"Предложения и жалобы", tr:"Öneriler ve şikâyetler", zh:"意见与投诉" },
   feedback_sub:{ uz:"Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.", en:"Write your feedback — it will be sent directly to the admin panel.", ru:"Напишите сообщение — оно будет отправлено прямо в админ-панель.", tr:"Fikrinizi yazın — mesaj doğrudan yönetim paneline gönderilir.", zh:"留下您的意见——消息将直接发送到管理面板。" },
   fb_name:{ uz:"Ismingiz", en:"Your name", ru:"Ваше имя", tr:"Adınız", zh:"您的姓名" },
-  fb_type_suggestion:{ uz:"💡 Taklif", en:"💡 Suggestion", ru:"💡 Предложение", tr:"💡 Öneri", zh:"💡 建议" },
-  fb_type_label:{ uz:"Murojaat turi", en:"Message type", ru:"Тип обращения", tr:"Başvuru türü", zh:"联系类型" },
-  fb_type_complaint:{ uz:"⚠️ Shikoyat", en:"⚠️ Complaint", ru:"⚠️ Жалоба", tr:"⚠️ Şikâyet", zh:"⚠️ 投诉" },
   fb_subject:{ uz:"Mavzu (ixtiyoriy)", en:"Subject (optional)", ru:"Тема (необязательно)", tr:"Konu (isteğe bağlı)", zh:"主题（可选）" },
   fb_message:{ uz:"Taklif yoki shikoyatingizni shu yerga yozing...", en:"Write your suggestion or complaint here...", ru:"Напишите здесь ваше предложение или жалобу...", tr:"Öneri veya şikâyetinizi buraya yazın...", zh:"请在此填写您的意见或投诉..." },
   fb_send:{ uz:"✉️ Yuborish", en:"✉️ Send", ru:"✉️ Отправить", tr:"✉️ Gönder", zh:"✉️ 发送" },
@@ -699,10 +684,6 @@ function applyStaticTranslations(){
   document.querySelectorAll("[data-i-title]").forEach(el => {
     const key = el.getAttribute("data-i-title");
     if (UI[key]) el.title = tr(key);
-  });
-  document.querySelectorAll("[data-i-aria]").forEach(el => {
-    const key = el.getAttribute("data-i-aria");
-    if (UI[key]) el.setAttribute("aria-label", tr(key));
   });
   updateLanguageButton();
   translateFeedback();
@@ -745,11 +726,6 @@ function categoryLocalized(category){
     historical:{uz:"Tarixiy maskan",en:"Historical site",ru:"Историческое место",tr:"Tarihi yer",zh:"历史遗址"}
   };
   return map[category] || makeLocalized(category, "Joy");
-}
-
-function rebuildAllLocations(){
-  allLocations = [];
-  districts.forEach(d => d.locations.forEach(loc => allLocations.push({district:d, loc})));
 }
 
 function dbRowToLocation(p, index){
@@ -840,16 +816,52 @@ async function loadPlacesFromSupabase(){
       return false;
     }
 
-    const dbDistricts = rowsToDistricts(data);
-    if (!dbDistricts.length) return false;
+    // Muhim: bosh sahifada faqat TARIXIY obyektlar ko‘rsatiladi.
+    // Mehmonxona va ovqatlanish yozuvlari admin panelida qoladi, lekin bu yerga kirmaydi.
+    const historicalRows = data.filter(isHistoricalDbRow);
+    const grouped = new Map();
 
-    // Admin paneldan kelgan ma'lumotlar asosiy ma'lumot sifatida ishlatiladi.
-    districts = dbDistricts;
-    currentDistrict = districts[0];
-    currentLocIndex = 0;
+    historicalRows.forEach((p, index) => {
+      const base = findBuiltinDistrict(p.district);
+      const key = base ? base.id : `db-${String(p.district || "sirdaryo").toLowerCase().replace(/[^a-z0-9а-яё]+/gi,"-")}`;
+      if (!grouped.has(key)) grouped.set(key, { base, rows:[] });
+      grouped.get(key).rows.push(p);
+    });
+
+    // Barcha hududlar saqlanadi — shu sabab Sirdaryo viloyati xaritasi ham ishlaydi.
+    // Har bir hududning joylar ro‘yxatiga faqat tarixiy obyektlar tushadi.
+    const result = BUILTIN_DISTRICTS.map(base => {
+      const item = grouped.get(base.id);
+      const dbLocations = item ? item.rows.map((p,i) => dbRowToLocation(p, i)) : [];
+      const fallbackHistorical = base.locations.filter(isHistoricalLocation);
+      return { ...base, locations: dbLocations.length ? dbLocations : fallbackHistorical };
+    });
+
+    // Bazada eski built-in ro‘yxatda yo‘q yangi hudud bo‘lsa, uni ham qo‘shamiz.
+    grouped.forEach((item, key) => {
+      if (item.base) return;
+      const rows = item.rows || [];
+      if (!rows.length) return;
+      const locs = rows.map((p,i) => dbRowToLocation(p, i));
+      const districtName = rows[0].district || "Sirdaryo viloyati";
+      const valid = locs.filter(x => x.lat !== null && x.lon !== null);
+      result.push({
+        id:key,
+        lat:valid.length ? valid.reduce((a,x)=>a+x.lat,0)/valid.length : 40.35,
+        lng:valid.length ? valid.reduce((a,x)=>a+x.lon,0)/valid.length : 68.65,
+        name:localizedDbDistrictName(districtName),
+        fact:makeLocalized(`${districtName} hududidagi tarixiy maskanlar.`),
+        locations:locs
+      });
+    });
+
+    districts = result;
+    currentDistrict = districts.find(d => d.id === currentDistrict?.id && d.locations.length)
+      || districts.find(d => d.locations.length)
+      || districts[0];
+    currentLocIndex = Math.min(currentLocIndex, Math.max(0, currentDistrict.locations.length - 1));
     publicPlacesLoaded = true;
 
-    // Yangi districtlar uchun tarjima kalitlarini qayta yaratamiz.
     districts.forEach(d => {
       UI["fact_body_" + d.id] = d.fact;
     });
@@ -961,10 +973,86 @@ let districts = [
     ]}
 ];
 
-// Built-in district data is kept as a safe source for the historical-sites list.
-// Supabase may replace `districts` with hotels/food/etc., but the main list below
-// must continue to show historical places only.
-const BUILTIN_DISTRICTS = districts;
+// Asosiy sahifa uchun doimiy manba: Supabase yuklanganda ham asl hududlar,
+// ularning tarjimalari va xarita koordinatalari yo‘qolib ketmasin.
+const BUILTIN_DISTRICTS = districts.map(d => ({ ...d, locations:[...d.locations] }));
+
+function isHistoricalLocation(loc){
+  if(!loc) return false;
+  const raw = String(loc.db_category || "").trim().toLowerCase();
+  if(raw === "historical" || raw === "history" || raw === "tarixiy") return true;
+  const categories = Object.values(loc.category || {}).join(" ").toLowerCase();
+  return /tarixiy|historical|истор|tarihi|历史/.test(categories);
+}
+
+function isHistoricalDbRow(row){
+  const raw = String(row?.category || "").trim().toLowerCase();
+  if(raw === "historical" || raw === "history" || raw === "tarixiy") return true;
+  return /tarixiy|historical|истор|tarihi|历史/.test(raw);
+}
+
+function localizedDbDistrictName(name){
+  const raw=normalizeDistrictName(name);
+  const known={
+    "yangiyer":{uz:"Yangiyer",en:"Yangiyer District",ru:"Янгиерский район",tr:"Yangiyer İlçesi",zh:"扬吉耶尔区"},
+    "guliston":{uz:"Guliston",en:"Guliston District",ru:"Гулистанский район",tr:"Guliston İlçesi",zh:"古利斯坦区"},
+    "sirdaryo":{uz:"Sirdaryo",en:"Sirdaryo District",ru:"Сырдарьинский район",tr:"Sirdaryo İlçesi",zh:"锡尔河区"}
+  };
+  return known[raw] || makeLocalized(name);
+}
+
+function normalizeDistrictName(value){
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[’‘'`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function districtStem(value){
+  return normalizeDistrictName(value)
+    .replace(/\b(tumani|tuman|shahri|shahar|district|city|район|город|ilçesi|ilçe)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findBuiltinDistrict(value){
+  const raw = normalizeDistrictName(value);
+  if(!raw) return null;
+
+  // Avval to‘liq nom bo‘yicha qidiramiz. Bu "Yangiyer" va
+  // "Yangiyer shahri" kabi alohida hududlarni birlashtirib yubormaydi.
+  const exact = BUILTIN_DISTRICTS.find(d => Object.values(d.name || {}).map(normalizeDistrictName).includes(raw));
+  if(exact) return exact;
+
+  // Faqat aniq ma’nodosh yozilishlar uchun xavfsiz aliaslar.
+  const aliases = {
+    "guliston shahri":"guliston-shahar",
+    "guliston city":"guliston-shahar",
+    "guliston tumani":"guliston-tuman",
+    "guliston district":"guliston-tuman",
+    "yangiyer shahri":"yangiyer",
+    "yangiyer city":"yangiyer",
+    "sirdaryo tumani":"sirdaryo-tuman",
+    "sirdaryo district":"sirdaryo-tuman",
+    "boyovut tumani":"boyovut",
+    "boyovut district":"boyovut",
+    "xovos tumani":"xovos",
+    "xovos district":"xovos",
+    "mirzaobod tumani":"mirzaobod",
+    "mirzaobod district":"mirzaobod",
+    "sardoba tumani":"sardoba",
+    "sardoba district":"sardoba",
+    "sayxunobod tumani":"sayxunobod",
+    "sayxunobod district":"sayxunobod",
+    "oqoltin tumani":"oqoltin",
+    "oqoltin district":"oqoltin",
+    "shirin shahri":"shirin",
+    "shirin city":"shirin"
+  };
+  const id = aliases[raw];
+  return id ? (BUILTIN_DISTRICTS.find(d => d.id === id) || null) : null;
+}
 
 // wire up per-district "interesting fact" translation keys used by applyStaticTranslations
 districts.forEach(d => { UI["fact_body_" + d.id] = d.fact; });
@@ -986,7 +1074,11 @@ function distName(d){ return d.name[currentLang] || d.name.uz; }
 
 // Flat index of every location across every district — used by favorites & the map modal.
 let allLocations = [];
-districts.forEach(d => d.locations.forEach(loc => allLocations.push({ district: d, loc })));
+function rebuildAllLocations(){
+  allLocations = [];
+  districts.forEach(d => d.locations.filter(isHistoricalLocation).forEach(loc => allLocations.push({ district:d, loc })));
+}
+rebuildAllLocations();
 
 function selectDistrict(d){
   currentDistrict = d;
@@ -995,8 +1087,15 @@ function selectDistrict(d){
   renderLocList();
   updateMiniMap();
   updateWeather();
-  loadScene(0);
   applyStaticTranslations();
+  if(!currentDistrict.locations.length){
+    document.getElementById("pillName").textContent = tr("search_no_results");
+    document.getElementById("pillIndex").textContent = "0 / 0";
+    document.getElementById("linkHint").style.display = "none";
+    document.getElementById("rightPanel").innerHTML = `<div class="rp-card"><div class="rp-body"><div class="rp-title">${escapeHtml(distName(currentDistrict))}</div><div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div></div></div>`;
+    return;
+  }
+  loadScene(0);
 }
 
 /* ============================================================
@@ -1078,100 +1177,40 @@ function renderDistrictChips(){
 function escapeHtml(value){
   return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
 }
-function isHistoricalLocation(loc){
-  if(!loc) return false;
-  const raw = String(loc.db_category || "").trim().toLowerCase();
-  if(raw === "historical" || raw === "history" || raw === "tarixiy") return true;
-  const categories = Object.values(loc.category || {}).join(" ").toLowerCase();
-  return /tarixiy|historical|истор|tarihi|历史/.test(categories);
+function haversineKm(lat1, lon1, lat2, lon2){
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
-
-function getHistoricalEntriesForDistrict(district){
-  if(!district) return [];
-  const direct = district.locations
-    .map((loc, index) => ({district, loc, index}))
-    .filter(x => isHistoricalLocation(x.loc));
-  if(direct.length) return direct;
-
-  // If Supabase currently contains only hotel/food rows for this district,
-  // fall back to the original built-in historical places for the same district.
-  const districtName = district.name?.uz || "";
-  const builtIn = BUILTIN_DISTRICTS.find(d => (d.name?.uz || "") === districtName);
-  if(!builtIn) return [];
-  return builtIn.locations
-    .map((loc, index) => ({district:builtIn, loc, index}))
-    .filter(x => isHistoricalLocation(x.loc));
-}
-
-function getAllHistoricalEntries(){
-  const result = [];
-  const seen = new Set();
-
-  allLocations
-    .filter(x => isHistoricalLocation(x.loc))
-    .forEach(x => {
-      const key = String(x.loc.id);
-      if(!seen.has(key)){ seen.add(key); result.push(x); }
-    });
-
-  BUILTIN_DISTRICTS.forEach(d => {
-    d.locations.forEach((loc, index) => {
-      if(!isHistoricalLocation(loc)) return;
-      const key = String(loc.id);
-      if(!seen.has(key)){
-        seen.add(key);
-        result.push({district:d, loc, index});
-      }
-    });
-  });
-
-  return result;
+function findNearbyPlaces(loc, limit=4){
+  if(!loc || !Number.isFinite(loc.lat) || !Number.isFinite(loc.lon)) return [];
+  return allLocations.filter(x=>x.loc.id!==loc.id && Number.isFinite(x.loc.lat) && Number.isFinite(x.loc.lon)).map(x=>({...x,distance:haversineKm(loc.lat,loc.lon,x.loc.lat,x.loc.lon)})).sort((a,b)=>a.distance-b.distance).slice(0,limit);
 }
 
 function renderLocList(filter=""){
   const wrap = document.getElementById("locList");
   wrap.innerHTML = "";
   const q = String(filter||"").trim().toLowerCase();
-
-  const entries = q
-    ? getAllHistoricalEntries().filter(({district,loc}) =>
-        [locName(loc),locCat(loc),distName(district),locDesc(loc)]
-          .join(" ").toLowerCase().includes(q))
-    : getHistoricalEntriesForDistrict(currentDistrict);
-
-  if(!entries.length){
-    wrap.innerHTML = `<div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div>`;
+  if(q){
+    const results = allLocations.filter(({district,loc}) => isHistoricalLocation(loc) && [locName(loc),locCat(loc),distName(district),locDesc(loc)].join(" ").toLowerCase().includes(q));
+    if(!results.length){ wrap.innerHTML=`<div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div>`; return; }
+    results.forEach(({district,loc})=>{
+      const i=district.locations.findIndex(x=>x.id===loc.id);
+      const div=document.createElement("div");
+      div.className="loc-item"+(district.id===currentDistrict.id&&i===currentLocIndex?" active":"");
+      div.innerHTML=`<img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt=""><div style="min-width:0"><div class="loc-name">${escapeHtml(locName(loc))}</div><div class="loc-sub">${escapeHtml(distName(district))} · ${escapeHtml(locCat(loc))}</div></div><span class="loc-heart${isFavorite(loc)?' active':''}">${isFavorite(loc)?'♥':'♡'}</span>`;
+      div.addEventListener("click",()=>{selectDistrict(district);loadScene(i>=0?i:0);document.getElementById("searchBox").value="";renderLocList("");});
+      div.querySelector(".loc-heart").addEventListener("click",e=>{e.stopPropagation();toggleFavorite(loc);});
+      wrap.appendChild(div);
+    });
     return;
   }
-
-  entries.forEach(({district,loc,index})=>{
-    const isCurrent =
-      district.id === currentDistrict.id &&
-      index === currentLocIndex;
-
+  currentDistrict.locations.filter(isHistoricalLocation).forEach((loc,i)=>{
     const div=document.createElement("div");
-    div.className="loc-item"+(isCurrent ? " active" : "");
-    div.innerHTML=`
-      <img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt="">
-      <div style="min-width:0">
-        <div class="loc-name">${escapeHtml(locName(loc))}</div>
-      </div>
-      <span class="loc-heart${isFavorite(loc)?' active':''}">
-        ${isFavorite(loc)?'♥':'♡'}
-      </span>`;
-
-    div.addEventListener("click",()=>{
-      selectDistrict(district);
-      loadScene(index >= 0 ? index : 0);
-      document.getElementById("searchBox").value="";
-      renderLocList("");
-    });
-
-    div.querySelector(".loc-heart").addEventListener("click",e=>{
-      e.stopPropagation();
-      toggleFavorite(loc);
-    });
-
+    div.className="loc-item"+(i===currentLocIndex?" active":"");
+    div.innerHTML=`<img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt=""><div style="min-width:0"><div class="loc-name">${escapeHtml(locName(loc))}</div></div><span class="loc-heart${isFavorite(loc)?' active':''}">${isFavorite(loc)?'♥':'♡'}</span>`;
+    div.addEventListener("click",()=>loadScene(i));
+    div.querySelector(".loc-heart").addEventListener("click",e=>{e.stopPropagation();toggleFavorite(loc);});
     wrap.appendChild(div);
   });
 }
@@ -1206,7 +1245,7 @@ function renderRightPanel(loc){
           <button class="btn-audio" id="audioBtn">🔊 ${tr("f_audio_t")}</button>
           <button class="btn-secondary${isFavorite(loc) ? ' active' : ''}" id="favBtn">${isFavorite(loc) ? '♥' : '♡'} ${isFavorite(loc) ? tr("sevimli_saved") : tr("sevimli")}</button>
         </div>
-
+        <div class="nearby-box"><div class="nearby-title">📍 ${tr("nearby_title")}</div><div class="nearby-list" id="nearbyList"></div></div>
       </div>
     </div>
   `;
@@ -1218,6 +1257,12 @@ function renderRightPanel(loc){
     const lng = loc.lon ?? currentDistrict.lng;
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, "_blank", "noopener");
   });
+  const nearby=findNearbyPlaces(loc);
+  const nearbyList=document.getElementById("nearbyList");
+  if(nearbyList){
+    nearbyList.innerHTML=nearby.length?nearby.map(x=>{const idx=x.district.locations.findIndex(l=>l.id===x.loc.id);return `<div class="nearby-item" data-nearby-id="${escapeHtml(String(x.loc.id))}"><div class="ni-main"><div class="ni-name">${escapeHtml(locName(x.loc))}</div><div class="ni-meta">${escapeHtml(distName(x.district))} · ${escapeHtml(locCat(x.loc))}</div></div><div class="ni-distance">${x.distance.toFixed(1)} ${escapeHtml(tr("distance_km"))}</div></div>`;}).join(""):`<div class="nearby-empty">${escapeHtml(tr("nearby_empty"))}</div>`;
+    nearbyList.querySelectorAll("[data-nearby-id]").forEach(el=>el.addEventListener("click",()=>{const x=nearby.find(y=>String(y.loc.id)===el.dataset.nearbyId);if(!x)return;const idx=x.district.locations.findIndex(l=>l.id===x.loc.id);selectDistrict(x.district);loadScene(idx>=0?idx:0);}));
+  }
 }
 
 /* ============================================================
@@ -1432,21 +1477,33 @@ document.getElementById("weatherModalOverlay").addEventListener("click", (e) => 
    9. MINI MAP (Leaflet + OpenStreetMap)
 ============================================================ */
 function initMiniMap(){
-  miniMap = L.map("miniMap", { zoomControl:false, attributionControl:true, dragging:true, scrollWheelZoom:false })
-    .setView([currentDistrict.lat, currentDistrict.lng], 11);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom:18, attribution:'&copy; OpenStreetMap'
-  }).addTo(miniMap);
-  miniMarker = L.marker([currentDistrict.lat, currentDistrict.lng]).addTo(miniMap);
+  const el=document.getElementById("miniMap");
+  if(!el || !window.L) return false;
+  if(miniMap){ setTimeout(()=>miniMap.invalidateSize(),100); return true; }
+  try{
+    miniMap = L.map(el, { zoomControl:false, attributionControl:true, dragging:true, scrollWheelZoom:false })
+      .setView([currentDistrict.lat, currentDistrict.lng], 9);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom:18, attribution:'&copy; OpenStreetMap'
+    }).addTo(miniMap);
+    miniMarker = L.marker([currentDistrict.lat, currentDistrict.lng]).addTo(miniMap);
+    setTimeout(()=>miniMap.invalidateSize(),150);
+    return true;
+  }catch(err){
+    console.error("Mini map xatosi:",err);
+    return false;
+  }
 }
 function updateMiniMap(){
-  document.getElementById("mapDistrictName").textContent = distName(currentDistrict);
+  const label=document.getElementById("mapDistrictName");
+  if(label) label.textContent = distName(currentDistrict);
+  if (!miniMap) { initMiniMap(); }
   if (!miniMap) return;
   const loc = currentDistrict.locations[currentLocIndex];
-  const lat = loc?.lat ?? currentDistrict.lat;
-  const lng = loc?.lon ?? currentDistrict.lng;
-  miniMap.setView([lat, lng], 13);
-  miniMarker.setLatLng([lat, lng]);
+  const lat = Number.isFinite(loc?.lat) ? loc.lat : currentDistrict.lat;
+  const lng = Number.isFinite(loc?.lon) ? loc.lon : currentDistrict.lng;
+  miniMap.setView([lat, lng], 11);
+  if(miniMarker) miniMarker.setLatLng([lat, lng]);
   setTimeout(() => miniMap.invalidateSize(), 150);
 }
 
@@ -1457,7 +1514,10 @@ let fullMap = null;
 let fullMapMarkers = [];
 
 function buildFullMap(){
-  fullMap = L.map("fullMap", { zoomControl:true, scrollWheelZoom:true }).setView([40.35, 68.65], 9);
+  if(!window.L) return;
+  const mapEl=document.getElementById("fullMap");
+  if(!mapEl) return;
+  fullMap = L.map(mapEl, { zoomControl:true, scrollWheelZoom:true }).setView([40.35, 68.65], 9);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom:18, attribution:'&copy; OpenStreetMap'
   }).addTo(fullMap);
@@ -1478,8 +1538,11 @@ function refreshFullMapLabels(){
 function openMapModal(){
   document.getElementById("mapModalOverlay").classList.add("open");
   if (!fullMap) buildFullMap();
-  else refreshFullMapLabels();
-  setTimeout(() => fullMap && fullMap.invalidateSize(), 200);
+  else {
+    refreshFullMapLabels();
+    fullMap.setView([currentDistrict.lat, currentDistrict.lng], 9);
+  }
+  setTimeout(() => fullMap && fullMap.invalidateSize(), 250);
 }
 function closeMapModal(){ document.getElementById("mapModalOverlay").classList.remove("open"); }
 document.getElementById("navMap").addEventListener("click", openMapModal);
@@ -1612,21 +1675,14 @@ document.getElementById("navContact").addEventListener("click", (e) => {
 ============================================================ */
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const form=e.currentTarget,
-        name=document.getElementById("fbName").value.trim(),
-        type=document.getElementById("fbType")?.value || "suggestion",
-        subject=document.getElementById("fbSubject").value.trim(),
-        message=document.getElementById("fbMessage").value.trim(),
-        btn=form.querySelector("button[type=submit]");
+  const form=e.currentTarget,name=document.getElementById("fbName").value.trim(),subject=document.getElementById("fbSubject").value.trim(),message=document.getElementById("fbMessage").value.trim(),btn=form.querySelector("button[type=submit]");
   if(!name||!message)return;
-  const typeLabel = type === "complaint" ? tr("fb_type_complaint") : tr("fb_type_suggestion");
-  const fullSubject = subject ? `${typeLabel} — ${subject}` : typeLabel;
   const oldText=btn.textContent;btn.disabled=true;btn.textContent="…";
   try{
     const client=publicPlacesClient||(window.supabase&&window.SUPABASE_URL&&window.SUPABASE_KEY?window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null);
     if(!client)throw new Error("Supabase unavailable");
     let submittedBy=null;try{const {data:{user}}=await client.auth.getUser();submittedBy=user?.id||null;}catch(_){}
-    const {error}=await client.from("site_feedback").insert({name,subject:fullSubject,message,status:"pending",submitted_by:submittedBy,page_path:location.pathname,language:currentLang});
+    const {error}=await client.from("site_feedback").insert({name,subject:subject||null,message,status:"pending",submitted_by:submittedBy,page_path:location.pathname,language:currentLang});
     if(error)throw error;form.reset();alert(tr("fb_success"));
   }catch(err){console.error("Feedback error:",err);alert(tr("fb_error"));}
   finally{btn.disabled=false;btn.textContent=oldText;}
@@ -1649,7 +1705,7 @@ function renderLangMenu(){
   LANGS.forEach(l => {
     const opt = document.createElement("div");
     opt.className = "lang-opt" + (l.code === currentLang ? " active" : "");
-    opt.innerHTML = `<span class="lang-flag">${l.flag}</span> <span>${l.name}</span>`;
+    opt.innerHTML = `<img class="lang-flag-img" src="${LANG_FLAG_URLS[l.code] || LANG_FLAG_URLS.uz}" alt="${l.name}"> <span>${l.name}</span>`;
     opt.addEventListener("click", () => {
       currentLang = l.code;
       localStorage.setItem("sirdaryo360_lang", currentLang);
@@ -1662,8 +1718,11 @@ function renderLangMenu(){
       updateMiniMap();
       updateWeather();
       const loc = currentDistrict.locations[currentLocIndex];
-      document.getElementById("pillName").textContent = locName(loc);
-      renderRightPanel(loc);
+      if(loc){
+        document.getElementById("pillName").textContent = locName(loc);
+        renderRightPanel(loc);
+      }
+      if(fullMap) refreshFullMapLabels();
       if (viewer) viewer.setTitle && viewer.setTitle(locName(loc));
     });
     menu.appendChild(opt);
@@ -1705,6 +1764,7 @@ async function initPublicSite(){
   updateWeather();
   loadScene(0);
   applyStaticTranslations();
+  updateMiniMap();
 
   // Sayt ochilgandan keyin admin panelda yangi obyekt qo'shilgan bo'lsa,
   // uni ko'rsatish uchun bir marta qayta tekshiramiz.
@@ -1715,7 +1775,13 @@ async function initPublicSite(){
       renderDistrictChips();
       renderLocList(document.getElementById("searchBox")?.value || "");
       updateMiniMap();
-      loadScene(0);
+      if(fullMap){
+        fullMap.remove();
+        fullMap=null;
+        fullMapMarkers=[];
+        buildFullMap();
+      }
+      if(currentDistrict.locations.length) loadScene(0);
     }
   }, 3000);
 }

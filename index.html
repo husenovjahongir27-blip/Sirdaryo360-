@@ -143,6 +143,16 @@
   .fb-submit{ background:var(--green); color:#fff; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700; border:none; }
   .fb-submit:hover{ background:var(--green-dark); }
 
+  .feedback-status{
+  display:none;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:var(--pastel-green);
+  color:var(--green-dark);
+  font-size:13px;
+  font-weight:600;
+}
   /* ================= STAGE ================= */
   .stage{
     position:relative; margin-top:16px; border-radius:22px; overflow:hidden;
@@ -1595,8 +1605,18 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
 
     if (error) throw error;
 
-    alert(tr("fb_success"));
-    form.reset();
+    const statusBox = document.getElementById("feedbackStatus");
+
+statusBox.textContent = tr("fb_success");
+statusBox.style.display = "block";
+
+form.reset();
+
+setTimeout(() => {
+  statusBox.style.display = "none";
+}, 5000);
+    </form>
+      <div id="feedbackStatus" class="feedback-status"></div>
 
   } catch (error) {
     console.error("Feedback yuborishda xato:", error);

@@ -152,13 +152,40 @@ button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden
   </div>
 </div>
 
-<div id="page-submissions" class="hidden">
-      <div class="top"><h1>Foydalanuvchi takliflari</h1></div>
-      <div class="panel">
-        <div class="toolbar"><select id="subFilter" onchange="loadSubmissions()"><option value="pending">Kutilmoqda</option><option value="approved">Tasdiqlangan</option><option value="rejected">Rad etilgan</option><option value="">Barchasi</option></select></div>
-        <div class="table-wrap"><table class="table"><thead><tr><th>Nomi</th><th>Turi</th><th>Hudud</th><th>Holati</th><th>Amal</th></tr></thead><tbody id="subBody"></tbody></table></div>
-      </div>
-    </div>
+<div id="page-submissions" class="hidden"> 
+  <div class="top"> 
+    <h1>Taklif va shikoyatlar</h1> 
+  </div> 
+ 
+  <div class="panel"> 
+    <div class="toolbar"> 
+      <select id="subFilter" onchange="loadSubmissions()"> 
+        <option value="new">Yangi</option> 
+        <option value="read">O‘qilgan</option> 
+        <option value="resolved">Hal qilingan</option> 
+        <option value="rejected">Rad etilgan</option> 
+        <option value="">Barchasi</option> 
+      </select> 
+    </div> 
+ 
+    <div class="table-wrap"> 
+      <table class="table"> 
+        <thead> 
+          <tr> 
+            <th>Ism</th> 
+            <th>Turi</th> 
+            <th>Mavzu</th> 
+            <th>Xabar</th> 
+            <th>Sana</th> 
+            <th>Holati</th> 
+            <th>Amal</th> 
+          </tr> 
+        </thead> 
+        <tbody id="subBody"></tbody> 
+      </table> 
+    </div> 
+  </div> 
+</div>
 
 <div id="page-settings" class="hidden">
       <div class="top"><h1>Sozlamalar</h1></div>
@@ -292,17 +319,133 @@ async function deletePlace(id){if(!confirm('O‘chirishni tasdiqlaysizmi?'))retu
 
 async function loadSubmissions(){
   if(!sb || !currentRole) return;
-  const status=document.getElementById('subFilter').value;
-  let q=sb.from('place_submissions').select('*').order('created_at',{ascending:false});
-  if(status) q=q.eq('status',status);
-  const {data,error}=await q;
-  if(error){toast(error.message);return}
-  document.getElementById('subBody').innerHTML=(data||[]).map(s=>`
-    <tr><td><b>${esc(s.name_uz)}</b></td><td><span class="badge">${label(s.category)}</span></td>
-    <td>${esc(s.district||'')}</td><td>${esc(s.status)}</td>
-    <td class="actions">${s.status==='pending'
-      ? `<button class="primary" onclick="approveSubmission('${s.id}')">Tasdiqlash</button><button class="danger" onclick="rejectSubmission('${s.id}')">Rad etish</button>`
-      : `<span class="badge">Ko‘rib chiqilgan</span>`}</td></tr>`).join('') || '<tr><td colspan="5">Taklif topilmadi.</td></tr>';
+
+  const status = document.getElementById('subFilter').value;
+
+  let q = sb
+    .from('feedbacks')
+    .select('*')
+    .order('created_at', { ascending:false });
+
+  if(status){
+    q = q.eq('status', status);
+  }
+
+  const { data, error } = await q;
+
+  if(error){
+    toast(error.message);
+    return;
+  }
+
+  document.getElementById('subBody').innerHTML =
+    (data || []).map(s => `
+      <tr>
+        <td><b>${esc(s.name || '')}</b></td>
+
+        <td>
+          <span class="badge">
+            ${s.type === 'suggestion' ? '💡 Taklif' : '⚠️ Shikoyat'}
+          </span>
+        </td>
+
+        <td>${esc(s.subject || '—')}</td>
+
+        <td style="white-space:normal;min-width:280px;max-width:420px">
+          ${esc(s.message || '')}
+        </td>
+
+        <td>
+          ${s.created_at
+            ? new Date(s.created_at).toLocaleString('uz-UZ')
+            : '—'}
+        </td>
+
+        <td>
+          <span class="badge">${feedbackStatusLabel(s.status)}</span>
+        </td>
+
+        <td class="actions">
+          ${
+            s.status === 'new'
+            ? `
+              <button class="ghost" onclick="markFeedbackRead('${s.id}')">
+                O‘qildi
+              </button>
+
+              <button class="primary" onclick="resolveFeedback('${s.id}')">
+                Hal qilindi
+              </button>
+
+              <button class="danger" onclick="deleteFeedback('${s.id}')">
+                O‘chirish
+              </button>
+            `
+            : `
+              <button class="danger" onclick="deleteFeedback('${s.id}')">
+                O‘chirish
+              </button>
+            `
+          }
+        </td>
+      </tr>
+    `).join('')
+    || '<tr><td colspan="7">Murojaatlar topilmadi.</td></tr>';
+}
+  function feedbackStatusLabel(status){
+  return {
+    new: 'Yangi',
+    read: 'O‘qilgan',
+    resolved: 'Hal qilingan',
+    rejected: 'Rad etilgan'
+  }[status] || status;
+}
+
+async function markFeedbackRead(id){
+  const { error } = await sb
+    .from('feedbacks')
+    .update({ status:'read' })
+    .eq('id', id);
+
+  if(error){
+    toast(error.message);
+    return;
+  }
+
+  toast('Murojaat o‘qilgan deb belgilandi');
+  loadSubmissions();
+}
+
+async function resolveFeedback(id){
+  const { error } = await sb
+    .from('feedbacks')
+    .update({ status:'resolved' })
+    .eq('id', id);
+
+  if(error){
+    toast(error.message);
+    return;
+  }
+
+  toast('Murojaat hal qilingan deb belgilandi');
+  loadSubmissions();
+}
+
+async function deleteFeedback(id){
+  if(!confirm('Bu murojaatni o‘chirishni tasdiqlaysizmi?')) return;
+
+  const { error } = await sb
+    .from('feedbacks')
+    .delete()
+    .eq('id', id);
+
+  if(error){
+    toast(error.message);
+    return;
+  }
+
+  toast('Murojaat o‘chirildi');
+  loadSubmissions();
 }
 async function approveSubmission(id){
   const {data,error}=await sb.from('place_submissions').select('*').eq('id',id).single();

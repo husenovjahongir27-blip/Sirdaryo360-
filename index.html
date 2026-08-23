@@ -85,7 +85,7 @@
   .lang-opt:hover{ background:var(--pastel-blue); }
   .lang-opt.active{ color:var(--green-dark); }
   .lang-flag{ font-size:15px; line-height:1; }
-  .lang-flag-img{ width:20px; height:14px; object-fit:cover; border-radius:2px; display:block; flex:0 0 auto; }
+  .lang-flag-img{ width:20px; min-width:20px; height:18px; display:inline-flex; align-items:center; justify-content:center; font-size:16px; line-height:1; flex:0 0 20px; }
 
   /* ================= MODALS (Xarita / Sevimlilar) ================= */
   .modal-overlay{ position:fixed; inset:0; background:rgba(10,18,24,0.55); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
@@ -362,7 +362,7 @@
     <div class="header-actions">
       <div class="icon-btn fav-count" id="favCountBtn">♥ <span id="favCount">0</span></div>
       <div class="icon-btn" id="darkToggle">🌙</div>
-      <div class="lang-btn" id="langBtn"><img class="lang-flag-img" id="langFlag" src="https://flagcdn.com/w20/uz.png" alt="UZ bayrog'i"> <span id="langLabel">UZ</span> ▾</div>
+      <div class="lang-btn" id="langBtn"><span class="lang-flag-img" id="langFlag" aria-hidden="true">🇺🇿</span> <span id="langLabel">UZ</span> ▾</div>
       <div class="lang-menu" id="langMenu"></div>
     </div>
   </header>
@@ -499,7 +499,7 @@
     <form id="feedbackForm">
       <div class="fb-row">
         <input type="text" id="fbName" data-i-placeholder="fb_name" placeholder="Ismingiz" required>
-        <select id="fbType" class="fb-type" aria-label="Murojaat turi">
+        <select id="fbType" class="fb-type" data-i-aria="fb_type_label" aria-label="Murojaat turi">
           <option value="suggestion">💡 Taklif</option>
           <option value="complaint">⚠️ Shikoyat</option>
         </select>
@@ -574,8 +574,10 @@ function updateLanguageButton(){
   const flag = document.getElementById("langFlag");
   if(label) label.textContent = activeLang.label;
   if(flag){
-    flag.src = LANG_FLAG_URLS[activeLang.code] || LANG_FLAG_URLS.uz;
-    flag.alt = activeLang.name + " bayrog'i";
+    // Emoji bayroqdan foydalanamiz: u kompyuter va telefonda tashqi CDN'siz ko'rinadi.
+    flag.textContent = activeLang.flag;
+    flag.title = activeLang.name;
+    flag.setAttribute("aria-label", activeLang.name + " bayrog'i");
   }
 }
 
@@ -657,6 +659,7 @@ const UI = {
   feedback_sub:{ uz:"Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.", en:"Write your feedback — it will be sent directly to the admin panel.", ru:"Напишите сообщение — оно будет отправлено прямо в админ-панель.", tr:"Fikrinizi yazın — mesaj doğrudan yönetim paneline gönderilir.", zh:"留下您的意见——消息将直接发送到管理面板。" },
   fb_name:{ uz:"Ismingiz", en:"Your name", ru:"Ваше имя", tr:"Adınız", zh:"您的姓名" },
   fb_type_suggestion:{ uz:"💡 Taklif", en:"💡 Suggestion", ru:"💡 Предложение", tr:"💡 Öneri", zh:"💡 建议" },
+  fb_type_label:{ uz:"Murojaat turi", en:"Message type", ru:"Тип обращения", tr:"Başvuru türü", zh:"联系类型" },
   fb_type_complaint:{ uz:"⚠️ Shikoyat", en:"⚠️ Complaint", ru:"⚠️ Жалоба", tr:"⚠️ Şikâyet", zh:"⚠️ 投诉" },
   fb_subject:{ uz:"Mavzu (ixtiyoriy)", en:"Subject (optional)", ru:"Тема (необязательно)", tr:"Konu (isteğe bağlı)", zh:"主题（可选）" },
   fb_message:{ uz:"Taklif yoki shikoyatingizni shu yerga yozing...", en:"Write your suggestion or complaint here...", ru:"Напишите здесь ваше предложение или жалобу...", tr:"Öneri veya şikâyetinizi buraya yazın...", zh:"请在此填写您的意见或投诉..." },
@@ -695,6 +698,10 @@ function applyStaticTranslations(){
   document.querySelectorAll("[data-i-title]").forEach(el => {
     const key = el.getAttribute("data-i-title");
     if (UI[key]) el.title = tr(key);
+  });
+  document.querySelectorAll("[data-i-aria]").forEach(el => {
+    const key = el.getAttribute("data-i-aria");
+    if (UI[key]) el.setAttribute("aria-label", tr(key));
   });
   updateLanguageButton();
   translateFeedback();
@@ -953,6 +960,11 @@ let districts = [
     ]}
 ];
 
+// Built-in district data is kept as a safe source for the historical-sites list.
+// Supabase may replace `districts` with hotels/food/etc., but the main list below
+// must continue to show historical places only.
+const BUILTIN_DISTRICTS = districts;
+
 // wire up per-district "interesting fact" translation keys used by applyStaticTranslations
 districts.forEach(d => { UI["fact_body_" + d.id] = d.fact; });
 
@@ -1065,40 +1077,100 @@ function renderDistrictChips(){
 function escapeHtml(value){
   return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
 }
-function haversineKm(lat1, lon1, lat2, lon2){
-  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+function isHistoricalLocation(loc){
+  if(!loc) return false;
+  const raw = String(loc.db_category || "").trim().toLowerCase();
+  if(raw === "historical" || raw === "history" || raw === "tarixiy") return true;
+  const categories = Object.values(loc.category || {}).join(" ").toLowerCase();
+  return /tarixiy|historical|истор|tarihi|历史/.test(categories);
 }
-function findNearbyPlaces(loc, limit=4){
-  if(!loc || !Number.isFinite(loc.lat) || !Number.isFinite(loc.lon)) return [];
-  return allLocations.filter(x=>x.loc.id!==loc.id && Number.isFinite(x.loc.lat) && Number.isFinite(x.loc.lon)).map(x=>({...x,distance:haversineKm(loc.lat,loc.lon,x.loc.lat,x.loc.lon)})).sort((a,b)=>a.distance-b.distance).slice(0,limit);
+
+function getHistoricalEntriesForDistrict(district){
+  if(!district) return [];
+  const direct = district.locations
+    .map((loc, index) => ({district, loc, index}))
+    .filter(x => isHistoricalLocation(x.loc));
+  if(direct.length) return direct;
+
+  // If Supabase currently contains only hotel/food rows for this district,
+  // fall back to the original built-in historical places for the same district.
+  const districtName = district.name?.uz || "";
+  const builtIn = BUILTIN_DISTRICTS.find(d => (d.name?.uz || "") === districtName);
+  if(!builtIn) return [];
+  return builtIn.locations
+    .map((loc, index) => ({district:builtIn, loc, index}))
+    .filter(x => isHistoricalLocation(x.loc));
+}
+
+function getAllHistoricalEntries(){
+  const result = [];
+  const seen = new Set();
+
+  allLocations
+    .filter(x => isHistoricalLocation(x.loc))
+    .forEach(x => {
+      const key = String(x.loc.id);
+      if(!seen.has(key)){ seen.add(key); result.push(x); }
+    });
+
+  BUILTIN_DISTRICTS.forEach(d => {
+    d.locations.forEach((loc, index) => {
+      if(!isHistoricalLocation(loc)) return;
+      const key = String(loc.id);
+      if(!seen.has(key)){
+        seen.add(key);
+        result.push({district:d, loc, index});
+      }
+    });
+  });
+
+  return result;
 }
 
 function renderLocList(filter=""){
   const wrap = document.getElementById("locList");
   wrap.innerHTML = "";
   const q = String(filter||"").trim().toLowerCase();
-  if(q){
-    const results = allLocations.filter(({district,loc}) => [locName(loc),locCat(loc),distName(district),locDesc(loc)].join(" ").toLowerCase().includes(q));
-    if(!results.length){ wrap.innerHTML=`<div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div>`; return; }
-    results.forEach(({district,loc})=>{
-      const i=district.locations.findIndex(x=>x.id===loc.id);
-      const div=document.createElement("div");
-      div.className="loc-item"+(district.id===currentDistrict.id&&i===currentLocIndex?" active":"");
-      div.innerHTML=`<img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt=""><div style="min-width:0"><div class="loc-name">${escapeHtml(locName(loc))}</div><div class="loc-sub">${escapeHtml(distName(district))} · ${escapeHtml(locCat(loc))}</div></div><span class="loc-heart${isFavorite(loc)?' active':''}">${isFavorite(loc)?'♥':'♡'}</span>`;
-      div.addEventListener("click",()=>{selectDistrict(district);loadScene(i>=0?i:0);document.getElementById("searchBox").value="";renderLocList("");});
-      div.querySelector(".loc-heart").addEventListener("click",e=>{e.stopPropagation();toggleFavorite(loc);});
-      wrap.appendChild(div);
-    });
+
+  const entries = q
+    ? getAllHistoricalEntries().filter(({district,loc}) =>
+        [locName(loc),locCat(loc),distName(district),locDesc(loc)]
+          .join(" ").toLowerCase().includes(q))
+    : getHistoricalEntriesForDistrict(currentDistrict);
+
+  if(!entries.length){
+    wrap.innerHTML = `<div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div>`;
     return;
   }
-  currentDistrict.locations.forEach((loc,i)=>{
+
+  entries.forEach(({district,loc,index})=>{
+    const isCurrent =
+      district.id === currentDistrict.id &&
+      index === currentLocIndex;
+
     const div=document.createElement("div");
-    div.className="loc-item"+(i===currentLocIndex?" active":"");
-    div.innerHTML=`<img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt=""><div style="min-width:0"><div class="loc-name">${escapeHtml(locName(loc))}</div></div><span class="loc-heart${isFavorite(loc)?' active':''}">${isFavorite(loc)?'♥':'♡'}</span>`;
-    div.addEventListener("click",()=>loadScene(i));
-    div.querySelector(".loc-heart").addEventListener("click",e=>{e.stopPropagation();toggleFavorite(loc);});
+    div.className="loc-item"+(isCurrent ? " active" : "");
+    div.innerHTML=`
+      <img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt="">
+      <div style="min-width:0">
+        <div class="loc-name">${escapeHtml(locName(loc))}</div>
+      </div>
+      <span class="loc-heart${isFavorite(loc)?' active':''}">
+        ${isFavorite(loc)?'♥':'♡'}
+      </span>`;
+
+    div.addEventListener("click",()=>{
+      selectDistrict(district);
+      loadScene(index >= 0 ? index : 0);
+      document.getElementById("searchBox").value="";
+      renderLocList("");
+    });
+
+    div.querySelector(".loc-heart").addEventListener("click",e=>{
+      e.stopPropagation();
+      toggleFavorite(loc);
+    });
+
     wrap.appendChild(div);
   });
 }
@@ -1133,7 +1205,7 @@ function renderRightPanel(loc){
           <button class="btn-audio" id="audioBtn">🔊 ${tr("f_audio_t")}</button>
           <button class="btn-secondary${isFavorite(loc) ? ' active' : ''}" id="favBtn">${isFavorite(loc) ? '♥' : '♡'} ${isFavorite(loc) ? tr("sevimli_saved") : tr("sevimli")}</button>
         </div>
-        <div class="nearby-box"><div class="nearby-title">📍 ${tr("nearby_title")}</div><div class="nearby-list" id="nearbyList"></div></div>
+
       </div>
     </div>
   `;
@@ -1145,12 +1217,6 @@ function renderRightPanel(loc){
     const lng = loc.lon ?? currentDistrict.lng;
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, "_blank", "noopener");
   });
-  const nearby=findNearbyPlaces(loc);
-  const nearbyList=document.getElementById("nearbyList");
-  if(nearbyList){
-    nearbyList.innerHTML=nearby.length?nearby.map(x=>{const idx=x.district.locations.findIndex(l=>l.id===x.loc.id);return `<div class="nearby-item" data-nearby-id="${escapeHtml(String(x.loc.id))}"><div class="ni-main"><div class="ni-name">${escapeHtml(locName(x.loc))}</div><div class="ni-meta">${escapeHtml(distName(x.district))} · ${escapeHtml(locCat(x.loc))}</div></div><div class="ni-distance">${x.distance.toFixed(1)} ${escapeHtml(tr("distance_km"))}</div></div>`;}).join(""):`<div class="nearby-empty">${escapeHtml(tr("nearby_empty"))}</div>`;
-    nearbyList.querySelectorAll("[data-nearby-id]").forEach(el=>el.addEventListener("click",()=>{const x=nearby.find(y=>String(y.loc.id)===el.dataset.nearbyId);if(!x)return;const idx=x.district.locations.findIndex(l=>l.id===x.loc.id);selectDistrict(x.district);loadScene(idx>=0?idx:0);}));
-  }
 }
 
 /* ============================================================

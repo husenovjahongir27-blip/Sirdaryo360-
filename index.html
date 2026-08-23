@@ -543,8 +543,8 @@
         aria-label="Murojaat turi"
         required
       >
-        <option value="suggestion" data-i="fb_suggestion">💡 Taklif</option>
-        <option value="complaint" data-i="fb_complaint">⚠️ Shikoyat</option>
+       <option value="suggestion" data-i="fb_type_suggestion">💡 Taklif</option>
+<option value="complaint" data-i="fb_type_complaint">⚠️ Shikoyat</option>
       </select>
 
       <input
@@ -650,7 +650,94 @@ const UI = {
   f_audio_playing:{ uz:"Tinglanmoqda...", en:"Playing...", ru:"Воспроизведение...", tr:"Çalıyor...", zh:"播放中..." },
   f_fav_t:{ uz:"Sevimlilar", en:"Favorites", ru:"Избранное", tr:"Favoriler", zh:"收藏" },
   f_fav_s:{ uz:"Yoqtirgan joylaringizni saqlang", en:"Save the places you like", ru:"Сохраняйте понравившиеся места", tr:"Beğendiğiniz yerleri kaydedin", zh:"保存您喜欢的地点" },
-    weather_title:{
+    feedback_title:{
+    uz:"Taklif va shikoyatlar",
+    en:"Suggestions & complaints",
+    ru:"Предложения и жалобы",
+    tr:"Öneriler ve şikâyetler",
+    zh:"意见与投诉"
+  },
+
+  feedback_sub:{
+    uz:"Fikringizni yozib qoldiring",
+    en:"Leave your feedback",
+    ru:"Оставьте своё сообщение",
+    tr:"Görüşlerinizi bırakın",
+    zh:"留下您的意见"
+  },
+
+  fb_name:{
+    uz:"Ismingiz",
+    en:"Your name",
+    ru:"Ваше имя",
+    tr:"Adınız",
+    zh:"您的姓名"
+  },
+
+  fb_type_label:{
+    uz:"Murojaat turi",
+    en:"Message type",
+    ru:"Тип обращения",
+    tr:"Başvuru türü",
+    zh:"联系类型"
+  },
+
+  fb_type_suggestion:{
+    uz:"💡 Taklif",
+    en:"💡 Suggestion",
+    ru:"💡 Предложение",
+    tr:"💡 Öneri",
+    zh:"💡 建议"
+  },
+
+  fb_type_complaint:{
+    uz:"⚠️ Shikoyat",
+    en:"⚠️ Complaint",
+    ru:"⚠️ Жалоба",
+    tr:"⚠️ Şikâyet",
+    zh:"⚠️ 投诉"
+  },
+
+  fb_subject:{
+    uz:"Mavzu (ixtiyoriy)",
+    en:"Subject (optional)",
+    ru:"Тема (необязательно)",
+    tr:"Konu (isteğe bağlı)",
+    zh:"主题（可选）"
+  },
+
+  fb_message:{
+    uz:"Taklif yoki shikoyatingizni shu yerga yozing...",
+    en:"Write your suggestion or complaint here...",
+    ru:"Напишите здесь ваше предложение или жалобу...",
+    tr:"Öneri veya şikâyetinizi buraya yazın...",
+    zh:"请在此填写您的意见或投诉..."
+  },
+
+  fb_send:{
+    uz:"✉️ Yuborish",
+    en:"✉️ Send",
+    ru:"✉️ Отправить",
+    tr:"✉️ Gönder",
+    zh:"✉️ 发送"
+  },
+
+  fb_success:{
+    uz:"Rahmat! Xabaringiz admin panelga yuborildi.",
+    en:"Thank you! Your message was sent to the admin panel.",
+    ru:"Спасибо! Ваше сообщение отправлено в админ-панель.",
+    tr:"Teşekkürler! Mesajınız yönetim paneline gönderildi.",
+    zh:"谢谢！您的消息已发送到管理面板。"
+  },
+
+  fb_error:{
+    uz:"Xabar yuborilmadi. Keyinroq qayta urinib ko‘ring.",
+    en:"Message could not be sent. Please try again.",
+    ru:"Не удалось отправить сообщение. Попробуйте позже.",
+    tr:"Mesaj gönderilemedi. Lütfen tekrar deneyin.",
+    zh:"消息发送失败，请稍后重试。"
+  },  
+  weather_title:{
     uz:"Viloyat ob-havosi",
     en:"Regional weather",
     ru:"Погода в регионе",
@@ -763,15 +850,56 @@ travel_history_desc:{
 function tr(key){ return (UI[key] && UI[key][currentLang]) || (UI[key] && UI[key].uz) || key; }
 
 function applyStaticTranslations(){
+
+  // Oddiy matnlar
   document.querySelectorAll("[data-i]").forEach(el => {
     const key = el.getAttribute("data-i");
-    if (UI[key]) el.textContent = tr(key);
+
+    if (UI[key]) {
+      el.textContent = tr(key);
+    }
   });
-  const activeLang = LANGS.find(l=>l.code===currentLang);
+
+  // Placeholderlar
+  document.querySelectorAll("[data-i-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i-placeholder");
+
+    if (UI[key]) {
+      el.placeholder = tr(key);
+    }
+  });
+
+  // aria-label
+  document.querySelectorAll("[data-i-aria]").forEach(el => {
+    const key = el.getAttribute("data-i-aria");
+
+    if (UI[key]) {
+      el.setAttribute("aria-label", tr(key));
+    }
+  });
+
+  // Til tugmasi
+  const activeLang = LANGS.find(l => l.code === currentLang);
+
   document.getElementById("langLabel").textContent = activeLang.label;
-document.getElementById("langFlag").innerHTML =
-  `<img src="${activeLang.flag}" alt="${activeLang.name}">`;
-  document.getElementById("footFact").textContent = tr("fact_body_" + currentDistrict.id) || "";
+
+  // Bayroq rasmi ishlatilayotgan bo‘lsa
+  const langFlag = document.getElementById("langFlag");
+  if (langFlag) {
+    if (activeLang.flag.startsWith("http")) {
+      langFlag.innerHTML =
+        `<img src="${activeLang.flag}" alt="${activeLang.name}">`;
+    } else {
+      langFlag.textContent = activeLang.flag;
+    }
+  }
+
+  // Qiziqarli ma'lumot
+  const footFact = document.getElementById("footFact");
+  if (footFact && currentDistrict) {
+    footFact.textContent =
+      tr("fact_body_" + currentDistrict.id) || "";
+  }
 }
 
 /* ============================================================

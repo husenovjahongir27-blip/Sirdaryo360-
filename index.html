@@ -517,16 +517,65 @@
   </div>
 
   <div class="feedback-card" id="feedbackCard">
-    <h4>Taklif va shikoyatlar</h4>
-    <div class="fb-sub">Fikringizni yozing — xabar to'g'ridan-to'g'ri emailimizga yuboriladi.</div>
-    <form id="feedbackForm">
-      <div class="fb-row">
-        <input type="text" id="fbName" placeholder="Ismingiz" required>
-        <input type="text" id="fbSubject" placeholder="Mavzu (ixtiyoriy)">
-      </div>
-      <div class="fb-row">
-        <textarea id="fbMessage" placeholder="Taklif yoki shikoyatingizni shu yerga yozing..." required></textarea>
-      </div>
+
+  <h4 data-i="feedback_title">Taklif va shikoyatlar</h4>
+
+  <div class="fb-sub" data-i="feedback_sub">
+    Fikringizni yozib qoldiring
+  </div>
+
+  <form id="feedbackForm">
+
+    <div class="fb-row">
+
+      <input
+        type="text"
+        id="fbName"
+        data-i-placeholder="fb_name"
+        placeholder="Ismingiz"
+        required
+      >
+
+      <select
+        id="fbType"
+        class="fb-type"
+        data-i-aria="fb_type_label"
+        aria-label="Murojaat turi"
+        required
+      >
+        <option value="suggestion" data-i="fb_suggestion">💡 Taklif</option>
+        <option value="complaint" data-i="fb_complaint">⚠️ Shikoyat</option>
+      </select>
+
+      <input
+        type="text"
+        id="fbSubject"
+        data-i-placeholder="fb_subject"
+        placeholder="Mavzu (ixtiyoriy)"
+      >
+
+    </div>
+
+    <div class="fb-row">
+
+      <textarea
+        id="fbMessage"
+        data-i-placeholder="fb_message"
+        placeholder="Taklif yoki shikoyatingizni shu yerga yozing..."
+        required
+      ></textarea>
+
+    </div>
+
+    <button
+      type="submit"
+      class="fb-submit"
+      data-i="fb_send"
+    >✉️ Yuborish</button>
+
+  </form>
+
+</div>
       <button type="submit" class="fb-submit">✉️ Yuborish</button>
     </form>
   </div>

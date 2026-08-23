@@ -1596,9 +1596,9 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
     if (error) throw error;
 
     alert(tr("fb_success"));
+    form.reset();
     
     </form>
-      <div id="feedbackStatus" class="feedback-status"></div>
 
   } catch (error) {
     console.error("Feedback yuborishda xato:", error);

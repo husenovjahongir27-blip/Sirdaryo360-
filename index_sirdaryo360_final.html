@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1ea672">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="sirdaryo360.webmanifest">
+<title>Sirdaryo 360° — Virtual sayohat</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  :root{
+    --blue:#1d6fb8; --blue-dark:#155a97;
+    --green:#1ea672; --green-dark:#178a5e;
+    --red:#ce1126; --amber:#f5a524;
+    --bg:#f4f7fa; --card:#ffffff; --ink:#1c2b36; --ink-dim:#6b7c88; --line:#e6ebf0;
+    --pastel-blue:#eaf3fb; --pastel-green:#e5f6ef; --pastel-amber:#fdf1de;
+  }
+  html.dark{
+    --bg:#0e161d; --card:#152029; --ink:#eef3f7; --ink-dim:#94a5b3; --line:#233240;
+    --pastel-blue:#182b3a; --pastel-green:#15302a; --pastel-amber:#332a18;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; transition:background 0.2s, color 0.2s; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  .shell{ max-width:1440px; margin:0 auto; padding:14px 24px 40px; }
+
+  /* ================= HEADER ================= */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--card); border-radius:16px; padding:12px 22px;
+    box-shadow:0 2px 10px rgba(20,40,60,0.06); position:relative; z-index:40;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-icon{ width:42px; height:42px; border-radius:10px; overflow:hidden; flex-shrink:0; }
+  .brand-icon img{ width:100%; height:100%; object-fit:cover; }
+  .brand-text .name{ font-size:19px; font-weight:800; letter-spacing:-0.01em; }
+  .brand-text .name .main{ color:var(--blue); }
+  .brand-text .name span:not(.main){ color:var(--green); }
+  .brand-text .tag{ font-size:11.5px; color:var(--ink-dim); font-weight:500; }
+
+  nav{ display:flex; align-items:center; gap:6px; }
+  .nav-item{
+    display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600;
+    color:var(--ink-dim); padding:9px 13px; border-radius:10px; transition:background 0.15s, color 0.15s;
+    white-space:nowrap;
+  }
+  .nav-item:hover{ background:var(--pastel-blue); color:var(--ink); }
+  .nav-item.active{ background:var(--pastel-green); color:var(--green-dark); }
+
+  .header-actions{ display:flex; align-items:center; gap:10px; position:relative; }
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%; background:var(--pastel-blue);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+    font-size:15px; position:relative; color:var(--ink);
+  }
+  .fav-count{ color:var(--red); gap:4px; display:flex; align-items:center; width:auto; padding:0 12px; border-radius:20px; cursor:pointer; }
+  .lang-btn{
+    display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:10px;
+    background:var(--pastel-blue); border:1px solid var(--line); font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .lang-menu{
+    position:absolute; top:46px; right:0; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:6px; display:none; min-width:170px; z-index:50;
+  }
+  .lang-menu.open{ display:block; }
+  .lang-opt{
+    display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .lang-opt:hover{ background:var(--pastel-blue); }
+  .lang-opt.active{ color:var(--green-dark); }
+  .lang-flag{ font-size:15px; line-height:1; }
+  .lang-flag-img{ width:20px; min-width:20px; height:18px; display:inline-flex; align-items:center; justify-content:center; font-size:16px; line-height:1; flex:0 0 20px; }
+
+  /* ================= MODALS (Xarita / Sevimlilar) ================= */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(10,18,24,0.55); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{ background:var(--card); border-radius:18px; width:100%; max-width:580px; max-height:82vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.3); }
+  .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line); font-weight:800; font-size:14.5px; flex-shrink:0; }
+  .modal-close{ width:32px; height:32px; border-radius:50%; background:var(--pastel-blue); border:none; font-size:14px; color:var(--ink); flex-shrink:0; }
+  .modal-close:hover{ background:var(--pastel-green); }
+  .modal-body{ padding:0; overflow-y:auto; flex:1; min-height:0; }
+  #fullMap{ height:100%; width:100%; min-height:380px; }
+  .fav-empty{ text-align:center; color:var(--ink-dim); font-size:13px; padding:40px 16px; }
+  .fav-list{ display:flex; flex-direction:column; gap:6px; padding:12px; }
+  .fav-item{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:12px; cursor:pointer; border:1.5px solid transparent; }
+  .fav-item:hover{ background:var(--pastel-blue); }
+  .fav-item img{ width:48px; height:48px; border-radius:10px; object-fit:cover; flex-shrink:0; background:#dfe7ee; }
+  .fav-item .fi-text{ flex:1; min-width:0; }
+  .fav-item .fi-name{ font-size:13px; font-weight:700; }
+  .fav-item .fi-sub{ font-size:11px; color:var(--ink-dim); }
+  .fav-item .fi-remove{ background:none; border:none; color:var(--red); font-size:18px; padding:6px; flex-shrink:0; }
+
+  /* ================= FAVORITE HEART ON LOCATION ROWS ================= */
+  .loc-heart{ margin-left:auto; flex-shrink:0; font-size:15px; color:var(--line); padding:4px; }
+  .loc-heart.active{ color:var(--red); }
+  .btn-secondary.active{ background:var(--red); color:#fff; border-color:var(--red); }
+
+  /* ================= SOCIAL / CONTACT ICON BADGES ================= */
+  .badge-circle{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; box-shadow:0 2px 7px rgba(20,40,60,0.10); }
+  .badge-circle svg{ width:18px; height:18px; display:block; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+  .badge-tg{ background:#229ED9; }
+  .badge-ig{ background:linear-gradient(135deg,#833AB4 0%,#E1306C 55%,#FCAF45 100%); }
+  .badge-phone{ background:var(--green); }
+  .badge-mail{ background:var(--amber); }
+
+  /* ================= FEEDBACK (Taklif va shikoyatlar) ================= */
+  .feedback-card{ margin-top:16px; background:var(--card); border-radius:14px; padding:20px; box-shadow:0 2px 8px rgba(20,40,60,0.05); }
+  .feedback-card h4{ font-size:15px; font-weight:800; margin-bottom:4px; color:var(--blue); }
+  .feedback-card .fb-sub{ font-size:12px; color:var(--ink-dim); margin-bottom:14px; }
+  .fb-row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .fb-row input, .fb-row textarea, .fb-row select{
+    flex:1; min-width:180px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px;
+    font-family:inherit; background:var(--bg); color:var(--ink); outline:none; resize:vertical;
+  }
+  .fb-row input:focus, .fb-row textarea:focus, .fb-row select:focus{ border-color:var(--blue); }
+  .fb-type{ cursor:pointer; appearance:auto; }
+  .fb-row textarea{ min-height:90px; width:100%; }
+  .fb-submit{ background:var(--green); color:#fff; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700; border:none; }
+  .fb-submit:hover{ background:var(--green-dark); }
+
+  /* ================= STAGE ================= */
+  .stage{
+    position:relative; margin-top:16px; border-radius:22px; overflow:hidden;
+    background:linear-gradient(180deg,var(--pastel-blue),var(--bg)); padding:0;
+  }
+
+  .layout{ display:flex; gap:16px; padding:16px 22px 0; }
+
+  /* ================= SIDEBAR ================= */
+  aside{
+    width:280px; flex-shrink:0; background:var(--card); border-radius:16px; padding:16px;
+    box-shadow:0 2px 10px rgba(20,40,60,0.06); max-height:680px; display:flex; flex-direction:column;
+  }
+  .aside-title{ display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; margin-bottom:10px; }
+  .aside-title .pin{ color:var(--blue); }
+
+  .district-scroll{ display:flex; gap:6px; overflow-x:auto; padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid var(--line); }
+  .district-chip{
+    flex-shrink:0; font-size:11.5px; font-weight:700; padding:7px 12px; border-radius:100px;
+    background:var(--pastel-blue); color:var(--ink-dim); white-space:nowrap; border:1.5px solid transparent;
+  }
+  .district-chip.active{ background:var(--blue); color:#fff; }
+
+  .search-input{
+    width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px;
+    margin-bottom:10px; background:var(--bg); outline:none; color:var(--ink);
+  }
+  .search-input:focus{ border-color:var(--blue); }
+
+  .loc-list{ overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:6px; padding-right:2px; }
+  .loc-item{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:12px; cursor:pointer; border:1.5px solid transparent; transition:background 0.15s, border-color 0.15s; }
+  .loc-item:hover{ background:var(--pastel-blue); }
+  .loc-item.active{ background:var(--pastel-blue); border-color:var(--blue); }
+  .loc-thumb{ width:44px; height:44px; border-radius:10px; object-fit:cover; flex-shrink:0; background:#dfe7ee; }
+  .loc-name{ font-size:13px; font-weight:700; line-height:1.3; }
+  .loc-sub{ font-size:11px; color:var(--ink-dim); }
+
+  .map-card{ margin-top:12px; border-radius:12px; overflow:hidden; border:1px solid var(--line); }
+  .map-card-label{ font-size:11px; font-weight:700; padding:8px 10px; background:var(--pastel-blue); display:flex; justify-content:space-between; }
+  #miniMap{ width:100%; aspect-ratio:4/3; height:auto; max-height:260px; }
+
+  /* ================= MAIN VIEWER ================= */
+  main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .viewer-card{ position:relative; background:#0d1418; border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(20,40,60,0.10); height:500px; }
+  #panorama{ width:100%; height:100%; }
+
+  .loc-pill{ display:none !important; position:absolute; top:16px; left:50%; transform:translateX(-50%); background:rgba(20,30,38,0.72); backdrop-filter:blur(4px);
+    color:#fff; padding:8px 16px; border-radius:100px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; z-index:5; }
+  .loc-pill .num{ opacity:0.7; font-weight:500; }
+
+  .nav-arrow{ position:absolute; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.92);
+    border:none; display:flex; align-items:center; justify-content:center; font-size:16px; color:#1c2b36; z-index:5; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .nav-arrow:hover{ background:#fff; }
+  .nav-arrow.left{ left:16px; } .nav-arrow.right{ right:16px; }
+
+  .loading-tag{ position:absolute; top:64px; left:50%; transform:translateX(-50%); font-size:11px; color:#fff; background:rgba(20,30,38,0.7);
+    padding:5px 12px; border-radius:100px; z-index:6; letter-spacing:0.04em; }
+
+  .link-hint{ position:absolute; bottom:58px; left:16px; z-index:5; font-size:10.5px; color:#fff; background:rgba(30,166,114,0.85);
+    padding:5px 10px; border-radius:100px; display:flex; align-items:center; gap:6px; }
+
+  .thumb-strip{ position:absolute; bottom:58px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:5; max-width:70%; overflow-x:auto; padding:2px; }
+  .thumb-strip img{ width:56px; height:40px; object-fit:cover; border-radius:8px; border:2px solid rgba(255,255,255,0.5); cursor:pointer; flex-shrink:0; opacity:0.75; transition:opacity 0.15s, border-color 0.15s; }
+  .thumb-strip img.active{ opacity:1; border-color:#fff; }
+
+  .controls-bar{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:5; }
+  .ctrl-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.92); border:none; display:flex; align-items:center; justify-content:center;
+    font-size:14px; color:#1c2b36; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .ctrl-btn:hover{ background:#fff; }
+  .ctrl-btn.on{ background:var(--green); color:#fff; }
+
+  /* ================= FEATURES ================= */
+  .features{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:16px; }
+  .feature{ background:var(--card); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:11px; box-shadow:0 2px 8px rgba(20,40,60,0.05); border:1px solid var(--line); min-height:66px; transition:transform .15s, box-shadow .15s, border-color .15s; }
+  .feature.clickable{ cursor:pointer; }
+  .feature.clickable:hover{ border-color:var(--green); transform:translateY(-1px); box-shadow:0 4px 12px rgba(20,40,60,0.08); }
+  .feature-icon{ width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .feature-icon svg{ width:21px; height:21px; stroke:currentColor; stroke-width:1.8; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .feature-title{ font-size:12.5px; font-weight:700; line-height:1.25; }
+  .feature-sub{ font-size:10.5px; color:var(--ink-dim); line-height:1.35; margin-top:2px; }
+
+  .right-panel{ width:290px; flex-shrink:0; display:flex; flex-direction:column; gap:14px; }
+  .rp-card{ background:var(--card); border-radius:16px; box-shadow:0 2px 10px rgba(20,40,60,0.06); overflow:hidden; }
+  .rp-img{ width:100%; height:110px; object-fit:cover; }
+  .rp-body{ padding:16px; }
+  .rp-title{ font-size:17px; font-weight:800; margin-bottom:8px; }
+  .rp-badge{ display:inline-block; background:var(--pastel-green); color:var(--green-dark); font-size:11px; font-weight:700; padding:4px 10px; border-radius:100px; margin-bottom:10px; }
+  .rp-desc{ font-size:12.5px; color:var(--ink-dim); line-height:1.55; margin-bottom:12px; }
+  .rp-detail{ display:flex; gap:8px; font-size:12px; margin-bottom:9px; }
+  .rp-detail .di{ color:var(--blue); flex-shrink:0; margin-top:1px; }
+  .rp-detail .dl{ color:var(--ink-dim); font-weight:600; display:block; }
+  .rp-detail .dv{ color:var(--ink); font-weight:600; }
+  .rp-actions{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .nearby-box{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .nearby-title{ font-size:12.5px; font-weight:800; margin-bottom:8px; }
+  .nearby-list{ display:flex; flex-direction:column; gap:6px; }
+  .nearby-item{ display:flex; align-items:center; gap:8px; padding:8px; border:1px solid var(--line); border-radius:10px; background:var(--bg); cursor:pointer; }
+  .nearby-item:hover{ border-color:var(--green); background:var(--pastel-green); }
+  .nearby-item .ni-main{ flex:1; min-width:0; }
+  .nearby-item .ni-name{ font-size:11.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .nearby-item .ni-meta{ font-size:10px; color:var(--ink-dim); margin-top:2px; }
+  .nearby-item .ni-distance{ font-size:10px; color:var(--green-dark); font-weight:800; white-space:nowrap; }
+  .nearby-empty{ font-size:11px; color:var(--ink-dim); padding:8px 0; }
+  .install-card{ margin-top:16px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; display:none; align-items:center; gap:12px; box-shadow:0 2px 8px rgba(20,40,60,.04); }
+  .install-card.show{ display:flex; }
+  .install-card .install-copy{ flex:1; min-width:0; }
+  .install-card h4{ font-size:13px; margin:0 0 3px; font-weight:800; }
+  .install-card p{ font-size:11px; color:var(--ink-dim); margin:0; line-height:1.4; }
+  .install-btn{ background:var(--green); color:#fff; border:none; border-radius:9px; padding:9px 12px; font-size:11.5px; font-weight:800; white-space:nowrap; }
+  .install-close{ background:var(--pastel-blue); color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:8px 10px; font-size:11px; }
+  .btn-primary, .btn-secondary, .btn-audio{ padding:10px; border-radius:10px; font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px; border:none; }
+  .btn-primary{ background:var(--green); color:#fff; }
+  .btn-primary:hover{ background:var(--green-dark); }
+  .btn-secondary{ background:var(--card); color:var(--red); border:1.5px solid #f3d4d8; }
+  .btn-audio{ background:var(--pastel-blue); color:var(--blue); border:1.5px solid var(--line); }
+  .btn-audio.playing{ background:var(--blue); color:#fff; }
+
+  .weather-modal-box{ max-width:680px; }
+  .weather-body{ padding:16px; }
+  .weather-loading{ padding:35px 10px; text-align:center; color:var(--ink-dim); font-size:13px; }
+  .weather-current{ background:var(--pastel-blue); border-radius:14px; padding:18px; display:flex; align-items:center; gap:16px; margin-bottom:14px; }
+  .weather-current-icon{ width:52px; height:52px; display:flex; align-items:center; justify-content:center; color:var(--blue); flex-shrink:0; }
+  .weather-current-temp{ font-size:30px; font-weight:800; }
+  .weather-current-desc{ font-size:13px; color:var(--ink-dim); margin-top:3px; }
+  .weather-details{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+  .weather-detail{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px; font-size:12px; }
+  .weather-detail strong{ display:block; font-size:13px; margin-top:3px; }
+  .weather-days{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .weather-day{ border:1px solid var(--line); border-radius:12px; padding:11px 7px; text-align:center; background:var(--card); }
+  .weather-day-name{ font-size:11px; font-weight:700; color:var(--ink-dim); }
+  .weather-day-icon{ min-height:42px; display:flex; align-items:center; justify-content:center; margin:7px 0; color:var(--blue); }
+  .weather-day-temp{ font-size:12px; font-weight:700; }
+  .weather-error{ padding:30px 12px; text-align:center; color:var(--ink-dim); }
+  @media (max-width:620px){ .weather-details{ grid-template-columns:1fr; } .weather-days{ grid-template-columns:repeat(2,1fr); } }
+
+
+  /* ================= TRAVEL CONVENIENCE ================= */
+  .travel-help{ margin-top:28px; }
+  .travel-help-kicker{ font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin-bottom:7px; }
+  .travel-help-title{ font-size:28px; line-height:1.15; font-weight:800; letter-spacing:-.025em; margin-bottom:16px; }
+  .travel-help-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  .travel-help-card{ background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; display:flex; align-items:flex-start; gap:15px; box-shadow:0 2px 8px rgba(20,40,60,.04); }
+  .travel-help-icon{ width:48px; height:48px; flex:0 0 48px; border-radius:14px; background:var(--pastel-green); color:var(--green); display:flex; align-items:center; justify-content:center; }
+  .travel-help-icon svg{ width:24px; height:24px; stroke:currentColor; stroke-width:1.8; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .travel-help-card h3{ font-size:15px; font-weight:800; margin-bottom:6px; }
+  .travel-help-card p{ font-size:12px; line-height:1.55; color:var(--ink-dim); }
+
+  .travel-help-card{ text-decoration:none; color:inherit; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+  .travel-help-card:hover{ transform:translateY(-2px); border-color:var(--green); box-shadow:0 5px 16px rgba(20,40,60,.08); }
+  .section-divider{ display:flex; align-items:center; gap:12px; margin:30px 0 2px; color:var(--ink-dim); }
+  .section-divider::before,.section-divider::after{ content:""; height:1px; flex:1; background:var(--line); }
+  .section-divider-badge{ display:flex; align-items:center; gap:7px; padding:7px 12px; border:1px solid var(--line); border-radius:999px; background:var(--card); color:var(--green-dark); font-size:11px; font-weight:700; white-space:nowrap; }
+  .section-divider-badge svg{ width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  @media (max-width:620px){
+    .travel-help-title{ font-size:23px; }
+    .travel-help-grid{ grid-template-columns:1fr; }
+  }
+
+  /* ================= FOOTER ================= */
+  .foot-grid{ display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:16px; margin-top:36px; }
+  .foot-card{ background:var(--card); border-radius:14px; padding:18px; box-shadow:0 2px 8px rgba(20,40,60,0.05); }
+  .foot-card h4{ font-size:14px; font-weight:800; margin-bottom:10px; color:var(--blue); }
+  .foot-info{ display:flex; gap:12px; align-items:flex-start; }
+  .foot-info .fi-icon{ width:44px; height:44px; border-radius:10px; background:var(--pastel-blue); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .foot-info p{ font-size:12px; color:var(--ink-dim); line-height:1.6; }
+  .foot-links{ list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .foot-links li a{ font-size:12.5px; color:var(--blue); font-weight:600; }
+  .foot-links li a:hover{ text-decoration:underline; }
+  .social-row{ display:flex; gap:10px; margin-top:4px; }
+  .social-circle{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; flex-shrink:0; }
+  .social-link-list{ display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+  .social-link-row{ display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:600; transition:opacity 0.15s; }
+  .social-link-row .social-circle{ width:32px; height:32px; font-size:14px; }
+  .social-link-row:hover{ opacity:0.75; }
+  .contact-row{ display:flex; align-items:center; gap:10px; font-size:12.5px; margin-bottom:10px; transition:opacity 0.15s; }
+  .contact-row:hover{ opacity:0.75; }
+  .contact-row .ci{ color:var(--green); width:16px; flex-shrink:0; }
+
+  .bottom-bar{ margin-top:18px; background:var(--green); border-radius:14px; padding:14px 22px; display:flex; justify-content:space-between; align-items:center; color:#fff; font-size:12px; font-weight:600; gap:10px; flex-wrap:wrap; }
+
+  /* ================= MOBILE ================= */
+  @media (max-width: 1100px){
+    .right-panel{ width:100%; flex-direction:row; flex-wrap:wrap; }
+    .right-panel .rp-card{ flex:1; min-width:260px; }
+    .layout{ flex-direction:column; }
+    aside{ width:100%; max-height:none; }
+    nav{ display:none; }
+    .features{ grid-template-columns:repeat(2,1fr); }
+    .foot-grid{ grid-template-columns:1fr 1fr; }
+    #miniMap{ aspect-ratio:16/9; max-height:220px; }
+  }
+  @media (max-width: 620px){
+    .shell{ padding:10px 12px 24px; }
+    header{ padding:10px 12px; flex-wrap:wrap; gap:10px; }
+    .header-actions{ order:3; width:100%; justify-content:flex-end; }
+    .features{ grid-template-columns:1fr; }
+    .foot-grid{ grid-template-columns:1fr; }
+    .thumb-strip{ display:none; }
+    .rp-body{ padding:14px; }
+    .viewer-card{ height:380px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Uzbekistan.svg" alt="O'zbekiston bayrog'i"></div>
+      <div class="brand-text">
+        <div class="name"><span class="main">SIRDARYO</span> <span>360°</span></div>
+        <div class="tag" data-i="tagline">Virtual sayohat</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-item" id="navHome">🏠 <span data-i="nav_home">Bosh sahifa</span></div>
+      <div class="nav-item" id="navPlaces">📍 <span data-i="nav_places">Joylar</span></div>
+      <div class="nav-item" id="navMap">🗺️ <span data-i="nav_map">Xarita</span></div>
+      <div class="nav-item active" id="navTour">🎡 <span data-i="nav_tour">360° Tur</span></div>
+      <div class="nav-item" id="navAbout">📋 <span data-i="nav_about">Loyiha haqida</span></div>
+      <div class="nav-item" id="navNews">📰 <span data-i="nav_news">Yangiliklar</span></div>
+      <a class="nav-item" href="tarixiy-manzillar.html" style="text-decoration:none">🏛️ <span data-i="nav_history">Tarixiy manzillar</span></a>
+      <div class="nav-item" id="navContact">✉️ <span data-i="nav_contact">Aloqa</span></div>
+    </nav>
+    <div class="header-actions">
+      <div class="icon-btn fav-count" id="favCountBtn">♥ <span id="favCount">0</span></div>
+      <div class="icon-btn" id="darkToggle">🌙</div>
+      <div class="lang-btn" id="langBtn"><span class="lang-flag-img" id="langFlag" aria-hidden="true">🇺🇿</span> <span id="langLabel">UZ</span> ▾</div>
+      <div class="lang-menu" id="langMenu"></div>
+    </div>
+  </header>
+
+  <div class="stage">
+
+    <div class="layout">
+
+      <aside>
+        <div class="aside-title"><span class="pin">📍</span> <span data-i="districts_title">Tumanlar</span></div>
+        <div class="district-scroll" id="districtScroll"></div>
+
+        <div class="aside-title" data-i="places_title" style="margin-top:2px;">Joylar ro'yxati</div>
+        <input class="search-input" type="text" id="searchBox" data-i-placeholder="search_placeholder" aria-label="Qidiruv">
+        <div class="loc-list" id="locList"></div>
+
+        <div class="map-card" id="miniMapCard">
+          <div class="map-card-label"><span data-i="map_label">Hudud xaritasi</span> <span id="mapDistrictName">—</span></div>
+          <div id="miniMap"></div>
+        </div>
+      </aside>
+
+      <main>
+        <div class="viewer-card">
+          <div class="loc-pill"><span id="pillName">—</span> <span class="num" id="pillIndex">1 / 1</span></div>
+          <div class="loading-tag" id="loadingTag" data-i="loading">Panorama yuklanmoqda</div>
+          <div class="link-hint" id="linkHint">🔗 <span data-i="linked_hint">Panoramadagi belgilarga bosib qo'shni joyga o'ting</span></div>
+          <button class="nav-arrow left" id="prevBtn">‹</button>
+          <button class="nav-arrow right" id="nextBtn">›</button>
+          <div id="panorama"></div>
+          <div class="thumb-strip" id="thumbStrip"></div>
+          <div class="controls-bar">
+            <button class="ctrl-btn" id="zoomIn">＋</button>
+            <button class="ctrl-btn" id="zoomOut">－</button>
+            <button class="ctrl-btn" id="fullscreenBtn">⛶</button>
+            <button class="ctrl-btn on" id="playBtn">▶</button>
+          </div>
+        </div>
+
+        <div class="features">
+          <div class="feature clickable" id="mapFeatureBtn"><div class="feature-icon" style="background:var(--pastel-green);color:var(--green)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 3.8 21V6L9 3l6 3 5.2-3v15L15 21z"/><path d="M9 3v15M15 6v15"/></svg></div><div><div class="feature-title" data-i="f_map_t">Interaktiv xarita</div><div class="feature-sub" data-i="f_map_s">Barcha joylar xaritada</div></div></div>
+          <div class="feature clickable" id="audioFeatureBtn"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7 7 0 0 1 0 10"/></svg></div><div><div class="feature-title" data-i="f_audio_t">Audio gid</div><div class="feature-sub" id="audioFeatureSub" data-i="f_audio_s">Bosing va tinglang</div></div></div>
+          <div class="feature clickable" id="weatherFeatureBtn" data-i-title="weather_feature_title"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)" id="weatherIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8 5.2 5.2M10.8 10.8 12.2 12.2"/><path d="M7 19h10a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.6-1.1A3.5 3.5 0 0 0 7 19z"/></svg></div><div><div class="feature-title" data-i="weather_feature">Viloyat ob-havosi</div><div class="feature-sub" id="weatherFeatureSub" data-i="weather_loading_short">Ob-havo yuklanmoqda...</div></div></div>
+          <div class="feature clickable" id="favFeatureBtn"><div class="feature-icon" style="background:var(--pastel-amber);color:var(--amber)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6z"/></svg></div><div><div class="feature-title" data-i="f_fav_t">Sevimlilar</div><div class="feature-sub" data-i="f_fav_s">Yoqtirgan joylaringizni saqlang</div></div></div>
+        </div>
+      </main>
+
+      <div class="right-panel" id="rightPanel"></div>
+    </div>
+  </div>
+
+
+  <section class="travel-help" aria-label="Sayohat uchun qulayliklar">
+    <div class="travel-help-kicker" data-i="travel_kicker">TURIST UCHUN QULAYLIK</div>
+    <h2 class="travel-help-title" data-i="travel_title">Sayohatingizni osonlashtiring</h2>
+    <div class="travel-help-grid">
+      <a class="travel-help-card" href="mehmonxonalar.html">
+        <div class="travel-help-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-6h3v6M13 20v-6h3v6"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
+        </div>
+        <div><h3 data-i="travel_hotel_title">Mehmonxonalar</h3><p data-i="travel_hotel_desc">Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.</p></div>
+      </a>
+      <a class="travel-help-card" href="ovqatlanish.html">
+        <div class="travel-help-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v18H4z"/><path d="M8 7h8M8 11h8M8 15h5"/><path d="M16 18h.01"/></svg>
+        </div>
+        <div><h3 data-i="travel_food_title">Ovqatlanish</h3><p data-i="travel_food_desc">Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.</p></div>
+      </a>
+      <a class="travel-help-card" href="tarixiy-manzillar.html">
+        <div class="travel-help-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M8 20v-5h8v5"/><path d="M9 10h.01M12 10h.01M15 10h.01"/><path d="M7 9h10"/></svg>
+        </div>
+        <div><h3 data-i="travel_history_title">Tarixiy maskanlar</h3><p data-i="travel_history_desc">Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.</p></div>
+      </a>
+    </div>
+  </section>
+
+  <div class="install-card" id="installCard">
+    <div style="font-size:24px">📱</div>
+    <div class="install-copy"><h4 data-i="install_title">Sirdaryo360'ni telefonga o‘rnating</h4><p data-i="install_text">Saytni ilovadek tez va qulay ishlatish uchun bosh ekranga qo‘shing.</p></div>
+    <button class="install-btn" id="installBtn" data-i="install_button">O‘rnatish</button>
+    <button class="install-close" id="installClose" data-i="install_later">Keyinroq</button>
+  </div>
+
+  <div class="section-divider" aria-hidden="true">
+    <div class="section-divider-badge">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m12 7 2 5-2 5-2-5 2-5z"/><path d="M12 3.5v2M20.5 12h-2M12 20.5v-2M3.5 12h2"/></svg>
+      <span data-i="discover_badge">Sirdaryoni kashf eting</span>
+    </div>
+  </div>
+
+  <div class="foot-grid">
+    <div class="foot-card">
+      <h4 data-i="fact_title">Qiziqarli ma'lumot</h4>
+      <div class="foot-info">
+        <div class="fi-icon">🕌</div>
+        <p id="footFact"></p>
+      </div>
+    </div>
+    <div class="foot-card">
+      <h4 data-i="links_title">Foydali havolalar</h4>
+      <ul class="foot-links">
+        <li><a href="https://gov.uz/oz/sirdaryo" target="_blank" rel="noopener" data-i="link1">Sirdaryo viloyati rasmiy sayti</a></li>
+        <li><a href="https://gov.uz/oz/guliston" target="_blank" rel="noopener" data-i="link2">Guliston shahar hokimligi</a></li>
+        <li><a href="https://uzbektourism.uz" target="_blank" rel="noopener" data-i="link3">Turizm qo'mitasi</a></li>
+        <li><a href="https://gov.uz" target="_blank" rel="noopener" data-i="link4">O'zbekiston Respublikasi</a></li>
+      </ul>
+    </div>
+    <div class="foot-card">
+      <h4 data-i="social_title">Biz ijtimoiy tarmoqlarda</h4>
+      <div class="social-link-list">
+        <a class="social-link-row" href="https://t.me/Uzb_Geografiya_Kanal" target="_blank" rel="noopener">
+          <span class="badge-circle badge-tg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.4 4.6 18.1 20c-.25 1.08-.9 1.34-1.82.84l-5.03-3.7-2.43 2.34c-.27.27-.5.5-1.03.5l.37-5.13 9.34-8.44c.41-.37-.09-.57-.64-.2L5.31 13.6.38 12.06c-1.07-.34-1.09-1.08.22-1.6L19.87 3c.9-.34 1.69.2 1.53 1.6Z" fill="currentColor" stroke="none"/></svg></span>
+          <span>@Uzb_Geografiya_Kanal</span>
+        </a>
+        <a class="social-link-row" href="https://t.me/Geografik_masalalar" target="_blank" rel="noopener">
+          <span class="badge-circle badge-tg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.4 4.6 18.1 20c-.25 1.08-.9 1.34-1.82.84l-5.03-3.7-2.43 2.34c-.27.27-.5.5-1.03.5l.37-5.13 9.34-8.44c.41-.37-.09-.57-.64-.2L5.31 13.6.38 12.06c-1.07-.34-1.09-1.08.22-1.6L19.87 3c.9-.34 1.69.2 1.53 1.6Z" fill="currentColor" stroke="none"/></svg></span>
+          <span>@Geografik_masalalar</span>
+        </a>
+      </div>
+    </div>
+    <div class="foot-card">
+      <h4 data-i="contact_title">Aloqa</h4>
+      <a class="contact-row" href="tel:+998996676223"><span class="badge-circle badge-phone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6.6 3.8 9 3.1c.55-.16 1.13.13 1.35.66l1.12 2.7c.2.49.06 1.05-.35 1.38L9.7 9.12a15.8 15.8 0 0 0 5.18 5.18l1.27-1.42c.33-.41.89-.55 1.38-.35l2.7 1.12c.53.22.82.8.66 1.35l-.7 2.4c-.16.54-.66.92-1.22.9C10.95 17.9 6.1 13.05 5.7 5.02c-.03-.56.35-1.06.9-1.22Z"/></svg></span> +998 99 667 62 23</a>
+      <a class="contact-row" href="https://t.me/Husenov_Jahongir" target="_blank" rel="noopener"><span class="badge-circle badge-tg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.4 4.6 18.1 20c-.25 1.08-.9 1.34-1.82.84l-5.03-3.7-2.43 2.34c-.27.27-.5.5-1.03.5l.37-5.13 9.34-8.44c.41-.37-.09-.57-.64-.2L5.31 13.6.38 12.06c-1.07-.34-1.09-1.08.22-1.6L19.87 3c.9-.34 1.69.2 1.53 1.6Z" fill="currentColor" stroke="none"/></svg></span> Husenov_Jahongir</a>
+      <a class="contact-row" href="https://instagram.com/Husenov_Jahongir" target="_blank" rel="noopener"><span class="badge-circle badge-ig" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r=".9" fill="currentColor" stroke="none"/></svg></span> Husenov_Jahongir</a>
+      <a class="contact-row" href="mailto:husenovjahongir27@gmail.com"><span class="badge-circle badge-mail" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span> husenovjahongir27@gmail.com</a>
+    </div>
+  </div>
+
+  <div class="feedback-card" id="feedbackCard">
+    <h4 data-i="feedback_title">Taklif va shikoyatlar</h4>
+    <div class="fb-sub" data-i="feedback_sub">Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.</div>
+    <form id="feedbackForm">
+      <div class="fb-row">
+        <input type="text" id="fbName" data-i-placeholder="fb_name" placeholder="Ismingiz" required>
+        <select id="fbType" class="fb-type" data-i-aria="fb_type_label" aria-label="Murojaat turi">
+          <option value="suggestion">💡 Taklif</option>
+          <option value="complaint">⚠️ Shikoyat</option>
+        </select>
+        <input type="text" id="fbSubject" data-i-placeholder="fb_subject" placeholder="Mavzu (ixtiyoriy)">
+      </div>
+      <div class="fb-row">
+        <textarea id="fbMessage" data-i-placeholder="fb_message" placeholder="Taklif yoki shikoyatingizni shu yerga yozing..." required></textarea>
+      </div>
+      <button type="submit" class="fb-submit" data-i="fb_send">✉️ Yuborish</button>
+    </form>
+  </div>
+
+  <div class="bottom-bar">
+    <span data-i="foot_copy">© 2026 Sirdaryo 360 – Barcha huquqlar himoyalangan</span>
+    <span data-i="foot_slogan">"Sirdaryoni kashf eting – tarix, madaniyat va go'zallik maskani"</span>
+    <span data-i="foot_made">Sayt ishlab chiqilgan ❤ bilan</span>
+    <span>Dasturchi: <strong>Husenov Jahongir</strong></span>
+  </div>
+
+</div>
+
+<!-- Interactive map modal -->
+<div class="modal-overlay" id="mapModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head"><span data-i="nav_map">Xarita</span><button class="modal-close" id="mapModalClose">✕</button></div>
+    <div class="modal-body"><div id="fullMap"></div></div>
+  </div>
+</div>
+
+<!-- Weather modal -->
+<div class="modal-overlay" id="weatherModalOverlay">
+  <div class="modal-box weather-modal-box">
+    <div class="modal-head"><span>🌤️ <span data-i="weather_modal_title">Sirdaryo viloyati ob-havosi</span></span><button class="modal-close" id="weatherModalClose">✕</button></div>
+    <div class="modal-body weather-body" id="weatherModalBody">
+      <div class="weather-loading" data-i="weather_loading">Ob-havo ma'lumotlari yuklanmoqda...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Favorites modal -->
+<div class="modal-overlay" id="favModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head"><span data-i="f_fav_t">Sevimlilar</span><button class="modal-close" id="favModalClose">✕</button></div>
+    <div class="modal-body"><div class="fav-list" id="favList"></div></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. TRANSLATIONS — UI CHROME
+============================================================ */
+const LANGS = [
+  { code:"uz", label:"UZ", name:"O'zbekcha", speech:"uz-UZ", flag:"🇺🇿" },
+  { code:"en", label:"EN", name:"English",   speech:"en-US", flag:"🇬🇧" },
+  { code:"ru", label:"RU", name:"Русский",   speech:"ru-RU", flag:"🇷🇺" },
+  { code:"tr", label:"TR", name:"Türkçe",    speech:"tr-TR", flag:"🇹🇷" },
+  { code:"zh", label:"ZH", name:"中文",       speech:"zh-CN", flag:"🇨🇳" }
+];
+let currentLang = localStorage.getItem("sirdaryo360_lang") || "uz";
+
+const LANG_FLAG_URLS = {
+  uz:"https://flagcdn.com/w20/uz.png",
+  en:"https://flagcdn.com/w20/gb.png",
+  ru:"https://flagcdn.com/w20/ru.png",
+  tr:"https://flagcdn.com/w20/tr.png",
+  zh:"https://flagcdn.com/w20/cn.png"
+};
+
+function updateLanguageButton(){
+  const activeLang = LANGS.find(l=>l.code===currentLang) || LANGS[0];
+  const label = document.getElementById("langLabel");
+  const flag = document.getElementById("langFlag");
+  if(label) label.textContent = activeLang.label;
+  if(flag){
+    // Emoji bayroqdan foydalanamiz: u kompyuter va telefonda tashqi CDN'siz ko'rinadi.
+    flag.textContent = activeLang.flag;
+    flag.title = activeLang.name;
+    flag.setAttribute("aria-label", activeLang.name + " bayrog'i");
+  }
+}
+
+function translateFeedback(){
+  ["feedback_title","feedback_sub","fb_send"].forEach(key=>{
+    const el=document.querySelector(`[data-i="${key}"]`);
+    if(el && UI[key]) el.textContent=tr(key);
+  });
+  document.querySelectorAll("[data-i-placeholder]").forEach(el=>{
+    const key=el.getAttribute("data-i-placeholder");
+    if(["fb_name","fb_subject","fb_message"].includes(key) && UI[key]) el.placeholder=tr(key);
+  });
+  const type=document.getElementById("fbType");
+  if(type){
+    const selected=type.value || "suggestion";
+    const s=type.querySelector('option[value="suggestion"]');
+    const c=type.querySelector('option[value="complaint"]');
+    if(s) s.textContent=tr("fb_type_suggestion");
+    if(c) c.textContent=tr("fb_type_complaint");
+    type.value=selected;
+  }
+}
+
+
+const UI = {
+  tagline:{ uz:"Virtual sayohat", en:"Virtual journey", ru:"Виртуальное путешествие", tr:"Sanal gezi", zh:"虚拟之旅" },
+  nav_home:{ uz:"Bosh sahifa", en:"Home", ru:"Главная", tr:"Ana sayfa", zh:"首页" },
+  nav_places:{ uz:"Joylar", en:"Places", ru:"Места", tr:"Yerler", zh:"地点" },
+  nav_map:{ uz:"Xarita", en:"Map", ru:"Карта", tr:"Harita", zh:"地图" },
+  nav_tour:{ uz:"360° Tur", en:"360° Tour", ru:"360° Тур", tr:"360° Tur", zh:"360°全景" },
+  nav_about:{ uz:"Loyiha haqida", en:"About", ru:"О проекте", tr:"Proje hakkında", zh:"关于项目" },
+  nav_news:{ uz:"Yangiliklar", en:"News", ru:"Новости", tr:"Haberler", zh:"新闻" },
+  nav_contact:{ uz:"Aloqa", en:"Contact", ru:"Контакты", tr:"İletişim", zh:"联系" },
+  districts_title:{ uz:"Tumanlar", en:"Districts", ru:"Районы", tr:"İlçeler", zh:"区县" },
+  places_title:{ uz:"Joylar ro'yxati", en:"Places list", ru:"Список мест", tr:"Yer listesi", zh:"地点列表" },
+  map_label:{ uz:"Hudud xaritasi", en:"Area map", ru:"Карта района", tr:"Bölge haritası", zh:"区域地图" },
+  loading:{ uz:"Panorama yuklanmoqda", en:"Loading panorama", ru:"Загрузка панорамы", tr:"Panorama yükleniyor", zh:"全景加载中" },
+  linked_hint:{ uz:"Panoramadagi belgilarga bosib qo'shni joyga o'ting", en:"Click the markers to move to a linked location", ru:"Нажмите на метки, чтобы перейти к соседнему месту", tr:"Bağlantılı yere geçmek için işaretlere tıklayın", zh:"点击标记前往相邻地点" },
+  f_360_t:{ uz:"360° Panorama", en:"360° Panorama", ru:"360° Панорама", tr:"360° Panorama", zh:"360°全景" },
+  f_360_s:{ uz:"Yuqori sifatli virtual tur", en:"High quality virtual tour", ru:"Виртуальный тур высокого качества", tr:"Yüksek kaliteli sanal tur", zh:"高清虚拟游览" },
+  f_map_t:{ uz:"Interaktiv xarita", en:"Interactive map", ru:"Интерактивная карта", tr:"İnteraktif harita", zh:"互动地图" },
+  f_map_s:{ uz:"Barcha joylar xaritada", en:"All places on the map", ru:"Все места на карте", tr:"Tüm yerler haritada", zh:"地图上的所有地点" },
+  f_audio_t:{ uz:"Audio gid", en:"Audio guide", ru:"Аудиогид", tr:"Sesli rehber", zh:"语音导览" },
+  f_audio_s:{ uz:"Bosing va tinglang", en:"Tap to listen", ru:"Нажмите и слушайте", tr:"Dokunun ve dinleyin", zh:"点击收听" },
+  f_audio_playing:{ uz:"Tinglanmoqda...", en:"Playing...", ru:"Воспроизведение...", tr:"Çalıyor...", zh:"播放中..." },
+  f_fav_t:{ uz:"Sevimlilar", en:"Favorites", ru:"Избранное", tr:"Favoriler", zh:"收藏" },
+  f_fav_s:{ uz:"Yoqtirgan joylaringizni saqlang", en:"Save the places you like", ru:"Сохраняйте понравившиеся места", tr:"Beğendiğiniz yerleri kaydedin", zh:"保存您喜欢的地点" },
+  fact_title:{ uz:"Qiziqarli ma'lumot", en:"Interesting fact", ru:"Интересный факт", tr:"İlginç bilgi", zh:"趣味知识" },
+  links_title:{ uz:"Foydali havolalar", en:"Useful links", ru:"Полезные ссылки", tr:"Faydalı bağlantılar", zh:"实用链接" },
+  link1:{ uz:"Sirdaryo viloyati rasmiy sayti", en:"Official Sirdaryo Region website", ru:"Официальный сайт Сырдарьинской области", tr:"Sirdaryo Bölgesi resmi sitesi", zh:"锡尔河州官方网站" },
+  link2:{ uz:"Guliston shahar hokimligi", en:"Guliston city administration", ru:"Хокимият города Гулистан", tr:"Guliston şehir yönetimi", zh:"古利斯坦市政府" },
+  link3:{ uz:"Turizm qo'mitasi", en:"Tourism committee", ru:"Комитет по туризму", tr:"Turizm komitesi", zh:"旅游委员会" },
+  link4:{ uz:"O'zbekiston Respublikasi", en:"Republic of Uzbekistan", ru:"Республика Узбекистан", tr:"Özbekistan Cumhuriyeti", zh:"乌兹别克斯坦共和国" },
+  social_title:{ uz:"Biz ijtimoiy tarmoqlarda", en:"We're on social media", ru:"Мы в соцсетях", tr:"Sosyal medyada biz", zh:"我们的社交媒体" },
+  contact_title:{ uz:"Aloqa", en:"Contact", ru:"Контакты", tr:"İletişim", zh:"联系方式" },
+  foot_copy:{ uz:"© 2026 Sirdaryo 360 – Barcha huquqlar himoyalangan", en:"© 2026 Sirdaryo 360 – All rights reserved", ru:"© 2026 Sirdaryo 360 – Все права защищены", tr:"© 2026 Sirdaryo 360 – Tüm hakları saklıdır", zh:"© 2026 Sirdaryo 360 – 保留所有权利" },
+  foot_slogan:{ uz:"\u201cSirdaryoni kashf eting – tarix, madaniyat va go'zallik maskani\u201d", en:"\u201cDiscover Sirdaryo – a home of history, culture and beauty\u201d", ru:"\u00abОткройте Сырдарью – край истории, культуры и красоты\u00bb", tr:"\u201cSirdaryo'yu keşfedin – tarih, kültür ve güzellik diyarı\u201d", zh:"\u201c探索锡尔河州——历史、文化与美的家园\u201d" },
+  foot_made:{ uz:"Sayt ishlab chiqilgan ❤ bilan", en:"Made with ❤", ru:"Сделано с ❤", tr:"❤ ile yapıldı", zh:"用❤制作" },
+  yo_nalish:{ uz:"Yo'nalish olish", en:"Get directions", ru:"Проложить маршрut".replace("ut","ут"), tr:"Yol tarifi al", zh:"获取路线" },
+  sevimli:{ uz:"Sevimlilarga qo'shish", en:"Add to favorites", ru:"Добавить в избранное", tr:"Favorilere ekle", zh:"添加到收藏" },
+  sevimli_saved:{ uz:"Sevimlilarda", en:"Saved", ru:"В избранном", tr:"Favorilerde", zh:"已收藏" },
+  demo_notice:{ uz:"Namuna panoramalar ko‘rsatilmoqda", en:"Sample panoramas are shown", ru:"Показаны демо-панорамы", tr:"Örnek panoramalar gösteriliyor", zh:"显示的是示例全景图" },
+  nav_history:{ uz:"Tarixiy manzillar", en:"Historical sites", ru:"Исторические места", tr:"Tarihi yerler", zh:"历史遗址" },
+  search_no_results:{ uz:"Ma’lumot topilmadi.", en:"No results found.", ru:"Ничего не найдено.", tr:"Sonuç bulunamadı.", zh:"未找到结果。" },
+  search_placeholder:{ uz:"Joy, tuman yoki turini qidiring...", en:"Search place, district or type...", ru:"Поиск места, района или типа...", tr:"Yer, ilçe veya tür ara...", zh:"搜索地点、地区或类型..." },
+  weather_feature_title:{ uz:"Ob-havo ma’lumotlarini ko‘rish", en:"View weather information", ru:"Посмотреть информацию о погоде", tr:"Hava durumu bilgilerini görüntüle", zh:"查看天气信息" },
+  weather_feature:{ uz:"Viloyat ob-havosi", en:"Regional weather", ru:"Погода в регионе", tr:"Bölge hava durumu", zh:"地区天气" },
+  weather_loading_short:{ uz:"Ob-havo yuklanmoqda...", en:"Loading weather...", ru:"Загрузка погоды...", tr:"Hava durumu yükleniyor...", zh:"天气加载中..." },
+  travel_kicker:{ uz:"TURIST UCHUN QULAYLIK", en:"TRAVEL CONVENIENCE", ru:"УДОБСТВА ДЛЯ ТУРИСТА", tr:"TURİST KOLAYLIKLARI", zh:"游客便利服务" },
+  travel_title:{ uz:"Sayohatingizni osonlashtiring", en:"Make your journey easier", ru:"Сделайте путешествие проще", tr:"Seyahatinizi kolaylaştırın", zh:"让您的旅程更轻松" },
+  travel_hotel_title:{ uz:"Mehmonxonalar", en:"Hotels", ru:"Гостиницы", tr:"Oteller", zh:"酒店" },
+  travel_hotel_desc:{ uz:"Gulistonda tunash uchun joylarni topish va xaritada ko‘rish.", en:"Find places to stay in Guliston and view them on the map.", ru:"Найдите места для проживания в Гулистане и посмотрите их на карте.", tr:"Guliston'da konaklama yerlerini bulun ve haritada görüntüleyin.", zh:"查找古利斯坦的住宿地点并在地图上查看。" },
+  travel_food_title:{ uz:"Ovqatlanish", en:"Food & Dining", ru:"Питание", tr:"Yeme-İçme", zh:"餐饮" },
+  travel_food_desc:{ uz:"Restoran, kafe va milliy taomlar bo‘yicha foydali ma’lumotlar.", en:"Useful information about restaurants, cafés and local cuisine.", ru:"Полезная информация о ресторанах, кафе и национальной кухне.", tr:"Restoranlar, kafeler ve yerel yemekler hakkında faydalı bilgiler.", zh:"餐厅、咖啡馆和当地美食的实用信息。" },
+  travel_history_title:{ uz:"Tarixiy maskanlar", en:"Historical sites", ru:"Исторические места", tr:"Tarihi yerler", zh:"历史遗址" },
+  travel_history_desc:{ uz:"Sirdaryodagi qadimiy shaharlar, tepaliklar va arxeologik yodgorliklarni kashf eting.", en:"Discover ancient settlements, mounds and archaeological sites in Sirdaryo.", ru:"Откройте древние поселения, городища и археологические памятники Сырдарьи.", tr:"Sirdaryo’daki antik yerleşimleri, tepeleri ve arkeolojik alanları keşfedin.", zh:"探索锡尔河州的古城、古丘和考古遗址。" },
+  discover_badge:{ uz:"Sirdaryoni kashf eting", en:"Discover Sirdaryo", ru:"Откройте Сырдарью", tr:"Sirdaryo’yu keşfedin", zh:"探索锡尔河州" },
+  feedback_title:{ uz:"Taklif va shikoyatlar", en:"Suggestions & complaints", ru:"Предложения и жалобы", tr:"Öneriler ve şikâyetler", zh:"意见与投诉" },
+  feedback_sub:{ uz:"Fikringizni yozing — xabar to‘g‘ridan-to‘g‘ri admin panelga yuboriladi.", en:"Write your feedback — it will be sent directly to the admin panel.", ru:"Напишите сообщение — оно будет отправлено прямо в админ-панель.", tr:"Fikrinizi yazın — mesaj doğrudan yönetim paneline gönderilir.", zh:"留下您的意见——消息将直接发送到管理面板。" },
+  fb_name:{ uz:"Ismingiz", en:"Your name", ru:"Ваше имя", tr:"Adınız", zh:"您的姓名" },
+  fb_type_suggestion:{ uz:"💡 Taklif", en:"💡 Suggestion", ru:"💡 Предложение", tr:"💡 Öneri", zh:"💡 建议" },
+  fb_type_label:{ uz:"Murojaat turi", en:"Message type", ru:"Тип обращения", tr:"Başvuru türü", zh:"联系类型" },
+  fb_type_complaint:{ uz:"⚠️ Shikoyat", en:"⚠️ Complaint", ru:"⚠️ Жалоба", tr:"⚠️ Şikâyet", zh:"⚠️ 投诉" },
+  fb_subject:{ uz:"Mavzu (ixtiyoriy)", en:"Subject (optional)", ru:"Тема (необязательно)", tr:"Konu (isteğe bağlı)", zh:"主题（可选）" },
+  fb_message:{ uz:"Taklif yoki shikoyatingizni shu yerga yozing...", en:"Write your suggestion or complaint here...", ru:"Напишите здесь ваше предложение или жалобу...", tr:"Öneri veya şikâyetinizi buraya yazın...", zh:"请在此填写您的意见或投诉..." },
+  fb_send:{ uz:"✉️ Yuborish", en:"✉️ Send", ru:"✉️ Отправить", tr:"✉️ Gönder", zh:"✉️ 发送" },
+  fb_success:{ uz:"Rahmat! Xabaringiz admin panelga yuborildi.", en:"Thank you! Your message was sent to the admin panel.", ru:"Спасибо! Ваше сообщение отправлено в админ-панель.", tr:"Teşekkürler! Mesajınız yönetim paneline gönderildi.", zh:"谢谢！您的消息已发送到管理面板。" },
+  fb_error:{ uz:"Xabar yuborilmadi. Keyinroq qayta urinib ko‘ring.", en:"Message could not be sent. Please try again.", ru:"Не удалось отправить сообщение. Попробуйте позже.", tr:"Mesaj gönderilemedi. Lütfen tekrar deneyin.", zh:"消息发送失败，请稍后重试。" },
+  nearby_title:{ uz:"Yaqin joylar", en:"Nearby places", ru:"Места рядом", tr:"Yakındaki yerler", zh:"附近地点" },
+  nearby_empty:{ uz:"Yaqin joylar uchun koordinatalar mavjud emas.", en:"Coordinates for nearby places are unavailable.", ru:"Координаты ближайших мест недоступны.", tr:"Yakındaki yerlerin koordinatları mevcut değil.", zh:"暂无附近地点的坐标。" },
+  distance_km:{ uz:"km", en:"km", ru:"км", tr:"km", zh:"公里" },
+  install_title:{ uz:"Sirdaryo360'ni telefonga o‘rnating", en:"Install Sirdaryo360 on your phone", ru:"Установите Sirdaryo360 на телефон", tr:"Sirdaryo360'ı telefonunuza yükleyin", zh:"将 Sirdaryo360 安装到手机" },
+  install_text:{ uz:"Saytni ilovadek tez va qulay ishlatish uchun bosh ekranga qo‘shing.", en:"Add it to your home screen for a faster app-like experience.", ru:"Добавьте сайт на главный экран для удобной работы как в приложении.", tr:"Uygulama gibi hızlı kullanmak için ana ekrana ekleyin.", zh:"添加到主屏幕，享受更快捷的应用式体验。" },
+  install_button:{ uz:"O‘rnatish", en:"Install", ru:"Установить", tr:"Yükle", zh:"安装" },
+  install_later:{ uz:"Keyinroq", en:"Later", ru:"Позже", tr:"Daha sonra", zh:"稍后" },
+  weather_modal_title:{ uz:"Sirdaryo viloyati ob-havosi", en:"Sirdaryo Region weather", ru:"Погода в Сырдарьинской области", tr:"Sirdaryo Bölgesi hava durumu", zh:"锡尔河州天气" },
+  weather_loading:{ uz:"Ob-havo ma’lumotlari yuklanmoqda...", en:"Loading weather information...", ru:"Загрузка данных о погоде...", tr:"Hava durumu bilgileri yükleniyor...", zh:"天气信息加载中..." },
+  weather_humidity:{ uz:"Namlik", en:"Humidity", ru:"Влажность", tr:"Nem", zh:"湿度" },
+  weather_feels:{ uz:"His qilinishi", en:"Feels like", ru:"Ощущается как", tr:"Hissedilen", zh:"体感温度" },
+  weather_wind:{ uz:"Shamol", en:"Wind", ru:"Ветер", tr:"Rüzgâr", zh:"风速" },
+  weather_forecast:{ uz:"5 kunlik prognoz", en:"5-day forecast", ru:"Прогноз на 5 дней", tr:"5 günlük tahmin", zh:"5天预报" },
+  weather_error:{ uz:"Ob-havo ma’lumotlarini yuklab bo‘lmadi.", en:"Weather information could not be loaded.", ru:"Не удалось загрузить данные о погоде.", tr:"Hava durumu bilgileri yüklenemedi.", zh:"无法加载天气信息。" },
+  weather_retry:{ uz:"Internet aloqasini tekshirib, qayta urinib ko‘ring.", en:"Check your internet connection and try again.", ru:"Проверьте интернет-соединение и повторите попытку.", tr:"İnternet bağlantınızı kontrol edip tekrar deneyin.", zh:"请检查网络连接后重试。" },
+  weather_unknown:{ uz:"Ob-havo ma’lumoti", en:"Weather information", ru:"Информация о погоде", tr:"Hava durumu bilgisi", zh:"天气信息" }
+};
+
+function tr(key){ return (UI[key] && UI[key][currentLang]) || (UI[key] && UI[key].uz) || key; }
+
+function applyStaticTranslations(){
+  document.querySelectorAll("[data-i]").forEach(el => {
+    const key = el.getAttribute("data-i");
+    if (UI[key]) el.textContent = tr(key);
+  });
+  document.querySelectorAll("[data-i-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i-placeholder");
+    if (UI[key]) el.placeholder = tr(key);
+  });
+  document.querySelectorAll("[data-i-title]").forEach(el => {
+    const key = el.getAttribute("data-i-title");
+    if (UI[key]) el.title = tr(key);
+  });
+  document.querySelectorAll("[data-i-aria]").forEach(el => {
+    const key = el.getAttribute("data-i-aria");
+    if (UI[key]) el.setAttribute("aria-label", tr(key));
+  });
+  updateLanguageButton();
+  translateFeedback();
+  document.getElementById("footFact").textContent = tr("fact_body_" + currentDistrict.id) || "";
+  updateWeatherLanguageUI();
+}
+
+/* ============================================================
+   2. DATA — DISTRICTS & LOCATIONS (multi-language content)
+============================================================ */
+const DEMO_PANOS = [
+  "https://pannellum.org/images/alma.jpg",
+  "https://pannellum.org/images/bma-0.jpg",
+  "https://pannellum.org/images/cerro-toco-0.jpg",
+  "https://pannellum.org/images/jfk.jpg"
+];
+function thumbUrl(seed){ return `https://picsum.photos/seed/${seed}/160/120`; }
+function thumbUrlSmall(seed){ return `https://picsum.photos/seed/${seed}/100/70`; }
+
+function locImage(loc, small=false){
+  const url = loc.image_url || loc.pano;
+  if (url) return url;
+  return small ? thumbUrlSmall(loc.seed || loc.id) : thumbUrl(loc.seed || loc.id);
+}
+
+function safeNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function makeLocalized(value, fallback){
+  const v = value || fallback || "";
+  return { uz:v, en:v, ru:v, tr:v, zh:v };
+}
+
+function categoryLocalized(category){
+  const map = {
+    hotel:{uz:"Mehmonxona",en:"Hotel",ru:"Гостиница",tr:"Otel",zh:"酒店"},
+    food:{uz:"Ovqatlanish",en:"Food & Dining",ru:"Питание",tr:"Yeme-İçme",zh:"餐饮"},
+    historical:{uz:"Tarixiy maskan",en:"Historical site",ru:"Историческое место",tr:"Tarihi yer",zh:"历史遗址"}
+  };
+  return map[category] || makeLocalized(category, "Joy");
+}
+
+function rebuildAllLocations(){
+  allLocations = [];
+  districts.forEach(d => d.locations.forEach(loc => allLocations.push({district:d, loc})));
+}
+
+function dbRowToLocation(p, index){
+  const category = categoryLocalized(p.category);
+  const nameUz = p.name_uz || "Nomsiz obyekt";
+  const description = p.description_uz || "";
+  return {
+    id: String(p.id || `place-${index}`),
+    seed: String(p.id || index),
+    pano: p.image_url || DEMO_PANOS[index % DEMO_PANOS.length],
+    image_url: p.image_url || "",
+    category,
+    name:{
+      uz:nameUz,
+      en:p.name_en || nameUz,
+      ru:p.name_ru || nameUz,
+      tr:p.name_tr || nameUz,
+      zh:p.name_zh || nameUz
+    },
+    desc:{
+      uz:description,
+      en:description,
+      ru:description,
+      tr:description,
+      zh:description
+    },
+    phone:p.phone || "",
+    maps_url:p.maps_url || "",
+    hours:p.hours || "",
+    lat:safeNum(p.lat),
+    lon:safeNum(p.lon),
+    db_category:p.category || ""
+  };
+}
+
+function rowsToDistricts(rows){
+  const groups = new Map();
+  rows.forEach((p, index) => {
+    const districtName = (p.district || "Sirdaryo viloyati").trim();
+    if (!groups.has(districtName)) groups.set(districtName, []);
+    groups.get(districtName).push(dbRowToLocation(p, index));
+  });
+
+  return Array.from(groups.entries()).map(([districtName, locations], i) => {
+    const valid = locations.filter(x => x.lat !== null && x.lon !== null);
+    const lat = valid.length ? valid.reduce((a,x)=>a+x.lat,0)/valid.length : 40.35;
+    const lng = valid.length ? valid.reduce((a,x)=>a+x.lon,0)/valid.length : 68.65;
+    return {
+      id:`db-${i}-${districtName.toLowerCase().replace(/[^a-z0-9а-яё]+/gi,"-")}`,
+      lat, lng,
+      name:makeLocalized(districtName),
+      fact:makeLocalized(`${districtName} hududidagi sayyohlik obyektlari.`),
+      locations
+    };
+  });
+}
+
+let publicPlacesClient = null;
+let publicPlacesLoaded = false;
+
+async function loadPlacesFromSupabase(){
+  if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_KEY) {
+    console.warn("Supabase konfiguratsiyasi topilmadi. Demo ma'lumotlar ishlatiladi.");
+    return false;
+  }
+
+  try {
+    publicPlacesClient = window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_KEY,
+      { auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false } }
+    );
+
+    const { data, error } = await publicPlacesClient
+      .from("places")
+      .select("id,category,name_uz,name_en,name_ru,name_tr,name_zh,description_uz,district,phone,maps_url,image_url,lat,lon,hours,is_active,created_at")
+      .eq("is_active", true)
+      .order("created_at", { ascending:false });
+
+    if (error) {
+      console.error("Supabase places xatosi:", error);
+      console.warn("Agar xato RLS/policy haqida bo'lsa, public SELECT policy kerak.");
+      return false;
+    }
+
+    if (!Array.isArray(data) || data.length === 0) {
+      console.info("places jadvalida faol obyektlar yo'q.");
+      return false;
+    }
+
+    const dbDistricts = rowsToDistricts(data);
+    if (!dbDistricts.length) return false;
+
+    // Admin paneldan kelgan ma'lumotlar asosiy ma'lumot sifatida ishlatiladi.
+    districts = dbDistricts;
+    currentDistrict = districts[0];
+    currentLocIndex = 0;
+    publicPlacesLoaded = true;
+
+    // Yangi districtlar uchun tarjima kalitlarini qayta yaratamiz.
+    districts.forEach(d => {
+      UI["fact_body_" + d.id] = d.fact;
+    });
+
+    rebuildAllLocations();
+    return true;
+
+  } catch (err) {
+    console.error("Supabase places yuklash xatosi:", err);
+    return false;
+  }
+}
+
+
+let districts = [
+  { id:"guliston-shahar", lat:40.4897, lng:68.7842,
+    name:{ uz:"Guliston shahri", en:"Guliston city", ru:"город Гулистан", tr:"Guliston şehri", zh:"古利斯坦市" },
+    fact:{ uz:"Guliston 1961-yilda Sirdaryo viloyati markazi etib belgilangan.", en:"Guliston was designated the capital of Sirdaryo Region in 1961.", ru:"Гулистан стал центром Сырдарьинской области в 1961 году.", tr:"Guliston, 1961'de Sirdaryo Bölgesi'nin merkezi ilan edildi.", zh:"古利斯坦于1961年被定为锡尔河州首府。" },
+    locations:[
+      { id:"navroz-maydoni", seed:"navroz", pano:DEMO_PANOS[0], category:{ uz:"Shahar, Ma'muriy", en:"City, Administrative", ru:"Город, Административный", tr:"Şehir, İdari", zh:"城市，行政" },
+        name:{ uz:"Navro'z maydoni", en:"Navruz Square", ru:"Площадь Навруз", tr:"Nevruz Meydanı", zh:"诺鲁孜广场" },
+        desc:{ uz:"Guliston shahrining markaziy maydoni. Bayram va tantanali tadbirlar shu yerda o'tkaziladi.", en:"The central square of Guliston city, host to festivals and ceremonies.", ru:"Центральная площадь города Гулистан, место проведения праздников и торжеств.", tr:"Guliston şehrinin merkez meydanı, bayram ve törenlere ev sahipliği yapar.", zh:"古利斯坦市的中央广场，是节庆和庆典活动的举办地。" } },
+      { id:"guliston-vokzal", seed:"vokzal", pano:DEMO_PANOS[1], category:{ uz:"Shahar, Transport", en:"City, Transport", ru:"Город, Транспорт", tr:"Şehir, Ulaşım", zh:"城市，交通" },
+        name:{ uz:"Guliston temiryo'l vokzali", en:"Guliston railway station", ru:"Железнодорожный вокзал Гулистан", tr:"Guliston tren garı", zh:"古利斯坦火车站" },
+        desc:{ uz:"Shahar transport tuguni, viloyatni respublika bo'ylab bog'lovchi asosiy stansiya.", en:"The city's transport hub connecting the region with the rest of the country.", ru:"Транспортный узел города, связывающий область со всей республикой.", tr:"Şehrin ulaşım merkezi, bölgeyi ülkeyle bağlayan ana istasyon.", zh:"该市的交通枢纽，是连接本州与全国的主要车站。" } }
+    ]},
+  { id:"boyovut", lat:40.2058, lng:68.9469,
+    name:{ uz:"Boyovut tumani", en:"Boyovut District", ru:"Боявутский район", tr:"Boyovut İlçesi", zh:"博约武特区" },
+    fact:{ uz:"Boyovut tumani Buyuk ipak yo'li yaqinidagi qadimiy manzilgohlari bilan mashhur.", en:"Boyovut District is known for ancient settlements near the Great Silk Road.", ru:"Боявутский район известен древними поселениями вблизи Великого шёлкового пути.", tr:"Boyovut İlçesi, İpek Yolu yakınındaki antik yerleşimleriyle bilinir.", zh:"博约武特区以靠近丝绸之路的古老聚落而闻名。" },
+    locations:[
+      { id:"boyovut-markaz", seed:"boyovut", pano:DEMO_PANOS[2], category:{ uz:"Tarixiy, Madaniy", en:"Historic, Cultural", ru:"Исторический, Культурный", tr:"Tarihi, Kültürel", zh:"历史，文化" },
+        name:{ uz:"Boyovut tuman markazi", en:"Boyovut district center", ru:"Центр Боявутского района", tr:"Boyovut ilçe merkezi", zh:"博约武特区中心" },
+        desc:{ uz:"Qadimiy sug'orish inshootlari va tarixiy yodgorliklarga boy tuman markazi.", en:"District center rich in ancient irrigation structures and historic monuments.", ru:"Центр района, богатый древними ирригационными сооружениями и памятниками.", tr:"Antik sulama yapıları ve tarihi anıtlarla zengin ilçe merkezi.", zh:"该区中心拥有丰富的古代灌溉设施和历史古迹。" } }
+    ]},
+  { id:"guliston-tuman", lat:40.35, lng:68.75,
+    name:{ uz:"Guliston tumani", en:"Guliston District", ru:"Гулистанский район", tr:"Guliston İlçesi", zh:"古利斯坦区" },
+    fact:{ uz:"Guliston tumani markazi Dehqonobod qishlog'ida joylashgan.", en:"The center of Guliston District is located in the village of Dehqonobod.", ru:"Центр Гулистанского района находится в посёлке Дехканабад.", tr:"Guliston İlçesi'nin merkezi Dehqonobod köyündedir.", zh:"古利斯坦区的中心位于德坎诺巴德村。" },
+    locations:[
+      { id:"dehqonobod", seed:"dehqonobod", pano:DEMO_PANOS[3], category:{ uz:"Qishloq xo'jaligi", en:"Agriculture", ru:"Сельское хозяйство", tr:"Tarım", zh:"农业" },
+        name:{ uz:"Dehqonobod qishlog'i", en:"Dehqonobod village", ru:"Посёлок Дехканабад", tr:"Dehqonobod köyü", zh:"德坎诺巴德村" },
+        desc:{ uz:"Paxta va don dalalari bilan o'ralgan tuman markazi qishlog'i.", en:"The district-center village surrounded by cotton and grain fields.", ru:"Посёлок — центр района, окружённый хлопковыми и зерновыми полями.", tr:"Pamuk ve tahıl tarlalarıyla çevrili ilçe merkezi köy.", zh:"该村是被棉花和谷物田环绕的区中心村。" } }
+    ]},
+  { id:"xovos", lat:40.2269, lng:68.7334,
+    name:{ uz:"Xovos tumani", en:"Xovos District", ru:"Ховосский район", tr:"Xovos İlçesi", zh:"霍沃斯区" },
+    fact:{ uz:"Xovos tumani 1926-yilda tashkil etilgan, viloyatning eng qadimiy tumanlaridan biri.", en:"Xovos District was established in 1926, one of the region's oldest districts.", ru:"Ховосский район образован в 1926 году — один из старейших районов области.", tr:"Xovos İlçesi 1926'da kuruldu, bölgenin en eski ilçelerinden biridir.", zh:"霍沃斯区成立于1926年，是该州最古老的区之一。" },
+    locations:[
+      { id:"xovos-stansiya", seed:"xovosstation", pano:DEMO_PANOS[0], category:{ uz:"Shahar, Transport", en:"City, Transport", ru:"Город, Транспорт", tr:"Şehir, Ulaşım", zh:"城市，交通" },
+        name:{ uz:"Xovos temiryo'l stansiyasi", en:"Xovos railway station", ru:"Железнодорожная станция Ховос", tr:"Xovos tren istasyonu", zh:"霍沃斯火车站" },
+        desc:{ uz:"Tuman markazidagi tarixiy temiryo'l stansiyasi, mintaqaviy tashuvda muhim o'rin tutadi.", en:"A historic railway station in the district center, important for regional transport.", ru:"Историческая железнодорожная станция в центре района, важна для регионального транспорта.", tr:"İlçe merkezindeki tarihi tren istasyonu, bölgesel ulaşımda önemlidir.", zh:"位于区中心的历史火车站，对区域交通十分重要。" } }
+    ]},
+  { id:"mirzaobod", lat:40.36, lng:69.20,
+    name:{ uz:"Mirzaobod tumani", en:"Mirzaobod District", ru:"Мирзаабадский район", tr:"Mirzaobod İlçesi", zh:"米尔扎巴德区" },
+    fact:{ uz:"Mirzaobod tumani Toshkent viloyati bilan chegaradosh.", en:"Mirzaobod District borders Tashkent Region.", ru:"Мирзаабадский район граничит с Ташкентской областью.", tr:"Mirzaobod İlçesi, Taşkent Bölgesi ile sınır komşusudur.", zh:"米尔扎巴德区与塔什干州接壤。" },
+    locations:[
+      { id:"mirzaobod-markaz", seed:"mirzaobod", pano:DEMO_PANOS[1], category:{ uz:"Shahar", en:"City", ru:"Город", tr:"Şehir", zh:"城市" },
+        name:{ uz:"Mirzaobod tuman markazi", en:"Mirzaobod district center", ru:"Центр Мирзаабадского района", tr:"Mirzaobod ilçe merkezi", zh:"米尔扎巴德区中心" },
+        desc:{ uz:"Keng ko'chalari va yashil hududlari bilan tanilgan tuman markazi.", en:"District center known for its wide streets and green areas.", ru:"Центр района, известный широкими улицами и зелёными зонами.", tr:"Geniş caddeleri ve yeşil alanlarıyla tanınan ilçe merkezi.", zh:"以宽阔街道和绿地闻名的区中心。" } }
+    ]},
+  { id:"sardoba", lat:40.3453, lng:68.1925,
+    name:{ uz:"Sardoba tumani", en:"Sardoba District", ru:"Сардобинский район", tr:"Sardoba İlçesi", zh:"萨尔多巴区" },
+    fact:{ uz:"Sardoba tumani markazi Paxtaobod shaharchasida joylashgan.", en:"The center of Sardoba District is in the town of Paxtaobod.", ru:"Центр Сардобинского района находится в посёлке Пахтаабад.", tr:"Sardoba İlçesi'nin merkezi Paxtaobod kasabasındadır.", zh:"萨尔多巴区的中心位于帕赫塔巴德镇。" },
+    locations:[
+      { id:"sardoba-dala", seed:"fields", pano:DEMO_PANOS[2], category:{ uz:"Qishloq xo'jaligi", en:"Agriculture", ru:"Сельское хозяйство", tr:"Tarım", zh:"农业" },
+        name:{ uz:"Sardoba tumani dalalari", en:"Sardoba district fields", ru:"Поля Сардобинского района", tr:"Sardoba ilçesi tarlaları", zh:"萨尔多巴区田野" },
+        desc:{ uz:"Paxta va don yetishtiriladigan keng dalalar, viloyatning qishloq xo'jaligi markazlaridan biri.", en:"Vast cotton and grain fields, one of the region's key agricultural areas.", ru:"Обширные хлопковые и зерновые поля — один из аграрных центров области.", tr:"Geniş pamuk ve tahıl tarlaları, bölgenin önemli tarım alanlarından biri.", zh:"广阔的棉花和谷物田，是该州主要的农业区之一。" } }
+    ]},
+  { id:"sayxunobod", lat:40.20, lng:68.60,
+    name:{ uz:"Sayxunobod tumani", en:"Sayxunobod District", ru:"Сайхунабадский район", tr:"Sayxunobod İlçesi", zh:"赛洪奥博德区" },
+    fact:{ uz:"Sayxunobod tumani markazi Sayxun shaharchasi hisoblanadi.", en:"The center of Sayxunobod District is the town of Sayxun.", ru:"Центр Сайхунабадского района — посёлок Сайхун.", tr:"Sayxunobod İlçesi'nin merkezi Sayxun kasabasıdır.", zh:"赛洪奥博德区的中心是赛洪镇。" },
+    locations:[
+      { id:"sayxun-qishlogi", seed:"sayxun", pano:DEMO_PANOS[3], category:{ uz:"Qishloq, Tabiat", en:"Village, Nature", ru:"Посёлок, Природа", tr:"Köy, Doğa", zh:"村庄，自然" },
+        name:{ uz:"Sayxun shaharchasi", en:"Sayxun town", ru:"Посёлок Сайхун", tr:"Sayxun kasabası", zh:"赛洪镇" },
+        desc:{ uz:"Tinch va yashil tuman markazi, atrofida sug'oriladigan dalalar joylashgan.", en:"A quiet, green district center surrounded by irrigated fields.", ru:"Тихий, зелёный центр района, окружённый орошаемыми полями.", tr:"Sakin ve yeşil ilçe merkezi, çevresinde sulanan tarlalar bulunur.", zh:"宁静的绿色区中心，周围是灌溉农田。" } }
+    ]},
+  { id:"sirdaryo-tuman", lat:40.8347, lng:68.6614,
+    name:{ uz:"Sirdaryo tumani", en:"Sirdaryo District", ru:"Сырдарьинский район", tr:"Sirdaryo İlçesi", zh:"锡尔河区" },
+    fact:{ uz:"Viloyatga nomini bergan Sirdaryo daryosi shu tuman orqali oqib o'tadi.", en:"The Syr Darya River, which gives the region its name, flows through this district.", ru:"Река Сырдарья, давшая название области, протекает через этот район.", tr:"Bölgeye adını veren Sirdaryo Nehri bu ilçeden geçer.", zh:"赋予该州名称的锡尔河流经该区。" },
+    locations:[
+      { id:"sirdaryo-daryo", seed:"river", pano:DEMO_PANOS[0], category:{ uz:"Tabiat", en:"Nature", ru:"Природа", tr:"Doğa", zh:"自然" },
+        name:{ uz:"Sirdaryo daryosi qirg'og'i", en:"Banks of the Syr Darya", ru:"Берег реки Сырдарья", tr:"Sirdaryo Nehri kıyısı", zh:"锡尔河河岸" },
+        desc:{ uz:"Keng tekislik bo'ylab oqib o'tuvchi daryo qirg'og'i, dam olish va baliqchilik uchun mashhur.", en:"The riverbank crossing the plains, popular for recreation and fishing.", ru:"Берег реки, протекающей по равнине, популярен для отдыха и рыбалки.", tr:"Ovadan geçen nehir kıyısı, dinlenme ve balıkçılık için ünlüdür.", zh:"穿越平原的河岸，是休闲垂钓的热门去处。" } },
+      { id:"farhod-suv-ombori", seed:"reservoir", pano:DEMO_PANOS[1], category:{ uz:"Tabiat", en:"Nature", ru:"Природа", tr:"Doğa", zh:"自然" },
+        name:{ uz:"Farhod suv ombori", en:"Farhod Reservoir", ru:"Фархадское водохранилище", tr:"Farhod Barajı", zh:"法尔霍德水库" },
+        desc:{ uz:"Farhod GESi yonidagi yirik suv ombori, sug'orish tizimining muhim qismi.", en:"A large reservoir next to the Farhod hydroelectric plant, key to the irrigation system.", ru:"Крупное водохранилище рядом с Фархадской ГЭС, важная часть ирригационной системы.", tr:"Farhod hidroelektrik santrali yanındaki büyük baraj, sulama sisteminin önemli bir parçası.", zh:"法尔霍德水电站旁的大型水库，是灌溉系统的重要组成部分。" } }
+    ]},
+  { id:"oqoltin", lat:40.10, lng:68.35,
+    name:{ uz:"Oqoltin tumani", en:"Oqoltin District", ru:"Окалтынский район", tr:"Oqoltin İlçesi", zh:"奥克尔廷区" },
+    fact:{ uz:"Oqoltin tumani Mirzacho'l (Ochlik dashti) hududida joylashgan.", en:"Oqoltin District lies within the Mirzachoʻl (Hungry Steppe).", ru:"Окалтынский район расположен в зоне Мирзачуль (Голодная степь).", tr:"Oqoltin İlçesi, Mirzachoʻl (Açlık Bozkırı) bölgesindedir.", zh:"奥克尔廷区位于米尔扎乔勒（饥饿草原）地带。" },
+    locations:[
+      { id:"dasht-ufq", seed:"steppe", pano:DEMO_PANOS[2], category:{ uz:"Tabiat, Manzara", en:"Nature, Scenery", ru:"Природа, Пейзаж", tr:"Doğa, Manzara", zh:"自然，风景" },
+        name:{ uz:"Cho'l ufqi — kechki manzara", en:"Steppe horizon — evening view", ru:"Горизонт степи — вечерний вид", tr:"Bozkır ufku — akşam manzarası", zh:"草原地平线——傍晚景色" },
+        desc:{ uz:"Cheksiz tekislik ustidagi kechki osmon manzarasi, keng dasht landshafti.", en:"An evening sky over the endless plain, a wide steppe landscape.", ru:"Вечернее небо над бескрайней равниной, широкий степной ландшафт.", tr:"Uçsuz bucaksız ova üzerinde akşam gökyüzü, geniş bozkır manzarası.", zh:"无垠平原上的傍晚天空，广袤的草原景观。" } }
+    ]},
+  { id:"shirin", lat:40.2360, lng:68.9130,
+    name:{ uz:"Shirin shahri", en:"Shirin city", ru:"город Ширин", tr:"Shirin şehri", zh:"希林市" },
+    fact:{ uz:"Shirin shahri sanoat korxonalari bilan tanilgan.", en:"Shirin city is known for its industrial enterprises.", ru:"Город Ширин известен своими промышленными предприятиями.", tr:"Shirin şehri sanayi kuruluşlarıyla tanınır.", zh:"希林市以工业企业闻名。" },
+    locations:[
+      { id:"shirin-markaz", seed:"shirin", pano:DEMO_PANOS[3], category:{ uz:"Shahar, Sanoat", en:"City, Industry", ru:"Город, Промышленность", tr:"Şehir, Sanayi", zh:"城市，工业" },
+        name:{ uz:"Shirin shahar markazi", en:"Shirin city center", ru:"Центр города Ширин", tr:"Shirin şehir merkezi", zh:"希林市中心" },
+        desc:{ uz:"Kompakt sanoat shahri, atrofida paxta tozalash korxonalari joylashgan.", en:"A compact industrial town surrounded by cotton-processing plants.", ru:"Компактный промышленный город, окружённый хлопкоочистительными предприятиями.", tr:"Çevresinde pamuk işleme tesisleri bulunan kompakt bir sanayi şehri.", zh:"周围环绕着轧棉厂的紧凑型工业城市。" } }
+    ]},
+  { id:"yangiyer", lat:40.1830, lng:68.8330,
+    name:{ uz:"Yangiyer shahri", en:"Yangiyer city", ru:"город Янгиер", tr:"Yangiyer şehri", zh:"扬吉耶尔市" },
+    fact:{ uz:"Yangiyer qand-shakar sanoati bilan mashhur shahar.", en:"Yangiyer is a city known for its sugar industry.", ru:"Янгиер — город, известный сахарной промышленностью.", tr:"Yangiyer, şeker sanayisiyle tanınan bir şehirdir.", zh:"扬吉耶尔市以制糖业闻名。" },
+    locations:[
+      { id:"yangiyer-markaz", seed:"yangiyer", pano:DEMO_PANOS[0], category:{ uz:"Shahar, Sanoat", en:"City, Industry", ru:"Город, Промышленность", tr:"Şehir, Sanayi", zh:"城市，工业" },
+        name:{ uz:"Yangiyer shahri", en:"Yangiyer city", ru:"Город Янгиер", tr:"Yangiyer şehri", zh:"扬吉耶尔市" },
+        desc:{ uz:"Qand-shakar sanoati bilan tanilgan sanoat shahri, rejalashtirilgan me'morchiligi bilan ajralib turadi.", en:"An industrial city known for its sugar industry and planned architecture.", ru:"Промышленный город, известный сахарной промышленностью и плановой архитектурой.", tr:"Şeker sanayisi ve planlı mimarisiyle bilinen bir sanayi şehri.", zh:"以制糖业和规划建筑闻名的工业城市。" } }
+    ]}
+];
+
+// Built-in district data is kept as a safe source for the historical-sites list.
+// Supabase may replace `districts` with hotels/food/etc., but the main list below
+// must continue to show historical places only.
+const BUILTIN_DISTRICTS = districts;
+
+// wire up per-district "interesting fact" translation keys used by applyStaticTranslations
+districts.forEach(d => { UI["fact_body_" + d.id] = d.fact; });
+
+/* ============================================================
+   3. STATE
+============================================================ */
+let currentDistrict = districts[0];
+let currentLocIndex = 0;
+let viewer = null;
+let autoRotateOn = true;
+let miniMap = null, miniMarker = null;
+let speaking = false;
+
+function locName(loc){ return loc.name[currentLang] || loc.name.uz; }
+function locDesc(loc){ return loc.desc[currentLang] || loc.desc.uz; }
+function locCat(loc){ return loc.category[currentLang] || loc.category.uz; }
+function distName(d){ return d.name[currentLang] || d.name.uz; }
+
+// Flat index of every location across every district — used by favorites & the map modal.
+let allLocations = [];
+districts.forEach(d => d.locations.forEach(loc => allLocations.push({ district: d, loc })));
+
+function selectDistrict(d){
+  currentDistrict = d;
+  currentLocIndex = 0;
+  renderDistrictChips();
+  renderLocList();
+  updateMiniMap();
+  updateWeather();
+  loadScene(0);
+  applyStaticTranslations();
+}
+
+/* ============================================================
+   3b. FAVORITES
+============================================================ */
+let favoriteIds = new Set();
+
+function isFavorite(loc){ return favoriteIds.has(loc.id); }
+
+function updateFavCountBadge(){
+  document.getElementById("favCount").textContent = favoriteIds.size;
+}
+
+function toggleFavorite(loc){
+  if (favoriteIds.has(loc.id)) favoriteIds.delete(loc.id);
+  else favoriteIds.add(loc.id);
+  updateFavCountBadge();
+  renderLocList(document.getElementById("searchBox").value);
+  if (currentDistrict.locations[currentLocIndex] && currentDistrict.locations[currentLocIndex].id === loc.id){
+    renderRightPanel(currentDistrict.locations[currentLocIndex]);
+  }
+  if (document.getElementById("favModalOverlay").classList.contains("open")) renderFavList();
+}
+
+function renderFavList(){
+  const wrap = document.getElementById("favList");
+  wrap.innerHTML = "";
+  const favs = allLocations.filter(x => favoriteIds.has(x.loc.id));
+  if (!favs.length){
+    wrap.innerHTML = `<div class="fav-empty">${tr("f_fav_s")} 🤍</div>`;
+    return;
+  }
+  favs.forEach(({district, loc}) => {
+    const row = document.createElement("div");
+    row.className = "fav-item";
+    row.innerHTML = `<img src="${locImage(loc)}" alt="">
+      <div class="fi-text"><div class="fi-name">${locName(loc)}</div><div class="fi-sub">${distName(district)}</div></div>
+      <button class="fi-remove" title="O'chirish">✕</button>`;
+    row.querySelector(".fi-remove").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFavorite(loc);
+      renderFavList();
+    });
+    row.addEventListener("click", () => {
+      selectDistrict(district);
+      const idx = district.locations.findIndex(l => l.id === loc.id);
+      loadScene(idx >= 0 ? idx : 0);
+      closeFavModal();
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function openFavModal(){ renderFavList(); document.getElementById("favModalOverlay").classList.add("open"); }
+function closeFavModal(){ document.getElementById("favModalOverlay").classList.remove("open"); }
+document.getElementById("favCountBtn").addEventListener("click", openFavModal);
+document.getElementById("favFeatureBtn").addEventListener("click", openFavModal);
+document.getElementById("favModalClose").addEventListener("click", closeFavModal);
+document.getElementById("favModalOverlay").addEventListener("click", (e) => { if (e.target.id === "favModalOverlay") closeFavModal(); });
+
+/* ============================================================
+   4. RENDER — DISTRICT CHIPS
+============================================================ */
+function renderDistrictChips(){
+  const wrap = document.getElementById("districtScroll");
+  wrap.innerHTML = "";
+  districts.forEach(d => {
+    const chip = document.createElement("div");
+    chip.className = "district-chip" + (d.id === currentDistrict.id ? " active" : "");
+    chip.textContent = distName(d);
+    chip.addEventListener("click", () => selectDistrict(d));
+    wrap.appendChild(chip);
+  });
+}
+
+/* ============================================================
+   5. RENDER — LOCATION LIST
+============================================================ */
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
+}
+function isHistoricalLocation(loc){
+  if(!loc) return false;
+  const raw = String(loc.db_category || "").trim().toLowerCase();
+  if(raw === "historical" || raw === "history" || raw === "tarixiy") return true;
+  const categories = Object.values(loc.category || {}).join(" ").toLowerCase();
+  return /tarixiy|historical|истор|tarihi|历史/.test(categories);
+}
+
+function getHistoricalEntriesForDistrict(district){
+  if(!district) return [];
+  const direct = district.locations
+    .map((loc, index) => ({district, loc, index}))
+    .filter(x => isHistoricalLocation(x.loc));
+  if(direct.length) return direct;
+
+  // If Supabase currently contains only hotel/food rows for this district,
+  // fall back to the original built-in historical places for the same district.
+  const districtName = district.name?.uz || "";
+  const builtIn = BUILTIN_DISTRICTS.find(d => (d.name?.uz || "") === districtName);
+  if(!builtIn) return [];
+  return builtIn.locations
+    .map((loc, index) => ({district:builtIn, loc, index}))
+    .filter(x => isHistoricalLocation(x.loc));
+}
+
+function getAllHistoricalEntries(){
+  const result = [];
+  const seen = new Set();
+
+  allLocations
+    .filter(x => isHistoricalLocation(x.loc))
+    .forEach(x => {
+      const key = String(x.loc.id);
+      if(!seen.has(key)){ seen.add(key); result.push(x); }
+    });
+
+  BUILTIN_DISTRICTS.forEach(d => {
+    d.locations.forEach((loc, index) => {
+      if(!isHistoricalLocation(loc)) return;
+      const key = String(loc.id);
+      if(!seen.has(key)){
+        seen.add(key);
+        result.push({district:d, loc, index});
+      }
+    });
+  });
+
+  return result;
+}
+
+function renderLocList(filter=""){
+  const wrap = document.getElementById("locList");
+  wrap.innerHTML = "";
+  const q = String(filter||"").trim().toLowerCase();
+
+  const entries = q
+    ? getAllHistoricalEntries().filter(({district,loc}) =>
+        [locName(loc),locCat(loc),distName(district),locDesc(loc)]
+          .join(" ").toLowerCase().includes(q))
+    : getHistoricalEntriesForDistrict(currentDistrict);
+
+  if(!entries.length){
+    wrap.innerHTML = `<div class="nearby-empty">${escapeHtml(tr("search_no_results"))}</div>`;
+    return;
+  }
+
+  entries.forEach(({district,loc,index})=>{
+    const isCurrent =
+      district.id === currentDistrict.id &&
+      index === currentLocIndex;
+
+    const div=document.createElement("div");
+    div.className="loc-item"+(isCurrent ? " active" : "");
+    div.innerHTML=`
+      <img class="loc-thumb" src="${escapeHtml(locImage(loc,true))}" alt="">
+      <div style="min-width:0">
+        <div class="loc-name">${escapeHtml(locName(loc))}</div>
+      </div>
+      <span class="loc-heart${isFavorite(loc)?' active':''}">
+        ${isFavorite(loc)?'♥':'♡'}
+      </span>`;
+
+    div.addEventListener("click",()=>{
+      selectDistrict(district);
+      loadScene(index >= 0 ? index : 0);
+      document.getElementById("searchBox").value="";
+      renderLocList("");
+    });
+
+    div.querySelector(".loc-heart").addEventListener("click",e=>{
+      e.stopPropagation();
+      toggleFavorite(loc);
+    });
+
+    wrap.appendChild(div);
+  });
+}
+
+function renderThumbStrip(){
+  const strip = document.getElementById("thumbStrip");
+  strip.innerHTML = "";
+  currentDistrict.locations.forEach((loc, i) => {
+    const img = document.createElement("img");
+    img.src = locImage(loc, true);
+    if (i === currentLocIndex) img.classList.add("active");
+    img.addEventListener("click", () => loadScene(i));
+    strip.appendChild(img);
+  });
+}
+
+/* ============================================================
+   6. RIGHT PANEL
+============================================================ */
+function renderRightPanel(loc){
+  const rp = document.getElementById("rightPanel");
+  rp.innerHTML = `
+    <div class="rp-card">
+      <img class="rp-img" src="${locImage(loc)}" alt="">
+      <div class="rp-body">
+        <div class="rp-title">${locName(loc)}</div>
+        <span class="rp-badge">${locCat(loc)}</span>
+        <div class="rp-desc">${locDesc(loc)}</div>
+        <div class="rp-detail"><span class="di">📍</span><span><span class="dl">${tr("districts_title")}:</span><br><span class="dv">${distName(currentDistrict)}</span></span></div>
+        <div class="rp-actions">
+          <button class="btn-primary" id="directionBtn">↗ ${tr("yo_nalish")}</button>
+          <button class="btn-audio" id="audioBtn">🔊 ${tr("f_audio_t")}</button>
+          <button class="btn-secondary${isFavorite(loc) ? ' active' : ''}" id="favBtn">${isFavorite(loc) ? '♥' : '♡'} ${isFavorite(loc) ? tr("sevimli_saved") : tr("sevimli")}</button>
+        </div>
+
+      </div>
+    </div>
+  `;
+  document.getElementById("favBtn").addEventListener("click", () => toggleFavorite(loc));
+  document.getElementById("audioBtn").addEventListener("click", () => toggleAudioGuide(loc));
+  document.getElementById("directionBtn").addEventListener("click", () => {
+    if (loc.maps_url) { window.open(loc.maps_url, "_blank", "noopener"); return; }
+    const lat = loc.lat ?? currentDistrict.lat;
+    const lng = loc.lon ?? currentDistrict.lng;
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, "_blank", "noopener");
+  });
+}
+
+/* ============================================================
+   7. AUDIO GUIDE (Web Speech API)
+============================================================ */
+let ttsVoices = [];
+let ttsVoicesReady = false;
+let ttsResumeTimer = null;
+
+function loadTtsVoices(){
+  if (!("speechSynthesis" in window)) return;
+  ttsVoices = window.speechSynthesis.getVoices();
+  if (ttsVoices.length) ttsVoicesReady = true;
+}
+if ("speechSynthesis" in window){
+  loadTtsVoices();
+  window.speechSynthesis.onvoiceschanged = loadTtsVoices;
+}
+
+// Pick the best matching voice for a given BCP-47 code (e.g. "uz-UZ").
+// Many devices have no Uzbek/Turkish/Chinese voice installed — speak()
+// then fails silently (no sound, no error). Falling back to the closest
+// available voice keeps the guide audible instead of mute.
+function pickTtsVoice(langCode){
+  if (!ttsVoices.length) return null;
+  const prefix = langCode.split("-")[0].toLowerCase();
+  const sameLang = ttsVoices.filter(v => v.lang.toLowerCase() === langCode.toLowerCase());
+  const samePrefix = ttsVoices.filter(v => v.lang.toLowerCase().startsWith(prefix));
+  const candidates = sameLang.length ? sameLang : samePrefix.length ? samePrefix : ttsVoices;
+
+  // Qurilmada mavjud bo'lsa, erkak ovozini ustun qo'yamiz.
+  const maleHints = [
+    "male","man","david","mark","george","daniel","alex","arthur",
+    "thomas","james","guy","jorge","diego","yuri","pavel","stefan",
+    "google uk english male","google us english"
+  ];
+  const male = candidates.find(v => {
+    const n = (v.name || "").toLowerCase();
+    return maleHints.some(h => n.includes(h));
+  });
+  return male || candidates.find(v => v.default) || candidates[0] || null;
+}
+
+function speakLocation(loc){
+  const districtText = currentDistrict.fact?.[currentLang] || currentDistrict.fact?.uz || "";
+  const text = `${distName(currentDistrict)}. ${districtText} ${locName(loc)}. ${locDesc(loc)}`;
+  const utter = new SpeechSynthesisUtterance(text);
+  const langInfo = LANGS.find(l => l.code === currentLang);
+  const voice = pickTtsVoice(langInfo.speech);
+  if (voice){ utter.voice = voice; utter.lang = voice.lang; }
+  else { utter.lang = langInfo.speech; }
+  utter.rate = 0.9;
+  utter.pitch = 0.82;
+
+  utter.onend = () => {
+    speaking = false;
+    updateAudioUI(false);
+    if (ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer = null; }
+  };
+  utter.onerror = () => {
+    speaking = false;
+    updateAudioUI(false);
+    if (ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer = null; }
+    if (!voice) alert("Bu til uchun ovoz topilmadi. Boshqa tilni tanlab ko'ring yoki qurilmangizga tegishli til paketini o'rnating.");
+  };
+
+  window.speechSynthesis.speak(utter);
+  speaking = true;
+  updateAudioUI(true);
+
+  // Chrome/Android bug workaround: speechSynthesis can silently stall on
+  // long utterances unless nudged with pause/resume periodically.
+  if (ttsResumeTimer) clearInterval(ttsResumeTimer);
+  ttsResumeTimer = setInterval(() => {
+    if (!window.speechSynthesis.speaking){ clearInterval(ttsResumeTimer); ttsResumeTimer = null; return; }
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+  }, 10000);
+}
+
+function toggleAudioGuide(loc){
+  if (!("speechSynthesis" in window)){
+    alert("Brauzeringiz audio o'qishni qo'llab-quvvatlamaydi.");
+    return;
+  }
+  if (speaking){
+    window.speechSynthesis.cancel();
+    speaking = false;
+    updateAudioUI(false);
+    if (ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer = null; }
+    return;
+  }
+  // Clear any stuck queue left over from a previous (silently failed) call.
+  window.speechSynthesis.cancel();
+  if (!ttsVoicesReady){
+    // Voices load asynchronously on first page visit — give them a beat.
+    setTimeout(() => speakLocation(loc), 150);
+  } else {
+    speakLocation(loc);
+  }
+}
+function updateAudioUI(on){
+  const btn = document.getElementById("audioBtn");
+  if (btn) btn.classList.toggle("playing", on);
+  const sub = document.getElementById("audioFeatureSub");
+  if (sub) sub.textContent = on ? tr("f_audio_playing") : tr("f_audio_s");
+}
+document.getElementById("audioFeatureBtn").addEventListener("click", () => {
+  toggleAudioGuide(currentDistrict.locations[currentLocIndex]);
+});
+
+/* ============================================================
+   8. WEATHER — SIRDARYO REGION
+============================================================ */
+const WEATHER_TEXT={
+ uz:{0:"Ochiq osmon",1:"Asosan ochiq",2:"Qisman bulutli",3:"Bulutli",45:"Tuman",48:"Qirovli tuman",51:"Mayda yomg‘ir",53:"Mayda yomg‘ir",55:"Mayda yomg‘ir",61:"Yomg‘ir",63:"Yomg‘ir",65:"Kuchli yomg‘ir",71:"Qor",73:"Qor",75:"Kuchli qor",80:"Yomg‘irli jala",81:"Yomg‘irli jala",82:"Kuchli yomg‘irli jala",95:"Momaqaldiroq",96:"Do‘l bilan momaqaldiroq",99:"Kuchli do‘l bilan momaqaldiroq"},
+ en:{0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Dense drizzle",61:"Rain",63:"Rain",65:"Heavy rain",71:"Snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy rain showers",95:"Thunderstorm",96:"Thunderstorm with hail",99:"Thunderstorm with heavy hail"},
+ ru:{0:"Ясное небо",1:"Преимущественно ясно",2:"Переменная облачность",3:"Пасмурно",45:"Туман",48:"Изморозь и туман",51:"Мелкий дождь",53:"Дождь",55:"Сильный моросящий дождь",61:"Дождь",63:"Дождь",65:"Сильный дождь",71:"Снег",73:"Снег",75:"Сильный снег",80:"Ливневый дождь",81:"Ливневый дождь",82:"Сильный ливень",95:"Гроза",96:"Гроза с градом",99:"Сильная гроза с градом"},
+ tr:{0:"Açık hava",1:"Çoğunlukla açık",2:"Parçalı bulutlu",3:"Kapalı",45:"Sis",48:"Kırağılı sis",51:"Hafif çiseleme",53:"Çiseleme",55:"Yoğun çiseleme",61:"Yağmur",63:"Yağmur",65:"Kuvvetli yağmur",71:"Kar",73:"Kar",75:"Yoğun kar",80:"Sağanak",81:"Sağanak",82:"Kuvvetli sağanak",95:"Gök gürültülü fırtına",96:"Dolu ile gök gürültüsü",99:"Kuvvetli dolulu fırtına"},
+ zh:{0:"晴朗",1:"基本晴朗",2:"局部多云",3:"阴天",45:"雾",48:"霜雾",51:"小毛毛雨",53:"毛毛雨",55:"较强毛毛雨",61:"降雨",63:"降雨",65:"大雨",71:"降雪",73:"降雪",75:"大雪",80:"阵雨",81:"阵雨",82:"强阵雨",95:"雷暴",96:"雷暴伴冰雹",99:"强雷暴伴冰雹"}
+};
+function weatherText(code){return WEATHER_TEXT[currentLang]?.[code] || WEATHER_TEXT.en[code] || tr("weather_unknown");}
+function updateWeatherLanguageUI(){const sub=document.getElementById("weatherFeatureSub"),btn=document.getElementById("weatherFeatureBtn");if(btn)btn.title=tr("weather_feature_title");if(sub&&!sub.dataset.loaded)sub.textContent=tr("weather_loading_short");}
+function weatherIcon(code){
+  const wrap = (body) => `<svg viewBox="0 0 48 48" aria-hidden="true" style="width:42px;height:42px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${body}</svg>`;
+  if (code === 0) return wrap(`<circle cx="24" cy="24" r="8" fill="currentColor" stroke="none"/><path d="M24 4v5M24 39v5M4 24h5M39 24h5M9.9 9.9l3.5 3.5M34.6 34.6l3.5 3.5M38.1 9.9l-3.5 3.5M13.4 34.6l-3.5 3.5"/>`);
+  if ([1,2].includes(code)) return wrap(`<circle cx="16" cy="16" r="6" fill="currentColor" stroke="none"/><path d="M16 5v3M16 24v3M5 16h3M24 16h3M8.2 8.2l2.1 2.1M23.7 23.7l2.1 2.1M23.8 8.2l-2.1 2.1M10.3 23.7l-2.1 2.1"/><path d="M14 35h18a5 5 0 0 0 .5-10 7 7 0 0 0-13.2-1.7A5.5 5.5 0 0 0 14 35z"/>`);
+  if ([3,45,48].includes(code)) return wrap(`<path d="M12 33h20a6 6 0 0 0 .6-12 8 8 0 0 0-15.2-2A6 6 0 0 0 12 33z"/>`);
+  if ([51,53,55,61,63,65,80,81,82].includes(code)) return wrap(`<path d="M12 27h20a6 6 0 0 0 .6-12 8 8 0 0 0-15.2-2A6 6 0 0 0 12 27z"/><path d="M16 32v1M24 32v1M32 32v1M16 37v1M24 37v1"/>`);
+  if ([71,73,75].includes(code)) return wrap(`<path d="M12 27h20a6 6 0 0 0 .6-12 8 8 0 0 0-15.2-2A6 6 0 0 0 12 27z"/><path d="m16 33 2 2-2 2M24 33l2 2-2 2M32 33l2 2-2 2"/>`);
+  if ([95,96,99].includes(code)) return wrap(`<path d="M12 28h20a6 6 0 0 0 .6-12 8 8 0 0 0-15.2-2A6 6 0 0 0 12 28z"/><path d="m22 29-3 6h4l-3 6 7-8h-4l3-4z"/>`);
+  return wrap(`<circle cx="16" cy="16" r="6"/><path d="M14 35h18a5 5 0 0 0 .5-10 7 7 0 0 0-13.2-1.7A5.5 5.5 0 0 0 14 35z"/>`);
+}
+function weatherDayName(dateStr){
+  const days={uz:["Yakshanba","Dushanba","Seshanba","Chorshanba","Payshanba","Juma","Shanba"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],ru:["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],tr:["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"],zh:["周日","周一","周二","周三","周四","周五","周六"]};
+  const d=new Date(dateStr+"T12:00:00");return (days[currentLang]||days.en)[d.getDay()];
+}
+async function getWeatherData(){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentDistrict.lat}&longitude=${currentDistrict.lng}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTashkent&forecast_days=5`;
+  const response = await fetch(url, { cache:"no-store" });
+  if (!response.ok) throw new Error("Weather request failed");
+  return await response.json();
+}
+async function updateWeather(){
+  const sub = document.getElementById("weatherFeatureSub");
+  const icon = document.getElementById("weatherIcon");
+  if (!sub || !icon) return;
+  sub.dataset.loaded="";
+  sub.textContent = tr("weather_loading_short");
+  icon.innerHTML = weatherIcon(2);
+  try {
+    const data = await getWeatherData();
+    const c = data.current;
+    icon.innerHTML = weatherIcon(c.weather_code);
+    sub.dataset.loaded="1";
+    sub.textContent = `${Math.round(c.temperature_2m)}°C · ${weatherText(c.weather_code)}`;
+    document.getElementById("weatherFeatureBtn").title =
+      `${distName(currentDistrict)}: ${Math.round(c.temperature_2m)}°C, ${weatherText(c.weather_code)}, shamol ${Math.round(c.wind_speed_10m)} km/soat`;
+  } catch (err) {
+    icon.innerHTML = weatherIcon(2);
+    sub.dataset.loaded="";
+    sub.textContent = tr("weather_feature_title");
+  }
+}
+async function openWeatherModal(){
+  const overlay = document.getElementById("weatherModalOverlay");
+  const body = document.getElementById("weatherModalBody");
+  overlay.classList.add("open");
+  body.innerHTML = `<div class="weather-loading">${escapeHtml(distName(currentDistrict))} — ${escapeHtml(tr("weather_loading"))}</div>`;
+  try {
+    const data = await getWeatherData();
+    const c = data.current;
+    const d = data.daily;
+    const forecast = d.time.map((date, i) => `
+      <div class="weather-day">
+        <div class="weather-day-name">${weatherDayName(date)}</div>
+        <div class="weather-day-icon">${weatherIcon(d.weather_code[i])}</div>
+        <div class="weather-day-temp">${Math.round(d.temperature_2m_max[i])}° / ${Math.round(d.temperature_2m_min[i])}°C</div>
+      </div>`).join("");
+    body.innerHTML = `
+      <div class="weather-current">
+        <div class="weather-current-icon">${weatherIcon(c.weather_code)}</div>
+        <div>
+          <div style="font-size:13px;color:var(--ink-dim);font-weight:600">${distName(currentDistrict)}</div>
+          <div class="weather-current-temp">${Math.round(c.temperature_2m)}°C</div>
+          <div class="weather-current-desc">${weatherText(c.weather_code)}</div>
+        </div>
+      </div>
+      <div class="weather-details">
+        <div class="weather-detail"><span style="color:var(--blue)">◌</span> ${tr("weather_humidity")}<strong>${Math.round(c.relative_humidity_2m)}%</strong></div>
+        <div class="weather-detail"><span style="color:var(--blue)">°</span> ${tr("weather_feels")}<strong>${Math.round(c.apparent_temperature)}°C</strong></div>
+        <div class="weather-detail"><span style="color:var(--blue)">≋</span> ${tr("weather_wind")}<strong>${Math.round(c.wind_speed_10m)} km/soat</strong></div>
+      </div>
+      <div style="font-size:13px;font-weight:800;margin:18px 0 10px">${tr("weather_forecast")}</div>
+      <div class="weather-days">${forecast}</div>
+    `;
+    updateWeather();
+  } catch (err) {
+    body.innerHTML = `<div class="weather-error">${escapeHtml(tr("weather_error"))}<br><small>${escapeHtml(tr("weather_retry"))}</small></div>`;
+  }
+}
+function closeWeatherModal(){
+  document.getElementById("weatherModalOverlay").classList.remove("open");
+}
+document.getElementById("weatherFeatureBtn").addEventListener("click", openWeatherModal);
+document.getElementById("weatherModalClose").addEventListener("click", closeWeatherModal);
+document.getElementById("weatherModalOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "weatherModalOverlay") closeWeatherModal();
+});
+
+/* ============================================================
+   9. MINI MAP (Leaflet + OpenStreetMap)
+============================================================ */
+function initMiniMap(){
+  miniMap = L.map("miniMap", { zoomControl:false, attributionControl:true, dragging:true, scrollWheelZoom:false })
+    .setView([currentDistrict.lat, currentDistrict.lng], 11);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom:18, attribution:'&copy; OpenStreetMap'
+  }).addTo(miniMap);
+  miniMarker = L.marker([currentDistrict.lat, currentDistrict.lng]).addTo(miniMap);
+}
+function updateMiniMap(){
+  document.getElementById("mapDistrictName").textContent = distName(currentDistrict);
+  if (!miniMap) return;
+  const loc = currentDistrict.locations[currentLocIndex];
+  const lat = loc?.lat ?? currentDistrict.lat;
+  const lng = loc?.lon ?? currentDistrict.lng;
+  miniMap.setView([lat, lng], 13);
+  miniMarker.setLatLng([lat, lng]);
+  setTimeout(() => miniMap.invalidateSize(), 150);
+}
+
+/* ============================================================
+   8b. FULL INTERACTIVE MAP (all districts, in a modal)
+============================================================ */
+let fullMap = null;
+let fullMapMarkers = [];
+
+function buildFullMap(){
+  fullMap = L.map("fullMap", { zoomControl:true, scrollWheelZoom:true }).setView([40.35, 68.65], 9);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom:18, attribution:'&copy; OpenStreetMap'
+  }).addTo(fullMap);
+  fullMapMarkers = districts.map(d => {
+    const marker = L.marker([d.lat, d.lng]).addTo(fullMap);
+    marker.bindPopup(`<b>${distName(d)}</b>`);
+    marker.on("click", () => {
+      selectDistrict(d);
+      closeMapModal();
+    });
+    marker._district = d;
+    return marker;
+  });
+}
+function refreshFullMapLabels(){
+  fullMapMarkers.forEach(m => m.getPopup() && m.setPopupContent(`<b>${distName(m._district)}</b>`));
+}
+function openMapModal(){
+  document.getElementById("mapModalOverlay").classList.add("open");
+  if (!fullMap) buildFullMap();
+  else refreshFullMapLabels();
+  setTimeout(() => fullMap && fullMap.invalidateSize(), 200);
+}
+function closeMapModal(){ document.getElementById("mapModalOverlay").classList.remove("open"); }
+document.getElementById("navMap").addEventListener("click", openMapModal);
+document.getElementById("mapFeatureBtn").addEventListener("click", openMapModal);
+document.getElementById("mapModalClose").addEventListener("click", closeMapModal);
+document.getElementById("mapModalOverlay").addEventListener("click", (e) => { if (e.target.id === "mapModalOverlay") closeMapModal(); });
+
+/* ============================================================
+   9. PANNELLUM — MULTI-SCENE WITH LINKED HOTSPOTS
+============================================================ */
+function buildScenesConfig(){
+  const scenes = {};
+  const locs = currentDistrict.locations;
+  locs.forEach((loc, i) => {
+    const hotSpots = [];
+    if (locs.length > 1){
+      const nextIdx = (i + 1) % locs.length;
+      const prevIdx = (i - 1 + locs.length) % locs.length;
+      hotSpots.push({ pitch:2, yaw:20, type:"scene", text: locName(locs[nextIdx]), sceneId: locs[nextIdx].id, targetYaw:180, targetPitch:2 });
+      if (locs.length > 2){
+        hotSpots.push({ pitch:2, yaw:-160, type:"scene", text: locName(locs[prevIdx]), sceneId: locs[prevIdx].id, targetYaw:0, targetPitch:2 });
+      }
+    }
+    scenes[loc.id] = {
+      title: locName(loc),
+      type:"equirectangular",
+      panorama: loc.pano,
+      hfov:110,
+      pitch:2,
+      hotSpots: hotSpots
+    };
+  });
+  return scenes;
+}
+
+function loadScene(index){
+  currentLocIndex = index;
+  const loc = currentDistrict.locations[index];
+  document.getElementById("loadingTag").style.display = "block";
+
+  if (!viewer){
+    viewer = pannellum.viewer("panorama", {
+      default:{ firstScene: loc.id, autoLoad:true, showZoomCtrl:false, showFullscreenCtrl:false, showControls:false, autoRotate: autoRotateOn ? -1.4 : 0, sceneFadeDuration:600 },
+      scenes: buildScenesConfig()
+    });
+    viewer.on("scenechange", onSceneChange);
+    viewer.on("load", () => { document.getElementById("loadingTag").style.display = "none"; });
+  } else {
+    viewer.destroy();
+    viewer = pannellum.viewer("panorama", {
+      default:{ firstScene: loc.id, autoLoad:true, showZoomCtrl:false, showFullscreenCtrl:false, showControls:false, autoRotate: autoRotateOn ? -1.4 : 0, sceneFadeDuration:600 },
+      scenes: buildScenesConfig()
+    });
+    viewer.on("scenechange", onSceneChange);
+    viewer.on("load", () => { document.getElementById("loadingTag").style.display = "none"; });
+  }
+
+  updateUIForLocation(loc);
+}
+
+function onSceneChange(sceneId){
+  const idx = currentDistrict.locations.findIndex(l => l.id === sceneId);
+  if (idx === -1) return;
+  currentLocIndex = idx;
+  updateUIForLocation(currentDistrict.locations[idx]);
+  document.getElementById("loadingTag").style.display = "none";
+}
+
+function updateUIForLocation(loc){
+  document.getElementById("pillName").textContent = locName(loc);
+  document.getElementById("pillIndex").textContent = (currentLocIndex+1) + " / " + currentDistrict.locations.length;
+  document.getElementById("linkHint").style.display = currentDistrict.locations.length > 1 ? "flex" : "none";
+  renderLocList(document.getElementById("searchBox").value);
+  renderThumbStrip();
+  renderRightPanel(loc);
+  if (speaking){ window.speechSynthesis.cancel(); speaking = false; updateAudioUI(false); }
+}
+
+/* ============================================================
+   10. CONTROLS
+============================================================ */
+document.getElementById("prevBtn").addEventListener("click", () => loadScene((currentLocIndex - 1 + currentDistrict.locations.length) % currentDistrict.locations.length));
+document.getElementById("nextBtn").addEventListener("click", () => loadScene((currentLocIndex + 1) % currentDistrict.locations.length));
+document.getElementById("searchBox").addEventListener("input", (e) => renderLocList(e.target.value));
+document.getElementById("zoomIn").addEventListener("click", () => viewer && viewer.setHfov(viewer.getHfov() - 10));
+document.getElementById("zoomOut").addEventListener("click", () => viewer && viewer.setHfov(viewer.getHfov() + 10));
+document.getElementById("fullscreenBtn").addEventListener("click", () => viewer && viewer.toggleFullscreen());
+document.getElementById("playBtn").addEventListener("click", (e) => {
+  autoRotateOn = !autoRotateOn;
+  e.currentTarget.classList.toggle("on", autoRotateOn);
+  e.currentTarget.textContent = autoRotateOn ? "▶" : "❚❚";
+  if (viewer) viewer.startAutoRotate(autoRotateOn ? -1.4 : false);
+});
+
+/* ============================================================
+   10b. NAV BAR — SCROLL TO SECTION
+============================================================ */
+function setActiveNav(id){
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.toggle("active", n.id === id));
+}
+function scrollToEl(el){ if (el) el.scrollIntoView({ behavior:"smooth", block:"start" }); }
+
+document.getElementById("navHome").addEventListener("click", (e) => {
+  setActiveNav("navHome");
+  window.scrollTo({ top:0, behavior:"smooth" });
+});
+document.getElementById("navPlaces").addEventListener("click", (e) => {
+  setActiveNav("navPlaces");
+  scrollToEl(document.querySelector("aside"));
+});
+document.getElementById("navTour").addEventListener("click", (e) => {
+  setActiveNav("navTour");
+  scrollToEl(document.querySelector(".viewer-card"));
+});
+document.getElementById("navAbout").addEventListener("click", (e) => {
+  setActiveNav("navAbout");
+  scrollToEl(document.querySelector(".foot-grid"));
+});
+document.getElementById("navNews").addEventListener("click", (e) => {
+  setActiveNav("navNews");
+  scrollToEl(document.getElementById("feedbackCard"));
+});
+document.getElementById("navContact").addEventListener("click", (e) => {
+  setActiveNav("navContact");
+  scrollToEl(document.getElementById("feedbackCard"));
+});
+
+/* ============================================================
+   10d. FEEDBACK FORM (Taklif va shikoyatlar) — sends via mailto:
+============================================================ */
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form=e.currentTarget,
+        name=document.getElementById("fbName").value.trim(),
+        type=document.getElementById("fbType")?.value || "suggestion",
+        subject=document.getElementById("fbSubject").value.trim(),
+        message=document.getElementById("fbMessage").value.trim(),
+        btn=form.querySelector("button[type=submit]");
+  if(!name||!message)return;
+  const typeLabel = type === "complaint" ? tr("fb_type_complaint") : tr("fb_type_suggestion");
+  const fullSubject = subject ? `${typeLabel} — ${subject}` : typeLabel;
+  const oldText=btn.textContent;btn.disabled=true;btn.textContent="…";
+  try{
+    const client=publicPlacesClient||(window.supabase&&window.SUPABASE_URL&&window.SUPABASE_KEY?window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null);
+    if(!client)throw new Error("Supabase unavailable");
+    let submittedBy=null;try{const {data:{user}}=await client.auth.getUser();submittedBy=user?.id||null;}catch(_){}
+    const {error}=await client.from("site_feedback").insert({name,subject:fullSubject,message,status:"pending",submitted_by:submittedBy,page_path:location.pathname,language:currentLang});
+    if(error)throw error;form.reset();alert(tr("fb_success"));
+  }catch(err){console.error("Feedback error:",err);alert(tr("fb_error"));}
+  finally{btn.disabled=false;btn.textContent=oldText;}
+});
+
+/* ============================================================
+   11. DARK MODE
+============================================================ */
+document.getElementById("darkToggle").addEventListener("click", () => {
+  const isDark = document.documentElement.classList.toggle("dark");
+  document.getElementById("darkToggle").textContent = isDark ? "☀️" : "🌙";
+});
+
+/* ============================================================
+   12. LANGUAGE SWITCHER
+============================================================ */
+function renderLangMenu(){
+  const menu = document.getElementById("langMenu");
+  menu.innerHTML = "";
+  LANGS.forEach(l => {
+    const opt = document.createElement("div");
+    opt.className = "lang-opt" + (l.code === currentLang ? " active" : "");
+    opt.innerHTML = `<span class="lang-flag">${l.flag}</span> <span>${l.name}</span>`;
+    opt.addEventListener("click", () => {
+      currentLang = l.code;
+      localStorage.setItem("sirdaryo360_lang", currentLang);
+      menu.classList.remove("open");
+      applyStaticTranslations();
+      renderLangMenu();
+      renderDistrictChips();
+      renderLocList(document.getElementById("searchBox").value);
+      renderThumbStrip();
+      updateMiniMap();
+      updateWeather();
+      const loc = currentDistrict.locations[currentLocIndex];
+      document.getElementById("pillName").textContent = locName(loc);
+      renderRightPanel(loc);
+      if (viewer) viewer.setTitle && viewer.setTitle(locName(loc));
+    });
+    menu.appendChild(opt);
+  });
+}
+document.getElementById("langBtn").addEventListener("click", () => {
+  document.getElementById("langMenu").classList.toggle("open");
+});
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".header-actions")) document.getElementById("langMenu").classList.remove("open");
+});
+
+/* ============================================================
+   13. INIT
+============================================================ */
+let deferredInstallPrompt=null;
+function setupPWAInstall(){
+  const card=document.getElementById("installCard"),btn=document.getElementById("installBtn"),close=document.getElementById("installClose");if(!card||!btn||!close)return;
+  if(localStorage.getItem("s360_install_dismissed")==="1")return;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;card.classList.add("show");});
+  window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;card.classList.remove("show");});
+  btn.addEventListener("click",async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice;}catch(_){}deferredInstallPrompt=null;card.classList.remove("show");});
+  close.addEventListener("click",()=>{localStorage.setItem("s360_install_dismissed","1");card.classList.remove("show");});
+}
+async function registerPWA(){if("serviceWorker" in navigator){try{await navigator.serviceWorker.register("sirdaryo360-sw.js");}catch(e){console.debug("PWA service worker:",e);}}}
+
+async function initPublicSite(){
+  // Avval Supabase'dan faol obyektlarni olamiz.
+  // Muvaffaqiyatsiz bo'lsa, mavjud demo ma'lumotlar saqlanadi.
+  await loadPlacesFromSupabase();
+
+  rebuildAllLocations();
+  registerPWA();
+  setupPWAInstall();
+  renderLangMenu();
+  renderDistrictChips();
+  renderLocList();
+  initMiniMap();
+  updateWeather();
+  loadScene(0);
+  applyStaticTranslations();
+
+  // Sayt ochilgandan keyin admin panelda yangi obyekt qo'shilgan bo'lsa,
+  // uni ko'rsatish uchun bir marta qayta tekshiramiz.
+  setTimeout(async () => {
+    const before = allLocations.length;
+    const loadedAgain = await loadPlacesFromSupabase();
+    if (loadedAgain && allLocations.length !== before) {
+      renderDistrictChips();
+      renderLocList(document.getElementById("searchBox")?.value || "");
+      updateMiniMap();
+      loadScene(0);
+    }
+  }, 3000);
+}
+
+initPublicSite();
+</script>
+
+</body>
+</html>

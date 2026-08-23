@@ -379,7 +379,19 @@
         <div class="features">
           <div class="feature clickable" id="mapFeatureBtn"><div class="feature-icon" style="background:var(--pastel-green);color:var(--green)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 3.8 21V6L9 3l6 3 5.2-3v15L15 21z"/><path d="M9 3v15M15 6v15"/></svg></div><div><div class="feature-title" data-i="f_map_t">Interaktiv xarita</div><div class="feature-sub" data-i="f_map_s">Barcha joylar xaritada</div></div></div>
           <div class="feature clickable" id="audioFeatureBtn"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4z"/><path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7 7 0 0 1 0 10"/></svg></div><div><div class="feature-title" data-i="f_audio_t">Audio gid</div><div class="feature-sub" id="audioFeatureSub" data-i="f_audio_s">Bosing va tinglang</div></div></div>
-          <div class="feature clickable" id="weatherFeatureBtn" title="Ob-havo ma'lumotlarini ko'rish"><div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)" id="weatherIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8 5.2 5.2M10.8 10.8 12.2 12.2"/><path d="M7 19h10a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.6-1.1A3.5 3.5 0 0 0 7 19z"/></svg></div><div><div class="feature-title">Viloyat ob-havosi</div><div class="feature-sub" id="weatherFeatureSub">Ob-havo yuklanmoqda...</div></div></div>
+<div class="feature clickable" id="weatherFeatureBtn" title="Ob-havo ma'lumotlarini ko'rish">
+  <div class="feature-icon" style="background:var(--pastel-blue);color:var(--blue)" id="weatherIcon">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8" cy="8" r="3"/>
+      <path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8 5.2 5.2M10.8 10.8 12.2 12.2"/>
+      <path d="M7 19h10a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.6-1.1A3.5 3.5 0 0 0 7 19z"/>
+    </svg>
+  </div>
+  <div>
+    <div class="feature-title" data-i="weather_title">Viloyat ob-havosi</div>
+    <div class="feature-sub" id="weatherFeatureSub" data-i="weather_loading">Ob-havo yuklanmoqda...</div>
+  </div>
+</div>
           <div class="feature clickable" id="favFeatureBtn"><div class="feature-icon" style="background:var(--pastel-amber);color:var(--amber)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6z"/></svg></div><div><div class="feature-title" data-i="f_fav_t">Sevimlilar</div><div class="feature-sub" data-i="f_fav_s">Yoqtirgan joylaringizni saqlang</div></div></div>
         </div>
       </main>
@@ -574,6 +586,37 @@ const UI = {
   f_audio_playing:{ uz:"Tinglanmoqda...", en:"Playing...", ru:"Воспроизведение...", tr:"Çalıyor...", zh:"播放中..." },
   f_fav_t:{ uz:"Sevimlilar", en:"Favorites", ru:"Избранное", tr:"Favoriler", zh:"收藏" },
   f_fav_s:{ uz:"Yoqtirgan joylaringizni saqlang", en:"Save the places you like", ru:"Сохраняйте понравившиеся места", tr:"Beğendiğiniz yerleri kaydedin", zh:"保存您喜欢的地点" },
+    weather_title:{
+    uz:"Viloyat ob-havosi",
+    en:"Regional weather",
+    ru:"Погода в регионе",
+    tr:"Bölge hava durumu",
+    zh:"地区天气"
+  },
+
+  weather_loading:{
+    uz:"Ob-havo yuklanmoqda...",
+    en:"Loading weather...",
+    ru:"Загрузка погоды...",
+    tr:"Hava durumu yükleniyor...",
+    zh:"天气加载中..."
+  },
+
+  weather_click:{
+    uz:"Ob-havoni ko‘rish uchun bosing",
+    en:"Click to view the weather",
+    ru:"Нажмите, чтобы посмотреть погоду",
+    tr:"Hava durumunu görmek için tıklayın",
+    zh:"点击查看天气"
+  },
+
+  weather_title_hint:{
+    uz:"Ob-havo ma'lumotlarini ko'rish",
+    en:"View weather information",
+    ru:"Посмотреть информацию о погоде",
+    tr:"Hava durumu bilgilerini görüntüle",
+    zh:"查看天气信息"
+  },
   travel_help_kicker:{
   uz:"TURIST UCHUN QULAYLIK",
   en:"TRAVEL CONVENIENCE",

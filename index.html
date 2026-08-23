@@ -14,7 +14,9 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+  
 <style>
   :root{
     --blue:#1d6fb8; --blue-dark:#155a97;
@@ -614,6 +616,11 @@
 /* ============================================================
    1. TRANSLATIONS — UI CHROME
 ============================================================ */
+const supabaseClient = window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+);
+
 const LANGS = [
   { code:"uz", label:"UZ", name:"O'zbekcha", speech:"uz-UZ", flag:"https://flagcdn.com/w20/uz.png" },
   { code:"en", label:"EN", name:"English",   speech:"en-US", flag:"https://flagcdn.com/w20/gb.png" },
@@ -1557,14 +1564,48 @@ document.getElementById("navContact").addEventListener("click", (e) => {
 /* ============================================================
    10d. FEEDBACK FORM (Taklif va shikoyatlar) — sends via mailto:
 ============================================================ */
-document.getElementById("feedbackForm").addEventListener("submit", (e) => {
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const form = document.getElementById("feedbackForm");
   const name = document.getElementById("fbName").value.trim();
-  const subject = document.getElementById("fbSubject").value.trim() || "Sirdaryo 360 — Taklif/shikoyat";
+  const type = document.getElementById("fbType").value;
+  const subject = document.getElementById("fbSubject").value.trim();
   const message = document.getElementById("fbMessage").value.trim();
-  const body = `Ism: ${name}\n\n${message}`;
-  const mailto = `mailto:husenovjahongir27@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailto;
+  const button = form.querySelector(".fb-submit");
+
+  if (!name || !type || !message) {
+    alert("Iltimos, barcha kerakli maydonlarni to‘ldiring.");
+    return;
+  }
+
+  button.disabled = true;
+  button.style.opacity = "0.7";
+
+  try {
+    const { error } = await supabaseClient
+      .from("feedbacks")
+      .insert({
+        name: name,
+        type: type,
+        subject: subject || null,
+        message: message,
+        status: "new"
+      });
+
+    if (error) throw error;
+
+    alert(tr("fb_success"));
+    form.reset();
+
+  } catch (error) {
+    console.error("Feedback yuborishda xato:", error);
+    alert(tr("fb_error"));
+
+  } finally {
+    button.disabled = false;
+    button.style.opacity = "1";
+  }
 });
 
 /* ============================================================

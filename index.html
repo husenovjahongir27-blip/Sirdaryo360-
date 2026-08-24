@@ -1505,13 +1505,12 @@ async function updateWeather(){
     sub.textContent = "Ob-havoni ko'rish uchun bosing";
   }
 }
-async function openWeatherModal(){
   async function openWeatherModal(){
     closeMapModal();
   const overlay = document.getElementById("weatherModalOverlay");
   const body = document.getElementById("weatherModalBody");
   overlay.classList.add("open");
-body.innerHTML = `<div class="weather-loading">${distName(currentDistrict)} — ${tr("weather_loading")}</div>`;
+body.innerHTML = `<div class="weather-loading">${distName(currentDistrict)} uchun ob-havo ma'lumotlari yuklanmoqda...</div>`;
     try {
     const data = await getWeatherData();
     const c = data.current;

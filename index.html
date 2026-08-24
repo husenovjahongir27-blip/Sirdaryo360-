@@ -597,12 +597,18 @@
 <!-- Weather modal -->
 <div class="modal-overlay" id="weatherModalOverlay">
   <div class="modal-box weather-modal-box">
-    <span>🌤️ <span data-i="weather_title">Sirdaryo viloyati ob-havosi</span></span><button class="modal-close" id="weatherModalClose">✕</button></div>
+
+    <div class="modal-head">
+      <span data-i="weather_title">🌤️ Sirdaryo viloyati ob-havosi</span>
+      <button class="modal-close" id="weatherModalClose" type="button">✕</button>
+    </div>
+
     <div class="modal-body weather-body" id="weatherModalBody">
       <div class="weather-loading" data-i="weather_loading">
-  Ob-havo ma'lumotlari yuklanmoqda...
-</div>
+        Ob-havo ma'lumotlari yuklanmoqda...
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -1500,12 +1506,13 @@ async function updateWeather(){
   }
 }
 async function openWeatherModal(){
-  closeMapModal();
+  async function openWeatherModal(){
+    closeMapModal();
   const overlay = document.getElementById("weatherModalOverlay");
   const body = document.getElementById("weatherModalBody");
   overlay.classList.add("open");
-  body.innerHTML = `<div class="weather-loading">${distName(currentDistrict)} uchun ob-havo ma'lumotlari yuklanmoqda...</div>`;
-  try {
+body.innerHTML = `<div class="weather-loading">${distName(currentDistrict)} — ${tr("weather_loading")}</div>`;
+    try {
     const data = await getWeatherData();
     const c = data.current;
     const d = data.daily;

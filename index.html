@@ -892,6 +892,37 @@ weather_load_error:{
     tr:"Hava durumu bilgilerini görüntüle",
     zh:"查看天气信息"
   },
+  weather_humidity:{
+  uz:"Namlik",
+  en:"Humidity",
+  ru:"Влажность",
+  tr:"Nem",
+  zh:"湿度"
+},
+
+weather_feels:{
+  uz:"His qilinishi",
+  en:"Feels like",
+  ru:"Ощущается как",
+  tr:"Hissedilen",
+  zh:"体感温度"
+},
+
+weather_wind:{
+  uz:"Shamol",
+  en:"Wind",
+  ru:"Ветер",
+  tr:"Rüzgar",
+  zh:"风速"
+},
+
+weather_forecast:{
+  uz:"5 kunlik prognoz",
+  en:"5-day forecast",
+  ru:"Прогноз на 5 дней",
+  tr:"5 günlük tahmin",
+  zh:"5天天气预报"
+},
   travel_help_kicker:{
   uz:"TURIST UCHUN QULAYLIK",
   en:"TRAVEL CONVENIENCE",
@@ -1469,6 +1500,7 @@ async function updateWeather(){
   }
 }
 async function openWeatherModal(){
+  closeMapModal();
   const overlay = document.getElementById("weatherModalOverlay");
   const body = document.getElementById("weatherModalBody");
   overlay.classList.add("open");

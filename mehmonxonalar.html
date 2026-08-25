@@ -25,7 +25,7 @@ html.dark{--bg:#0e161d;--card:#152029;--ink:#eef3f7;--ink-dim:#94a5b3;--line:#23
 <div class="page">
 <header class="top">
   <div class="brand"><span class="main">SIRDARYO</span><span class="sub">360°</span></div>
-  <div class="top-actions"><div class="lang-wrap"><button class="lang-select" id="langBtn" type="button" aria-label="Til"><img class="lang-flag" id="langFlag" src="https://flagcdn.com/w40/uz.png" alt="UZ"> <span id="langLabel">UZ</span> <span class="lang-chevron">▾</span></button><div class="lang-menu" id="langMenu"></div></div><button class="icon-btn" id="darkToggle" title="Tungi rejim">☾</button><a class="back" href="index.html" id="backBtn">← Asosiy sahifa</a></div>
+  <div class="top-actions"><div class="lang-wrap"><button class="lang-select" id="langBtn" type="button" aria-label="Til"><img class="lang-flag" id="langFlag" src="https://flagcdn.com/w40/uz.png" alt="UZ"> <span id="langLabel">UZ</span> <span class="lang-chevron">▾</span></button><div class="lang-menu" id="langMenu"></div></div><button class="icon-btn" id="darkToggle" title="Tungi rejim"><span id="darkIcon">☾</span></button><a class="back" href="index.html" id="backBtn">← Asosiy sahifa</a></div>
 </header>
 <section class="hero">
   <div class="kicker" data-i="kicker">TURIST UCHUN QULAYLIK</div>
@@ -150,7 +150,26 @@ const LANG_OPTIONS=[
   {code:'zh',flag:'https://flagcdn.com/w40/cn.png',name:'中文'}
 ]; 
   function renderLangMenu(){const menu=document.getElementById('langMenu');menu.innerHTML=LANG_OPTIONS.map(o=>`<div class="lang-opt ${o.code===lang?'active':''}" data-code="${o.code}"><img class="lang-flag" src="${o.flag}" alt="${o.code.toUpperCase()}"><span>${o.name}</span></div>`).join('');menu.querySelectorAll('.lang-opt').forEach(o=>o.addEventListener('click',()=>{lang=o.dataset.code;const x=LANG_OPTIONS.find(v=>v.code===lang);document.getElementById('langFlag').src=x.flag;
-document.getElementById('langFlag').alt=x.code.toUpperCase();document.getElementById('langLabel').textContent=x.code.toUpperCase();menu.classList.remove('open');renderLangMenu();applyLang()}))} document.getElementById('langBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('langMenu').classList.toggle('open')});document.addEventListener('click',e=>{if(!e.target.closest('.lang-wrap'))document.getElementById('langMenu').classList.remove('open')});document.getElementById('search').addEventListener('input',render);document.getElementById('district').addEventListener('change',render);document.getElementById('sort').addEventListener('change',render);document.getElementById('close').addEventListener('click',()=>document.getElementById('modal').classList.remove('open'));document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('open')});document.getElementById('darkToggle').addEventListener('click',()=>{document.documentElement.classList.toggle('dark');localStorage.setItem('sirdaryoDark',document.documentElement.classList.contains('dark')?'1':'0')});if(localStorage.getItem('sirdaryoDark')==='1')document.documentElement.classList.add('dark');
+document.getElementById('langFlag').alt=x.code.toUpperCase();document.getElementById('langLabel').textContent=x.code.toUpperCase();menu.classList.remove('open');renderLangMenu();applyLang()}))} document.getElementById('langBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('langMenu').classList.toggle('open')});document.addEventListener('click',e=>{if(!e.target.closest('.lang-wrap'))document.getElementById('langMenu').classList.remove('open')});document.getElementById('search').addEventListener('input',render);document.getElementById('district').addEventListener('change',render);document.getElementById('sort').addEventListener('change',render);document.getElementById('close').addEventListener('click',()=>document.getElementById('modal').classList.remove('open'));document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('open')});function updateDarkIcon(){
+  const isDark=document.documentElement.classList.contains('dark');
+  const icon=document.getElementById('darkIcon');
+  const btn=document.getElementById('darkToggle');
+  if(icon) icon.textContent=isDark?'☀':'☾';
+  if(btn) btn.title=isDark?'Kunduzgi rejim':'Tungi rejim';
+}
+
+document.getElementById('darkToggle').addEventListener('click',()=>{
+  document.documentElement.classList.toggle('dark');
+  const isDark=document.documentElement.classList.contains('dark');
+  localStorage.setItem('sirdaryoDark',isDark?'1':'0');
+  updateDarkIcon();
+});
+
+if(localStorage.getItem('sirdaryoDark')==='1'){
+  document.documentElement.classList.add('dark');
+}
+
+updateDarkIcon();
 renderLangMenu(); applyLang(); loadHotelsFromSupabase();
 </script>
 </body></html>
